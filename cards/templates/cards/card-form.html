@@ -1,0 +1,14 @@
+{% extends "ohnet/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% load static %}
+	<div class="container">
+        <h1>{{ title }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input type="submit" name="submit" value="Submit">
+        </form>
+    </div>
+
+{% endblock content %}

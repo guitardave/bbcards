@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <div class="row">
+            <div class="col-md-8">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+              <div class="content-section">
+                <h3>Player Management</h3>
+                <p>
+                  <ul class="list-group">
+                        <li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">Enter New Player</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">View Players</a>
+                        </li>
+
+                  </ul>
+                </p>
+              </div>
+            </div>
+			<div class="col-md-4">
+              <div class="content-section">
+                <h3>Card Management</h3>
+                <p>
+                  <ul class="list-group">
+                        <li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">Enter New Card Set</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">View Card Sets</a>
+                        </li>
+						<li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">Enter New Card</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light">
+                            <a href="{% url '#' %}">View Cards</a>
+                        </li>
+                  </ul>
+                </p>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
