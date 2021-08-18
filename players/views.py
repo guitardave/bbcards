@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from . import models, forms
 
+
 class PlayerList(ListView):
 	model = Player
 	template_name = ''
@@ -17,7 +18,6 @@ class PlayerList(ListView):
 	def get(self, request, *args, **kwargs):
 		context = {'title': 'Player List', 'players': self.get_queryset()}
 		return render(request, self.template_name, context)
-
 
 
 class PlayerDetail(DetailView):
@@ -42,5 +42,4 @@ class PlayerUpdate(UpdateView):
 	model = Player
 	template_name = 'players/player-form.html'
 	form_class = PlayerForm
-
 
