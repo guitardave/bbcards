@@ -9,7 +9,7 @@ from . import models, forms
 
 class PlayerList(ListView):
 	model = Player
-	template_name = ''
+	template_name = 'players/player_list.html'
 	context_object_name = 'players'
 
 	def get_queryset(self):
@@ -22,7 +22,7 @@ class PlayerList(ListView):
 
 class PlayerDetail(DetailView):
 	model = Player
-	template_name = 'player-detail.html'
+	template_name = 'player_detail.html'
 
 	def get_queryset(self):
 		return Player.objects.get(pk=self.kwargs.get('pk'))
@@ -34,12 +34,12 @@ class PlayerDetail(DetailView):
 
 class PlayerNew(CreateView):
 	model = Player
-	template_name = 'players/player-form.html'
+	template_name = 'players/player_form.html'
 	form_class = PlayerForm
 
 
 class PlayerUpdate(UpdateView):
 	model = Player
-	template_name = 'players/player-form.html'
+	template_name = 'players/player_form.html'
 	form_class = PlayerForm
 

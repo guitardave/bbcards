@@ -1,0 +1,18 @@
+{% extends "cards/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% load static %}
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <article class="media content-section">
+            {% if cust.logo %}
+                <img class="article-img" src="{{ cust.logo.url|default_if_none:'customers/cust-logos/default.png' }}">
+
+            {% endif %}
+          <div class="media-body">
+            <h4>{{ object.player_first_name }} {{ object.player_last_name }}</h4>
+          </div>
+        </article>
+    </div>
+
+{% endblock content %}
