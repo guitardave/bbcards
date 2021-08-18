@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*%85jgzkmlt+!d=b3iorl424la2xbi36=5!w9%@*2b#49hur@k'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS')
 
 
 # Application definition
@@ -75,19 +76,11 @@ WSGI_APPLICATION = 'bbcards.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+if os.getenv("DATABASE_URL", None) is None:
+    raise Exception("DATABASE_URL environment variable not defined")
 DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bbcards',
-        'HOST': 'dave-pg-do-user-9288761-0.b.db.ondigitalocean.com',
-        'USER': 'bbusr',
-        'PASSWORD': 'y90k494n5qwoskb3',
-        'PORT': 25060
-    }
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
