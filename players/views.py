@@ -33,7 +33,13 @@ class PlayerDetail(DetailView):
 
 
 class PlayerNew(CreateView):
-	model = PlayerNew
+	model = Player
+	template_name = 'players/player-form.html'
+	form_class = PlayerForm
+
+
+class PlayerUpdate(UpdateView):
+	model = Player
 	template_name = 'players/player-form.html'
 	form_class = PlayerForm
 
