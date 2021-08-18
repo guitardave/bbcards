@@ -18,10 +18,10 @@
                 <p>
                   <ul class="list-group">
                         <li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">Enter New Player</a>
+                            <a href="{% url 'players:player-new' %}">Enter New Player</a>
                         </li>
                         <li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">View Players</a>
+                            <a href="{% url 'players:player-list' %}">View Players</a>
                         </li>
 
                   </ul>
@@ -34,16 +34,16 @@
                 <p>
                   <ul class="list-group">
                         <li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">Enter New Card Set</a>
+                            <a href="{% url 'cards:cardsets-new' %}">Enter New Card Set</a>
                         </li>
                         <li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">View Card Sets</a>
+                            <a href="{% url 'cards:cardsets' %}">View Card Sets</a>
                         </li>
 						<li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">Enter New Card</a>
+                            <a href="{% url 'cards:cards-new' %}">Enter New Card</a>
                         </li>
                         <li class="list-group-item list-group-item-light">
-                            <a href="{% url '#' %}">View Cards</a>
+                            <a href="{% url 'cards:cards-all' %}">View Cards</a>
                         </li>
                   </ul>
                 </p>

@@ -1,0 +1,19 @@
+{% extends "cards/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% load static %}
+	<div class="container">
+        <h1>{{ title }}</h1>
+        <table class="table table-condensed table-striped">
+            <tbody>
+                <tr>
+                    <td>{{ object.player_id }}</td>
+                    <td><a href="{% url 'cards:card-list' object.card_set_id_id %}">{{ object.card_set_id }}</a></td>
+                    <td>{{ object.card_subset }}</td>
+                    <td>{{ object.card_num }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock content %}

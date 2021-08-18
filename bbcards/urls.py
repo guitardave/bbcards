@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+
+app_name = 'bbcards'
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
+    path('cards/', include('cards.urls')),
+    path('players/', include('players.urls')),
 ]

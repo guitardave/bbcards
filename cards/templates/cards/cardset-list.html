@@ -1,0 +1,19 @@
+{% extends "cards/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% load static %}
+	<div class="container">
+        <h1>{{ title }}</h1>
+        <table class="table table-condensed table-striped">
+            <tbody>
+            {% for card in cards %}
+                <tr>
+                    <td>{{ card.year }}</td>
+                    <td><a href="{% url 'cards:card-list' card.id %}">{{ card.card_set_name }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock content %}
