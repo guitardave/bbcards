@@ -12,7 +12,7 @@ class CardSet(models.Model):
         return '%s %s' % (str(self.year), self.card_set)
         
     def get_absolute_url(self):
-        return reverse('cards:card-set-home', self.id)
+        return reverse('cards:cardset-home')
 
 
 class Card(models.Model):
@@ -26,6 +26,6 @@ class Card(models.Model):
         return self.card_num
         
     def get_absolute_url(self):
-        return reverse('cards:card-list', self.id)
+        return reverse('cards:card-list', kwargs={'id': self.card_set_id})
         
  
