@@ -66,3 +66,8 @@ class CardsDetail(DetailView):
     def get(self, request, *args, **kwargs):
         context = {'title': 'Card Detail'}
         return render(request, self.template_name, context)
+
+
+def home(request):
+    context = {'title': 'Cards Home'}
+    return render(request, 'cards/home.html', context)
