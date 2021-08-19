@@ -1,10 +1,10 @@
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
-from . import models, forms
+from .models import Player
+from .forms import PlayerForm
 
 
 class PlayerList(ListView):

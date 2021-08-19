@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
-from . import forms
-from . import models
+from .forms import CardSetForm, CardForm
+from .models import Card, CardSet
 
 
 class CardSetCreate(CreateView):
@@ -30,7 +30,7 @@ class CardCreate(CreateView):
 
     def post(self, request, *args, **kwargs):
         context = {'title': 'Create Card'}
-        if kwarg.get('id'):
+        if kwargs.get('id'):
             form = self.form_class(request.POST, instance=kwargs.get('id') or None)
         else:
             form = self.form_class(request.POST or None)
@@ -53,11 +53,7 @@ class CardsView(ListView):
     template_name = 'card-list.html'
     
     def get_queryset(self):
-        return Card.objects.all().order_by(card_set)
-    
-    def get_context_data(self, **kwargs):
-        super(CardsView, self).get_context_data(**kwargs)
-        context['set'] = CardSet.objects.get(card_set)
+        return Card.objects.all().order_by('card_set_id')
 
 
 class CardsDetail(DetailView):
