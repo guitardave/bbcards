@@ -18,6 +18,7 @@ class CardSetList(ListView):
     model = CardSet
     template_name = 'cards/cardset-list.html'
     context_object_name = 'cards'
+    paginate_by = 50
 
     def get_queryset(self):
         return CardSet.objects.all().order_by('card_set_name')
@@ -32,6 +33,8 @@ class CardCreate(CreateView):
 class CardsView(ListView):
     model = Card
     template_name = 'cards/card-list.html'
+    paginate_by = 50
+    context_object_name = 'cards'
     
     def get_queryset(self):
         return Card.objects.all().order_by('card_set_id')
