@@ -1,1 +1,1 @@
-worker: gunicorn bbcards.wsgi
+web: gunicorn bbcards.wsgi
