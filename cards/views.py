@@ -11,12 +11,12 @@ from .models import Card, CardSet
 class CardSetCreate(CreateView):
     model = CardSet
     form_class = CardSetForm
-    template_name = 'cardset-form.html'
+    template_name = 'cards/cardset-form.html'
 
 
 class CardSetList(ListView):
     model = CardSet
-    template_name = 'cards/home.html'
+    template_name = 'cards/cardset-list.html'
     context_object_name = 'cards'
 
     def get_queryset(self):
@@ -26,31 +26,12 @@ class CardSetList(ListView):
 class CardCreate(CreateView):
     model = Card
     form_class = CardForm
-    template_name = 'card-form.html'
-
-    def post(self, request, *args, **kwargs):
-        context = {'title': 'Create Card'}
-        if kwargs.get('id'):
-            form = self.form_class(request.POST, instance=kwargs.get('id') or None)
-        else:
-            form = self.form_class(request.POST or None)
-        return reverse('cards:')
-
-
-    def get(self, request, *args, **kwargs):
-        context = {'title': 'Create Card'}
-        if kwargs.get('id'):
-            form = CardForm(instance=kwargs.get('id'))
-        else:
-            form = CardForm()
-
-        context['form'] = form
-        return render(request, self.template_name, context)
+    template_name = 'cards/card-form.html'
     
     
 class CardsView(ListView):
     model = Card
-    template_name = 'card-list.html'
+    template_name = 'cards/card-list.html'
     
     def get_queryset(self):
         return Card.objects.all().order_by('card_set_id')
@@ -58,7 +39,7 @@ class CardsView(ListView):
 
 class CardsDetail(DetailView):
     model = CardSet
-    template_name = 'card-detail.html'
+    template_name = 'cards/card-detail.html'
 
     def get_queryset(self):
         return Card.objects.get(pk=self.kwargs.get('pk'))

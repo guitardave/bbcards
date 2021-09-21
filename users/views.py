@@ -2,6 +2,7 @@ from django.shortcuts import render
 from urllib.request import urlopen
 import json
 
+
 def login(request):
     context = {'title': 'Login'}
     return render(request, 'users/login.html', context)
@@ -32,6 +33,6 @@ def weather(request):
     report = f'It is currently {temp}C ({temp_f}F) ' \
              f'and {cond} with winds of {wind} (gusts up to {wind_g}) in {loc}, {st}'
 
-    return render(request, 'blog/weather.html', {'title': 'Weather Information', 'report': report})
+    return render(request, 'users/weather.html', {'title': 'Weather Information', 'report': report})
 
 

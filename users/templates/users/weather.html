@@ -1,6 +1,12 @@
-{% extends "blog/base.html" %}
+{% extends "cards/base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Weather" "users:weather" %}
+{% endblock breadcrumbs %}
 {% block content %}
     <h1>{{ title }}</h1>
+    <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
     <article class="media content-section">
       <div class="media-body">
           <p class="article-content">{{ report }}</p>

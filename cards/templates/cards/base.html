@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'cards/main.css' %}">
 	{% if title %}
 		<title>BBCards: {{ title }}</title>
@@ -27,7 +27,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" href="{% url 'cards:home' %}">Cards</a>
+                <a class="nav-item nav-link" href="{% url 'cards:cardsets' %}">Cards</a>
                 <a class="nav-item nav-link" href="{% url 'players:players-home' %}">Players</a>
                 <a class="nav-item nav-link" href="{% url 'users:weather' %}">Weather</a>
             </div>
@@ -45,6 +45,13 @@
       </nav>
     </header>
 	<main role="main" class="container">
+        {% load django_bootstrap_breadcrumbs %}
+
+        {% block breadcrumbs %}
+            {% clear_breadcrumbs %}
+            {% breadcrumb "Home" "/" %}
+        {% endblock breadcrumbs %}
+
       <div class="row">
         <div class="col-md-8">
             {% if messages %}
@@ -52,34 +59,15 @@
                     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
-            {% block content %}{% endblock %}
-        </div>
-
-        <div class="col-md-4">
-          <div class="content-section">
-            <h3>Fart</h3>
-              <p class='text-muted'>Cards and Stuff I dunno
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">
-                    <a href="#">Card List Items</a>
-                </li>
-                <li class="list-group-item list-group-item-light">
-                    <a href="#">Other stuff</a>
-                </li>
-                <li class="list-group-item list-group-item-light">
-                  <a href="{#">Players</a>
-                </li>
-                
-
-              </ul>
-            </p>
-                {% block sidecontent %} {% endblock sidecontent %}
-          </div>
+            {% block content %}
+                {% render_breadcrumbs %}
+            {% endblock %}
         </div>
       </div>
 
     </main>
     <div class="container">
+
         <p>&nbsp;</p>
         <footer class="site-footer">
 

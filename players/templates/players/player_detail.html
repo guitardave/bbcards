@@ -1,9 +1,15 @@
 {% extends "cards/base.html" %}
-{% load crispy_forms_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Players Home" "players:players-home" %}
+    {% breadcrumb "Player Detail" "players:players-det" obj.id %}
+{% endblock breadcrumbs %}
 {% block content %}
     {% load static %}
     <div class="container">
         <h1>{{ title }}</h1>
+        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <article class="media content-section">
             {% if cust.logo %}
                 <img class="article-img" src="{{ cust.logo.url|default_if_none:'customers/cust-logos/default.png' }}">
