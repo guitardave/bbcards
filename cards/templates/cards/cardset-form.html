@@ -9,8 +9,9 @@
 {% block content %}
     {% load static %}
 	<div class="container">
-        <h1>{{ title }}</h1>
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <h1>{{ title }}</h1>
+
         <form method="POST">
             {% csrf_token %}
             {{ form|crispy }}

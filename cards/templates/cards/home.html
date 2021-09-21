@@ -11,41 +11,19 @@
                 {% endif %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-              <div class="content-section">
-                <h3>Player Management</h3>
-                <p>
-                  <ul class="list-group">
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'players:players-new' %}">Enter New Player</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'players:players-home' %}">View Players</a>
-                        </li>
 
-                  </ul>
-                </p>
-              </div>
-            </div>
-			<div class="col-md-4">
-              <div class="content-section">
-                <h3>Card Management</h3>
-                <p>
-                  <ul class="list-group">
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'cards:cardsets-new' %}">Enter New Card Set</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'cards:cardsets' %}">View Card Sets</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'cards:card-new-all' %}">View Cards</a>
-                        </li>
-                  </ul>
-                </p>
-              </div>
-            </div>
+        <div class="row">
+
+			<table class="table table-dark table-striped">
+            <tr>
+                <td><a href="{% url 'players:players-new' %}">Enter New Player</a></td>
+                <td><a href="{% url 'players:players-home' %}">View Players</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'cards:cardsets-new' %}">Enter New Card Set</a></td>
+                <td><a href="{% url 'cards:cardsets' %}">View Card Sets</a></td>
+            </tr>
+        </table>
         </div>
     </div>
 {% endblock content %}

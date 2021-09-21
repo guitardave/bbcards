@@ -8,8 +8,10 @@
 {% block content %}
     {% load static %}
     <div class="container">
-        <h1>{{ title }}</h1>
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <h1>{{ title }}</h1>
+
+    {% include 'cards/pag.html' %}
         <table class="table table-dark table-striped">
             <tbody>
             {% for card in cards %}
@@ -23,27 +25,7 @@
             {% endfor %}
         </tbody>
         </table>
-    {% if page_obj and is_paginated %}
-
-        {% if page_obj.has_previous %}
-            <a class="btn btn-outline-dark mb-4" href="?page=1">First</a>
-            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <a class="btn btn-outline-danger mb-4" href="?page={{ num }}">{{ num }}</a>
-            {% elif num > page_obj.number|add:'-3' and num > page_obj.number|add:'3' %}
-                <a class="btn btn-outline-dark mb-4" href="?page={{ num }}">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-        {% endif %}
-
-    {% endif %}
+    {% include 'cards/pag.html' %}
     </div>
 
 {% endblock content %}

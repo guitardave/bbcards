@@ -8,8 +8,9 @@
 {% block content %}
     {% load static %}
     <div class="container">
-        <h1>{{ title }}</h1>
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <h1>{{ title }}</h1>
+
         <article class="media content-section">
             {% if cust.logo %}
                 <img class="article-img" src="{{ cust.logo.url|default_if_none:'customers/cust-logos/default.png' }}">

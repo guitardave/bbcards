@@ -39,8 +39,6 @@ class CardsView(ListView):
     def get_queryset(self):
         if self.kwargs.get('id'):
             return Card.objects.filter(card_set_id=self.kwargs.get('id')).order_by('card_set_id__year')
-        elif self.kwargs.get('player'):
-            return Card.objects.filter(player_id_id=self.kwargs.get('player')).order_by('card_set_id__year')
         else:
             return Card.objects.all().order_by('card_set_id__year')
 
