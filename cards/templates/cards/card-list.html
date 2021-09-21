@@ -14,10 +14,11 @@
             <tbody>
             {% for card in cards %}
                 <tr>
-                    <td>{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</td>
+                    <td><a href="{% url 'cards:card-list-player' card.player_id_id %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
+                    <td>{{ card.card_set_id.year }}</td>
                     <td><a href="{% url 'cards:card-list' card.card_set_id_id %}">{{ card.card_set_id.card_set_name }}</a></td>
                     <td>{{ card.card_subset }}</td>
-                    <td>{{ card.card_num }}</td>
+                    <td><a href="{% url 'cards:card-det' card.id %}">{{ card.card_num }}</a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -25,21 +26,21 @@
     {% if page_obj and is_paginated %}
 
         {% if page_obj.has_previous %}
-            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="btn btn-outline-dark mb-4" href="?page=1">First</a>
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
-                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                <a class="btn btn-outline-danger mb-4" href="?page={{ num }}">{{ num }}</a>
             {% elif num > page_obj.number|add:'-3' and num > page_obj.number|add:'3' %}
-                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                <a class="btn btn-outline-dark mb-4" href="?page={{ num }}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
         {% endif %}
 
     {% endif %}
