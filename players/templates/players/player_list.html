@@ -13,8 +13,8 @@
             <tbody>
             {% for p in players %}
                 <tr>
-                    <td>{{ p.player_first_name }}</td>
-                    <td>{{ p.player_last_name }}</td>
+                    <td>{{ p.player_fname }}</td>
+                    <td>{{ p.player_lname }}</td>
                     <td><a href="{% url 'cards:card-list' p.id %}">View Cards</a></td>
                 </tr>
 

@@ -13,14 +13,12 @@
         <table class="table table-dark table-striped">
             <tbody>
             {% for card in cards %}
-
                 <tr>
-                    <td>{{ card.player_id }}</td>
+                    <td>{{ card.player_id. }}</td>
                     <td><a href="{% url 'cards:card-list' card.card_set_id_id %}">{{ card.card_set_id }}</a></td>
                     <td>{{ card.card_subset }}</td>
                     <td>{{ card.card_num }}</td>
                 </tr>
-
             {% endfor %}
         </tbody>
         </table>
