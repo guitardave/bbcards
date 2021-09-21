@@ -31,6 +31,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 # SECRET_KEY = env('DJANGO_SECRET_KEY')
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
@@ -90,11 +91,12 @@ WSGI_APPLICATION = 'bbcards.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 if os.getenv("DATABASE_URL", None) is None:
     raise Exception("DATABASE_URL environment variable not defined")
 DATABASES = {
-    # "default": dj_database_url.parse(env("DATABASE_URL")),
-    "default": dj_database_url.parse(os.environ.get("BBCARD_DB")),
+    # "default": dj_database_url.parse(env("BBCARD_DB")),
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
 }
 
 # Password validation

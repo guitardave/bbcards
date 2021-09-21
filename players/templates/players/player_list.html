@@ -9,16 +9,17 @@
     <div class="container">
         <h1>{{ title }}</h1>
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <table class="table table-condensed table-striped">
-            {% for p in players %}
+        <table class="table table-dark table-striped">
             <tbody>
+            {% for p in players %}
                 <tr>
                     <td>{{ p.player_first_name }}</td>
                     <td>{{ p.player_last_name }}</td>
                     <td><a href="{% url 'cards:card-list' p.id %}">View Cards</a></td>
                 </tr>
-            </tbody>
+
             {% endfor %}
+        </tbody>
         </table>
     </div>
 
