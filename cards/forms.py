@@ -3,6 +3,9 @@ from .models import *
 
 
 class CardCreateForm(forms.ModelForm):
+    card_set_id = forms.ModelChoiceField(queryset=CardSet.objects.all().order_by('slug'))
+    player_id = forms.ModelChoiceField(queryset=Player.objects.all().order_by('player_lname'))
+
     class Meta:
         model = Card
         fields = "__all__"

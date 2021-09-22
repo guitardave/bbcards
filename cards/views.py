@@ -33,7 +33,7 @@ class CardSetList(ListView):
 class CardSetUpdate(LoginRequiredMixin, UpdateView):
     model = CardSet
     template_name = 'cards/cardset-form.html'
-    form_class = CardUpdateForm
+    form_class = CardSetForm
 
 
 class CardCreate(LoginRequiredMixin, CreateView):
@@ -61,8 +61,7 @@ class CardsView(ListView):
     context_object_name = 'cards'
 
     def get_queryset(self):
-        return Card.objects.all().order_by('card_set_id__year').\
-                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
+        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
 
 class CardsViewAll(ListView):
@@ -72,8 +71,7 @@ class CardsViewAll(ListView):
     context_object_name = 'cards'
 
     def get_queryset(self):
-        return Card.objects.all().order_by('card_set_id__year').\
-                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
+        return Card.objects.all().order_by('card_set_id__slug')
 
 
 class CardsViewPLayer(ListView):
@@ -83,9 +81,7 @@ class CardsViewPLayer(ListView):
     context_object_name = 'cards'
 
     def get_queryset(self):
-        if self.kwargs.get('slug'):
-            return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__year').\
-                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
+        return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
 
 class CardsDetail(DetailView):

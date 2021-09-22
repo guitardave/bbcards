@@ -14,5 +14,5 @@ urlpatterns = [
     path('cards/all/', views.CardsViewAll.as_view(), name='card-list-all'),
     path('cards/new/', views.CardCreate.as_view(), name='card-new-all'),
     path('cards/<int:pk>/', views.CardsDetail.as_view(), name='card-det'),
-    path('cards/<int:pk>/update/', views.CardUpdate.as_view(), name='card-upd'),  # not linked yet 9/21
+    path('cards/<int:pk>/update/', views.CardUpdate.as_view(), name='card-upd'),
 ]
