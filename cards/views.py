@@ -8,7 +8,7 @@ from .forms import CardSetForm, CardForm
 from .models import Card, CardSet
 
 
-class CardSetCreate(CreateView):
+class CardSetCreate(LoginRequiredMixin, CreateView):
     model = CardSet
     form_class = CardSetForm
     template_name = 'cards/cardset-form.html'
@@ -23,8 +23,14 @@ class CardSetList(ListView):
     def get_queryset(self):
         return CardSet.objects.all().order_by('card_set_name')
 
-    
-class CardCreate(CreateView):
+
+class CardSetUpdate(LoginRequiredMixin, UpdateView):
+    model = CardSet
+    template_name = 'cards/cardset-form.html'
+    fields = "__all__"
+
+
+class CardCreate(LoginRequiredMixin, CreateView):
     model = Card
     form_class = CardForm
     template_name = 'cards/card-form.html'
@@ -57,7 +63,7 @@ class CardsViewPLayer(ListView):
 
 
 class CardsDetail(DetailView):
-    model = CardSet
+    model = Card
     template_name = 'cards/card-detail.html'
 
     def get_queryset(self):
@@ -66,6 +72,12 @@ class CardsDetail(DetailView):
     def get(self, request, *args, **kwargs):
         context = {'title': 'Card Detail'}
         return render(request, self.template_name, context)
+
+
+class CardUpdate(LoginRequiredMixin, UpdateView):
+    model = Card
+    template_name = 'cards/card-form.html'
+    fields = '__all__'
 
 
 def home(request):

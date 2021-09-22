@@ -1,16 +1,31 @@
-from django.shortcuts import render
+from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 from urllib.request import urlopen
 import json
 
 
-def login(request):
+def login_view(request):
     context = {'title': 'Login'}
+    if request.method == 'POST':
+        username = request.POST['username']
+        pw = request.POST['password']
+        user = authenticate(request, username=username, password=pw)
+        if user is not None:
+            login(request, user)
+            redirect('cards:home')
+        else:
+            messages.error(request, 'Login Failed')
+            context['form'] = AuthenticationForm()
+            redirect('users:login')
+    else:
+        context['form'] = AuthenticationForm()
     return render(request, 'users/login.html', context)
 
 
-def logout(request):
-    context = {'title': 'Login'}
-    return render(request, 'users/logout.html', context)
+def logout_view(request):
+    logout(request)
 
 
 def weather(request):
