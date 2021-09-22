@@ -9,6 +9,11 @@ from .models import Card, CardSet
 from players.models import Player
 
 
+def home(request):
+    context = {'title': 'Cards Home'}
+    return render(request, 'cards/home.html', context)
+
+
 class CardSetCreate(LoginRequiredMixin, CreateView):
     model = CardSet
     form_class = CardSetForm
@@ -67,13 +72,6 @@ class CardsDetail(DetailView):
     model = Card
     template_name = 'cards/card-detail.html'
 
-    def get_queryset(self):
-        return Card.objects.get(pk=self.kwargs.get('pk'))
-
-    def get(self, request, *args, **kwargs):
-        context = {'title': 'Card Detail'}
-        return render(request, self.template_name, context)
-
 
 class CardUpdate(LoginRequiredMixin, UpdateView):
     model = Card
@@ -84,11 +82,6 @@ class CardUpdate(LoginRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['pk'] = self.kwargs['pk']
         return kwargs
-
-
-def home(request):
-    context = {'title': 'Cards Home'}
-    return render(request, 'cards/home.html', context)
 
 
 def card_search(request):

@@ -20,6 +20,7 @@ class Card(models.Model):
     card_num = models.CharField(max_length=50, default=None)
     card_set_id = models.ForeignKey(CardSet, on_delete=models.CASCADE)
     card_subset = models.CharField(max_length=100, default=None, null=True)
+    card_image = models.FileField(upload_to='upload/', default=None, null=True, blank=True)
     date_entered = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
