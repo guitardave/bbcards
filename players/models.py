@@ -10,4 +10,4 @@ class Player(models.Model):
         return '%s %s' % (self.player_fname, self.player_lname)
 
     def get_absolute_url(self):
-        return reverse('cards:cards-list', self.id)
+        return reverse('players:players-home')
