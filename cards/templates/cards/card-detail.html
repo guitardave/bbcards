@@ -15,7 +15,7 @@
         <article class="media content-section">
               <div class="media-body">
                 <div class="article-metadata">
-                    <small class="text-muted">{{ object.year }} | <a href="{% url 'cards:card-list' object.card_set_id_id %}">{{ object.card_set_name }}</a></small>
+                    <small class="text-muted">{{ object.year }} | {{ object.card_set_name }}</small>
                     <h3 class="article-title">{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</h3>
                     <p class="article-content">{{ object.card_subset }} | {{ object.card_num }}</p>
                 </div>

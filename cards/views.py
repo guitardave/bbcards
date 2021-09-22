@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
-from .forms import CardSetForm, CardForm
+from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
 from .models import Card, CardSet
+from players.models import Player
 
 
 class CardSetCreate(LoginRequiredMixin, CreateView):
@@ -27,12 +28,12 @@ class CardSetList(ListView):
 class CardSetUpdate(LoginRequiredMixin, UpdateView):
     model = CardSet
     template_name = 'cards/cardset-form.html'
-    fields = "__all__"
+    form_class = CardUpdateForm
 
 
 class CardCreate(LoginRequiredMixin, CreateView):
     model = Card
-    form_class = CardForm
+    form_class = CardCreateForm
     template_name = 'cards/card-form.html'
     
     
@@ -77,9 +78,29 @@ class CardsDetail(DetailView):
 class CardUpdate(LoginRequiredMixin, UpdateView):
     model = Card
     template_name = 'cards/card-form.html'
-    fields = '__all__'
+    form_class = CardUpdateForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['pk'] = self.kwargs['pk']
+        return kwargs
 
 
 def home(request):
     context = {'title': 'Cards Home'}
     return render(request, 'cards/home.html', context)
+
+
+def card_search(request):
+    context = {'title': 'Card Search'}
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            cards = Card.objects.filter(card_set_id__card__card_subset__icontains=request.POST['search'])
+            context['cards'] = cards
+            context['form'] = SearchForm()
+        return render(request, 'cards/card-search.html', context)
+    else:
+        form = SearchForm()
+        context['form'] = form
+    return render(request, 'cards/card-search.html', context)
