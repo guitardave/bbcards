@@ -2,6 +2,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponseRedirect
 from urllib.request import urlopen
 import json
 
@@ -14,11 +15,10 @@ def login_view(request):
         user = authenticate(request, username=username, password=pw)
         if user is not None:
             login(request, user)
-            redirect('cards:home')
+            return HttpResponseRedirect('/')
         else:
-            messages.error(request, 'Login Failed')
+            messages.info(request, 'Login Failed')
             context['form'] = AuthenticationForm()
-            redirect('users:login')
     else:
         context['form'] = AuthenticationForm()
     return render(request, 'users/login.html', context)
@@ -26,6 +26,8 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.success(request, 'logout successful')
+    return HttpResponseRedirect('/users/')
 
 
 def weather(request):
@@ -49,5 +51,3 @@ def weather(request):
              f'and {cond} with winds of {wind} (gusts up to {wind_g}) in {loc}, {st}'
 
     return render(request, 'users/weather.html', {'title': 'Weather Information', 'report': report})
-
-
