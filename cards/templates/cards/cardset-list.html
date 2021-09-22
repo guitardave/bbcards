@@ -17,7 +17,7 @@
             {% for card in cards %}
                 <tr>
                     <td>{{ card.year }}</td>
-                    <td><a href="{% url 'cards:card-list' card.id %}">{{ card.card_set_name }}</a></td>
+                    <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
                 </tr>
             {% endfor %}
             </tbody>

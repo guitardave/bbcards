@@ -40,32 +40,31 @@ class CardCreate(LoginRequiredMixin, CreateView):
     model = Card
     form_class = CardCreateForm
     template_name = 'cards/card-form.html'
-    
-    
+
+
 class CardsView(ListView):
     model = Card
     template_name = 'cards/card-list.html'
     paginate_by = 50
     context_object_name = 'cards'
-    
-    def get_queryset(self):
-        if self.kwargs.get('id'):
-            return Card.objects.filter(card_set_id=self.kwargs.get('id')).order_by('card_set_id__year')
-        else:
-            return Card.objects.all().order_by('card_set_id__year')
-
-
-class CardsViewPLayer(ListView):
-    model = Card
-    template_name = 'cards/card-list.html'
-    paginate_by = 50
-    context_object_name = 'cards'
 
     def get_queryset(self):
-        if self.kwargs.get('id'):
-            return Card.objects.filter(player_id_id=self.kwargs.get('id')).order_by('card_set_id__year')
-        else:
-            return Card.objects.all().order_by('card_set_id__year')
+        return Card.objects.all().order_by('card_set_id__year').\
+                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
+
+
+class CardsViewAll(CardsView):
+    def get_queryset(self):
+        if self.kwargs.get('slug'):
+            return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__year').\
+                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
+
+
+class CardsViewPLayer(CardsView):
+    def get_queryset(self):
+        if self.kwargs.get('slug'):
+            return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__year').\
+                order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
 
 
 class CardsDetail(DetailView):

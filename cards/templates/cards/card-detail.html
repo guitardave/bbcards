@@ -13,16 +13,16 @@
 	<div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <h1>{{ title }}</h1><div>
-
         <article class="media content-section">
             {% if object.card_image %}
-                <img class="article-img" src="{{ object.card_image.url|default_if_none:'default.png' }}">
+                <img class="article-img" src="{{ object.card_image.url|default_if_none:'default.png' }}" alt="{{ object.card_num }}">
             {% endif %}
               <div class="media-body">
                 <div class="article-metadata">
                     <small class="text-muted">
                         {{ object.card_set_id.year }} {{ object.card_set_id.card_set_name }} |
-                        {{ object.card_subset }} | {{ object.card_num }}
+                        {{ object.card_subset }} | {{ object.card_num }} |
+                        <a href="{% url 'cards:card-upd' object.id %}">Update</a>
                     </small>
                 </div>
                     <h3 class="article-title">{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</h3>

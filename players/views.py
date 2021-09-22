@@ -15,31 +15,26 @@ class PlayerList(ListView):
 	def get_queryset(self):
 		return Player.objects.all().order_by('player_lname')
 
-	def get(self, request, *args, **kwargs):
-		context = {'title': 'Player List', 'players': self.get_queryset()}
-		return render(request, self.template_name, context)
-
 
 class PlayerDetail(DetailView):
 	model = Player
-	template_name = 'player_detail.html'
+	template_name = 'players/player_detail.html'
 
 	def get_queryset(self):
-		return Player.objects.get(pk=self.kwargs.get('pk'))
+		return Player.objects.get(slug=self.kwargs.get('slug'))
 
 	def get(self, request, *args, **kwargs):
 		context = {'title': 'Player Detail', 'object': self.get_queryset()}
 		return render(request, self.template_name, context)
 
 
-class PlayerNew(CreateView):
+class PlayerNew(LoginRequiredMixin, CreateView):
 	model = Player
 	template_name = 'players/player_form.html'
 	form_class = PlayerForm
 
 
-class PlayerUpdate(UpdateView):
+class PlayerUpdate(LoginRequiredMixin, UpdateView):
 	model = Player
 	template_name = 'players/player_form.html'
 	form_class = PlayerForm
-
