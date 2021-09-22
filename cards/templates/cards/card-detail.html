@@ -4,7 +4,9 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Cards Home" "cards:cardsets" %}
-    {% breadcrumb "Card Detail" "" %}
+    {% breadcrumb "Card List All" "cards:card-list-all" %}
+    {% breadcrumb object.player_id.player_lname "cards:card-list-player" object.player_id_id %}
+    {% breadcrumb "Card Detail" "cards:card-det" object.player_id %}
 {% endblock breadcrumbs %}
 {% block content %}
     {% load static %}
@@ -13,12 +15,18 @@
         <h1>{{ title }}</h1><div>
 
         <article class="media content-section">
+            {% if object.card_image %}
+                <img class="article-img" src="{{ object.card_image.url|default_if_none:'default.png' }}">
+            {% endif %}
               <div class="media-body">
                 <div class="article-metadata">
-                    <small class="text-muted">{{ object.year }} | {{ object.card_set_name }}</small>
+                    <small class="text-muted">
+                        {{ object.card_set_id.year }} {{ object.card_set_id.card_set_name }} |
+                        {{ object.card_subset }} | {{ object.card_num }}
+                    </small>
                 </div>
                     <h3 class="article-title">{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</h3>
-                    <p class="article-content">{{ object.card_subset }} | {{ object.card_num }}</p>
+
 
               </div>
         </article>

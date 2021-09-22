@@ -1,6 +1,12 @@
 {% extends "cards/base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+
+{% endblock breadcrumbs %}
 {% block content %}
     <div class="container">
+    <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <h1>{{ title }}</h1>
 
         <div class="row">

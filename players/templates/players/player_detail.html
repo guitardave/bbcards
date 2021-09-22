@@ -2,8 +2,10 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
+    {% breadcrumb "Card List All" "cards:card-list-all" %}
     {% breadcrumb "Players Home" "players:players-home" %}
-    {% breadcrumb "Player Detail" "players:players-det" obj.id %}
+    {% breadcrumb object.player_lname "cards:card-list-player" object.id %}
+    {% breadcrumb "Player Detail" "players:players-det" object.id %}
 {% endblock breadcrumbs %}
 {% block content %}
     {% load static %}

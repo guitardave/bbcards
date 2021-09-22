@@ -2,6 +2,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
+
     {% breadcrumb "Cardsets Home" "cards:cardsets" %}
 {% endblock breadcrumbs %}
 {% block content %}
