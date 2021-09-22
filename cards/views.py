@@ -27,7 +27,7 @@ class CardSetList(ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return CardSet.objects.all().order_by('card_set_name')
+        return CardSet.objects.all().order_by('year')
 
 
 class CardSetUpdate(LoginRequiredMixin, UpdateView):
@@ -41,6 +41,18 @@ class CardCreate(LoginRequiredMixin, CreateView):
     form_class = CardCreateForm
     template_name = 'cards/card-form.html'
 
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            obj = Card.objects.latest('id')
+            messages.success(request, 'Card Created Successfully')
+            return redirect('cards:card-det', obj.id)
+
+    def get(self, request, *args, **kwargs):
+        context = {'title': 'Enter new card', 'form': self.form_class}
+        return render(request, self.template_name, context)
+
 
 class CardsView(ListView):
     model = Card
@@ -53,14 +65,23 @@ class CardsView(ListView):
                 order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
 
 
-class CardsViewAll(CardsView):
+class CardsViewAll(ListView):
+    model = Card
+    template_name = 'cards/card-list.html'
+    paginate_by = 50
+    context_object_name = 'cards'
+
     def get_queryset(self):
-        if self.kwargs.get('slug'):
-            return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__year').\
+        return Card.objects.all().order_by('card_set_id__year').\
                 order_by('card_set_id__card_set_name').order_by('player_id__player_lname')
 
 
-class CardsViewPLayer(CardsView):
+class CardsViewPLayer(ListView):
+    model = Card
+    template_name = 'cards/card-list.html'
+    paginate_by = 50
+    context_object_name = 'cards'
+
     def get_queryset(self):
         if self.kwargs.get('slug'):
             return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__year').\
