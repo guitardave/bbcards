@@ -79,6 +79,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bbcards.wsgi.application'
 
+# Login
+
+LOGIN_URL = 'users:login'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -128,6 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 # AWS access information for S3 bucket
+
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')

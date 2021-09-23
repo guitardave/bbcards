@@ -4,7 +4,6 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Cards Home" "cards:cardsets" %}
-    {% breadcrumb "Card List All" "cards:card-list-all" %}
     {% breadcrumb object.player_id.player_lname "cards:card-list-player" object.player_id.slug %}
     {% breadcrumb "Card Detail" "cards:card-det" object.player_id %}
 {% endblock breadcrumbs %}
