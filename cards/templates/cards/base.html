@@ -21,25 +21,38 @@
 	<header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="{% url 'cards:home' %}">Home</a>
+          <a class="navbar-brand mr-4" href="{% url 'cards:card-list-all' %}">Home</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" href="{% url 'cards:card-list-all' %}">Cards</a>
-            <a class="nav-item nav-link" href="{% url 'cards:cardsets' %}">Card Sets</a>
-                <a class="nav-item nav-link" href="{% url 'players:players-home' %}">Players</a>
-                {% if user.is_authenticated %}
-                    <a class="nav-item nav-link" href="{% url 'cards:card-new-all' %}">Enter new card</a>
-                {% endif %}
-
+                <div class="btn-group">
+                    <a class="nav-link dropdown-toggle" href="{% url 'cards:card-list-all' %}" id="carddrp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Cards / Cardsets</a>
+                    <div class="dropdown-menu" aria-labelledby="carddrp">
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' %}">View Card Sets</a>
+                        {% if user.is_authenticated %}
+                            <a class="dropdown-item" href="{% url 'cards:card-new-all' %}">Enter new card</a>
+                            <a class="dropdown-item" href="{% url 'cards:cardsets-new' %}">Enter New Card Set</a>
+                            <a class="dropdown-item" href="{% url 'cards:card-search' %}"> Card Search</a>
+                        {% endif %}
+                    </div>
+                </div>
+            <div class="btn-group">
+                        <a class="nav-link dropdown-toggle" href="{% url 'cards:card-list-all' %}" id="pldrp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Payers</a>
+                        <div class="dropdown-menu" aria-labelledby="pldrp">
+                            <a class="dropdown-item" href="{% url 'players:players-home' %}"> View Player list</a>
+                            {% if user.is_authenticated %}
+                                <a class="dropdown-item" href="{% url 'players:players-new' %}">Enter New Player</a>
+                            {% endif %}
+                        </div>
+                </div>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if user.is_authenticated %}
-                  <a class="nav-item nav-link" href="{% url 'cards:card-search' %}"> Card Search</a>
                   <a class="nav-item nav-link" href="{% url 'users:weather' %}">Weather</a>
+                  <a class="nav-item nav-link" href="{% url 'users:user-profile' user.id %}">My Profile</a>
                   <a class="nav-item nav-link" href="{% url 'users:logout' %}">Logout</a>
               {% else %}
                     <a class="nav-item nav-link" href="{% url 'users:weather' %}">Weather</a>

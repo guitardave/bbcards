@@ -1,0 +1,28 @@
+{% extends "cards/base.html" %}
+{% load crispy_forms_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "User Update" "users:user-update" object.id %}
+    {% breadcrumb object.last_name "users:user-detail" object.id %}
+{% endblock breadcrumbs %}
+{% block content %}
+    {% load static %}
+	<div class="container">
+        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <h1>{{ title }}</h1>
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <small class="text-muted"><b>Last login: </b>{{ object.last_login }} |
+                        <a href="{% url 'users:user-update'  object.id%}">Update</a>
+                    </small>
+                </div>
+                <h4>{{ object.first_name }} {{ object.last_name }}</h4>
+                <p class="article-content"><b>Username: </b>{{ object.username }}
+                    <b>Favorite Player:</b> {{ object.favorite_player }}</p>
+            </div>
+        </article>
+    </div>
+
+{% endblock content %}
