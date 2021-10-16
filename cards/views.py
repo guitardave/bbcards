@@ -106,7 +106,6 @@ def card_search(request):
         form = SearchForm(request.POST)
         cards = []
         if form.is_valid():
-            cards.append(dict(Card.objects.filter(card_set_id__card__player_id=request.POST['search'])))
             cards.append(dict(Card.objects.filter(card_set_id__card__card_subset__icontains=request.POST['search'])))
             cards.append(dict(Card.objects.filter(card_set_id__card_set_name__icontains=request.POST['search'])))
             context['cards'] = cards
