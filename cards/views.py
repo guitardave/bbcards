@@ -106,6 +106,8 @@ def card_search(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             cards = Card.objects.filter(card_set_id__card__card_subset__icontains=request.POST['search'])
+            cards += Card.objects.filter(card_set_id__card_set_name__icontains=request.POST['search'])
+            cards += Card.objects.filter(card_set_id__card__player_id=request.POST['search'])
             context['cards'] = cards
             context['form'] = SearchForm()
         return render(request, 'cards/card-search.html', context)
