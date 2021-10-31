@@ -1,3 +1,4 @@
+from datetime import datetime
 from django import forms
 from .models import *
 
@@ -8,7 +9,7 @@ class CardCreateForm(forms.ModelForm):
 
     class Meta:
         model = Card
-        fields = "__all__"
+        fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image',)
 
 
 class CardCreateSetForm(forms.ModelForm):
@@ -27,7 +28,7 @@ class CardCreateSetForm(forms.ModelForm):
 class CardUpdateForm(forms.ModelForm):
     class Meta:
         model = Card
-        fields = "__all__"
+        fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image',)
 
     def __init__(self, *args, **kwargs):
         qs = kwargs.pop('pk')
@@ -36,9 +37,11 @@ class CardUpdateForm(forms.ModelForm):
 
 
 class CardSetForm(forms.ModelForm):
+    year = forms.IntegerField(max_value=datetime.now().year)
+
     class Meta:
         model = CardSet
-        fields = "__all__"
+        fields = ('year', 'card_set_name',)
 
 
 class SearchForm(forms.Form):
