@@ -15,6 +15,16 @@
                 {% include 'cards/pag.html' %}
 
             <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Player Name</th>
+                        <th>Year</th>
+                        <th>Set</th>
+                        <th>Subset/Info</th>
+                        <th>Card Num</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                 {% for card in cards %}
                     <tr>
@@ -22,9 +32,10 @@
                         <td>{{ card.card_set_id.year }}</td>
                         <td><a href="{% url 'cards:card-list' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
                         <td>{{ card.card_subset }}</td>
+                        <td>{{ card.card_num }}</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group" aria-label="btn-grp">
-                                <a class="btn btn-outline-info" href="{% url 'cards:card-det' card.id %}">{{ card.card_num }}</a>
+                                <a class="btn btn-outline-info" href="{% url 'cards:card-det' card.id %}">Detail</a>
                                 <a class="btn btn-sm btn-outline-success" href="{% url 'cards:card-new-set' card.card_set_id.slug %}">Add Card</a>
                             </div>
                         </td>
