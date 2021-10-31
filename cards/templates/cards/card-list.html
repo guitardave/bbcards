@@ -13,36 +13,26 @@
         <div class="row">
             <div class="col-sm-12 col-md-10 col-lg-10">
                 {% include 'cards/pag.html' %}
-                    <table class="table table-dark table-striped">
-                        <thead>
-                            <tr>
-                                <th>Player</th>
-                                <th>Card Set</th>
-                                <th>Subset</th>
-                                <th>Card Num</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for card in cards %}
-                            <tr>
-                                <td><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
-                                <td>{{ card.card_set_id.year }}</td>
-                                <td><a href="{% url 'cards:card-list' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
-                                <td>{{ card.card_subset }}</td>
-                                <td>{{ card.card_num }}</td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group" aria-label="btn-grp">
-                                        <a class="btn btn-outline-info" href="{% url 'cards:card-det' card.id %}">Detail</a>
-                                        <a class="btn btn-sm btn-outline-success" href="{% url 'cards:card-new-set' card.card_set_id.slug %}">+Card</a>
-                                        <a class="btn btn-sm btn-outline-light" href="{% url 'cards:card-upd' card.id %}">Update</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    </table>
-                {% include 'cards/pag.html' %}
+
+            <table class="table table-dark table-striped">
+                <tbody>
+                {% for card in cards %}
+                    <tr>
+                        <td><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
+                        <td>{{ card.card_set_id.year }}</td>
+                        <td><a href="{% url 'cards:card-list' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
+                        <td>{{ card.card_subset }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="btn-grp">
+                                <a class="btn btn-outline-info" href="{% url 'cards:card-det' card.id %}">{{ card.card_num }}</a>
+                                <a class="btn btn-sm btn-outline-success" href="{% url 'cards:card-new-set' card.card_set_id.slug %}">Add Card</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        {% include 'cards/pag.html' %}
             </div>
         </div>
 
