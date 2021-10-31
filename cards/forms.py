@@ -11,6 +11,20 @@ class CardCreateForm(forms.ModelForm):
         fields = "__all__"
 
 
+class CardCreateSetForm(forms.ModelForm):
+    card_set_id = forms.ModelChoiceField(queryset=CardSet.objects.all().order_by('slug'))
+    player_id = forms.ModelChoiceField(queryset=Player.objects.all().order_by('player_lname'))
+
+    class Meta:
+        model = Card
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        qs = kwargs.pop('slug')
+        super(CardCreateSetForm, self).__init__(*args, **kwargs)
+        self.fields['card_set_id'].queryset = CardSet.objects.gat(slug=qs)
+
+
 class CardUpdateForm(forms.ModelForm):
     class Meta:
         model = Card

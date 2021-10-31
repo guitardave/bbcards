@@ -12,6 +12,7 @@ urlpatterns = [
     path('cards/<slug>/player/', views.CardsViewPLayer.as_view(), name='card-list-player'),
     path('cards/<slug>/set/', views.CardsView.as_view(), name='card-list'),
     path('cards/new/', views.CardCreate.as_view(), name='card-new-all'),
+    path('cards/<slug>/new/', views.CardNewSet.as_view(), name='card-new-set'),
     path('cards/<int:pk>/', views.CardsDetail.as_view(), name='card-det'),
     path('cards/<int:pk>/update/', views.CardUpdate.as_view(), name='card-upd'),
 ]

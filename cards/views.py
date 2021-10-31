@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
-from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
+from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
 from .models import Card, CardSet
 from players.models import Player
 
@@ -18,6 +18,13 @@ class CardSetCreate(LoginRequiredMixin, CreateView):
     model = CardSet
     form_class = CardSetForm
     template_name = 'cards/cardset-form.html'
+    context_object_name = 'out'
+
+    def get_context_data(self, **kwargs):
+        data = super(CardSetCreate, self).get_context_data(**kwargs)
+        data['out'] = self.context_object_name
+        data['title'] = 'Create Card Set'
+        return data
 
 
 class CardSetList(ListView):
@@ -29,18 +36,40 @@ class CardSetList(ListView):
     def get_queryset(self):
         return CardSet.objects.all().order_by('year')
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        data = super(CardSetList, self).get_context_data(**kwargs)
+        data['title'] = 'Card Sets'
+        data['cards'] = self.get_queryset()
+        return data
+
 
 class CardSetUpdate(LoginRequiredMixin, UpdateView):
     model = CardSet
     template_name = 'cards/cardset-form.html'
     form_class = CardSetForm
+    context_object_name = 'out'
+
+    def get_context_data(self, **kwargs):
+        obj = CardSet.objects.get(slug=self.kwargs['slug'])
+        data = super(CardSetUpdate, self).get_context_data(**kwargs)
+        data['title'] = 'Update - ' + obj.card_set_name
+        data['out'] = self.context_object_name
+        return data
 
 
 class CardCreate(LoginRequiredMixin, CreateView):
     model = Card
     form_class = CardCreateForm
     template_name = 'cards/card-form.html'
+    context_object_name = 'out'
 
+    def get_context_data(self, **kwargs):
+        data = super(CardCreate, self).get_context_data(**kwargs)
+        data['title'] = 'Enter New Card'
+        data['out'] = self.context_object_name
+        return data
+
+    """
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES or None)
         if form.is_valid():
@@ -52,6 +81,26 @@ class CardCreate(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         context = {'title': 'Enter new card', 'form': self.form_class}
         return render(request, self.template_name, context)
+    """
+
+
+class CardNewSet(LoginRequiredMixin, CreateView):
+    model = Card
+    template_name = 'cards/card-form.html'
+    form_class = CardCreateSetForm
+    context_object_name = 'out'
+
+    def get_form_kwargs(self):
+        kwargs = super(CardNewSet, self).get_form_kwargs()
+        kwargs['slug'] = self.kwargs['slug']
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        obj = CardSet.objects.get(slug=self.kwargs['slug'])
+        data = super(CardNewSet, self).get_context_data(**kwargs)
+        data['title'] = 'Add Card - ' + obj.card_set_name
+        data['out'] = self.context_object_name
+        return data
 
 
 class CardsView(ListView):
