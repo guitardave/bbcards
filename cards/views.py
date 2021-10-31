@@ -112,6 +112,12 @@ class CardsView(ListView):
     def get_queryset(self):
         return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        data = super(CardsView, self).get_context_data(**kwargs)
+        data['title'] = 'Cards List'
+        data['cards'] = self.get_queryset()
+        return data
+
 
 class CardsViewAll(ListView):
     model = Card
@@ -121,6 +127,12 @@ class CardsViewAll(ListView):
 
     def get_queryset(self):
         return Card.objects.all().order_by('card_set_id__slug')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        data = super(CardsViewAll, self).get_context_data(**kwargs)
+        data['title'] = 'Cards List'
+        data['cards'] = self.get_queryset()
+        return data
 
 
 class CardsViewPLayer(ListView):
@@ -132,6 +144,11 @@ class CardsViewPLayer(ListView):
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        data = super(CardsViewPLayer, self).get_context_data(**kwargs)
+        data['title'] = 'Cards List'
+        data['cards'] = self.get_queryset()
+        return data
 
 class CardsDetail(DetailView):
     model = Card
