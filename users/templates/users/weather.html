@@ -8,11 +8,14 @@
     <div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <h1>{{ title }}</h1>
-
-        <article class="media content-section border-dark">
-          <div class="media-body">
-              <p class="article-content">{{ report }}</p>
-          </div>
-        </article>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <article class="media content-section border-dark">
+                  <div class="media-body">
+                      <p class="article-content">{{ report }}</p>
+                  </div>
+                </article>
+            </div>
+        </div>
     </div>
 {% endblock content %}
