@@ -13,7 +13,7 @@
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <h1>{{ title }}</h1>
         <div class="row">
-            <div class="col-sm-12 col-md-10 col-lg-10">
+            <div class="col-sm-12 col-md-8 col-lg-8">
                 <article class="media content-section">
                     {% if object.card_image %}
                         <img class="article-img" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">

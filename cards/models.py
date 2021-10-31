@@ -1,8 +1,10 @@
 from datetime import datetime
+
 from django.db import models
-from django.urls import reverse
-from players.models import Player
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+
+from players.models import Player
 
 
 class CardSet(models.Model):
