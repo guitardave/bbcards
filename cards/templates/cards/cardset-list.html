@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{ card.year }}</td>
                     <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
-                    <td><a href="{% url 'cards:cardsets-upd' card.slug %}">Update</a></td>
+                    <td><a class="btn btn-sm btn-info" href="{% url 'cards:cardsets-upd' card.slug %}">Update</a></td>
                 </tr>
             {% endfor %}
             </tbody>

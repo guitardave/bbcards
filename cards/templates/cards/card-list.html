@@ -21,8 +21,8 @@
                         <td><a href="{% url 'cards:card-list' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
                         <td>{{ card.card_subset }}</td>
                         <td>
-                            <a href="{% url 'cards:card-det' card.id %}">{{ card.card_num }}</a>
-                            <a href="{% url 'cards:card-new-set' card.card_set_id.slug %}">{{ card.card_num }}</a>
+                            <a class="btn btn-outline-info" href="{% url 'cards:card-det' card.id %}">{{ card.card_num }}</a>
+                            <a class="btn btn-sm btn-outline-success" href="{% url 'cards:card-new-set' card.card_set_id.slug %}">Add Card</a>
                         </td>
                     </tr>
                 {% endfor %}

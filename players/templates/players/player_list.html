@@ -17,7 +17,7 @@
                 <tr>
                     <td>{{ p.player_fname }}</td>
                     <td>{{ p.player_lname }}</td>
-                    <td><a href="{% url 'cards:card-list-player' p.slug %}">View Cards</a></td>
+                    <td><a class="btn btn-sm btn-outline-light" href="{% url 'cards:card-list-player' p.slug %}">View Cards</a></td>
                 </tr>
 
             {% endfor %}
