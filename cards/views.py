@@ -69,20 +69,6 @@ class CardCreate(LoginRequiredMixin, CreateView):
         data['out'] = self.context_object_name
         return data
 
-    """
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES or None)
-        if form.is_valid():
-            form.save()
-            obj = Card.objects.latest('id')
-            messages.success(request, 'Card Created Successfully')
-            return redirect('cards:card-det', obj.id)
-
-    def get(self, request, *args, **kwargs):
-        context = {'title': 'Enter new card', 'form': self.form_class}
-        return render(request, self.template_name, context)
-    """
-
 
 class CardNewSet(LoginRequiredMixin, CreateView):
     model = Card
@@ -149,6 +135,7 @@ class CardsViewPLayer(ListView):
         data['title'] = 'Cards List'
         data['cards'] = self.get_queryset()
         return data
+
 
 class CardsDetail(DetailView):
     model = Card
