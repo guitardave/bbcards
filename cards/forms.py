@@ -12,7 +12,6 @@ class CardCreateForm(forms.ModelForm):
 
 
 class CardCreateSetForm(forms.ModelForm):
-    card_set_id = forms.ModelChoiceField(queryset=CardSet.objects.all().order_by('slug'))
     player_id = forms.ModelChoiceField(queryset=Player.objects.all().order_by('player_lname'))
 
     class Meta:
