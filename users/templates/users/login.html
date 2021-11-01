@@ -6,11 +6,18 @@
         <h1>{{ title }}</h1>
         <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-12">
-                <form action="." method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <input type="submit" name="submit" value="Submit">
-                </form>
+                <article class="media content-section">
+                    {% if object.card_image %}
+                        <img class="article-img" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">
+                    {% endif %}
+                      <div class="media-body">
+                        <form action="." method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <input type="submit" name="submit" value="Submit">
+                        </form>
+                      </div>
+                </article>
             </div>
         </div>
     </div>
