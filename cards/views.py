@@ -153,11 +153,18 @@ class CardUpdate(LoginRequiredMixin, UpdateView):
     model = Card
     template_name = 'cards/card-form.html'
     form_class = CardUpdateForm
+    context_object_name = 'out'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['pk'] = self.kwargs['pk']
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        data = super(CardUpdate, self).get_context_data(**kwargs)
+        data['title'] = 'Update Card Details'
+        data['out'] = self.context_object_name
+        return data
 
 
 def card_search(request):

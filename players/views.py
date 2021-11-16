@@ -26,9 +26,6 @@ class PlayerDetail(DetailView):
 	model = Player
 	template_name = 'players/player_detail.html'
 
-	def get_queryset(self):
-		return Player.objects.get(slug=self.kwargs.get('slug'))
-
 	def get_context_data(self, **kwargs):
 		obj = Player.objects.get(slug=self.kwargs['slug'])
 		data = super(PlayerDetail, self).get_context_data(**kwargs)
