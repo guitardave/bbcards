@@ -4,7 +4,7 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Players Home" "players:players-home" %}
-    {% breadcrumb "Player Detail" "obj.id" %}
+    {% breadcrumb "Player Form" "obj.id" %}
 {% endblock breadcrumbs %}
 {% block content %}
     {% load static %}
@@ -17,7 +17,7 @@
                     {% if object.card_image %}
                         <img class="article-img" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">
                     {% endif %}
-                      <div class="media-body">
+                      <div class="media-body text-light">
                         <form method="POST">
                             {% csrf_token %}
                             {{ form|crispy }}
