@@ -18,7 +18,7 @@ class PlayerList(ListView):
 	def get_context_data(self, *, object_list=None, **kwargs):
 		data = super(PlayerList, self).get_context_data(**kwargs)
 		data['title'] = 'Player List'
-		data['out'] = self.get_queryset()
+		data['players'] = self.get_queryset()
 		return data
 
 
