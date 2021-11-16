@@ -22,7 +22,7 @@ class CardCreateSetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         qs = kwargs.pop('slug')
         super(CardCreateSetForm, self).__init__(*args, **kwargs)
-        self.fields['card_set_id'].queryset = CardSet.objects.get(slug=qs)
+        self.fields['card_set_id'].queryset = CardSet.objects.filter(slug=qs)
 
 
 class CardUpdateForm(forms.ModelForm):
