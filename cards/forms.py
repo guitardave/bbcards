@@ -17,7 +17,7 @@ class CardCreateSetForm(forms.ModelForm):
 
     class Meta:
         model = Card
-        fields = "__all__"
+        fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image',)
 
     def __init__(self, *args, **kwargs):
         qs = kwargs.pop('slug')
