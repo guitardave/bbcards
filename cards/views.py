@@ -84,7 +84,7 @@ class CardNewSet(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         obj = CardSet.objects.get(slug=self.kwargs['slug'])
         data = super(CardNewSet, self).get_context_data(**kwargs)
-        data['title'] = 'Add Card - ' + obj.card_set_name
+        data['title'] = 'Add Card - ' + obj.slug
         data['out'] = self.context_object_name
         return data
 
