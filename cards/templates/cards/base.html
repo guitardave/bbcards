@@ -77,12 +77,13 @@
 
       <div class="row">
         <div class="col-md-12">
+            <br><br><br>
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
-            <br><br>
+
             {% block content %}
                 {% render_breadcrumbs %}
             {% endblock %}

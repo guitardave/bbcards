@@ -89,11 +89,14 @@ class CardNewSet(LoginRequiredMixin, CreateView):
         return data
 
 
-class CardsView(ListView):
+class CardsListView(ListView):
     model = Card
     template_name = 'cards/card-list.html'
     paginate_by = 50
     context_object_name = 'cards'
+
+
+class CardsView(CardsListView):
 
     def get_queryset(self):
         return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
@@ -105,11 +108,7 @@ class CardsView(ListView):
         return data
 
 
-class CardsViewAll(ListView):
-    model = Card
-    template_name = 'cards/card-list.html'
-    paginate_by = 50
-    context_object_name = 'cards'
+class CardsViewAll(CardsListView):
 
     def get_queryset(self):
         return Card.objects.all().order_by('card_set_id__slug')
@@ -121,11 +120,7 @@ class CardsViewAll(ListView):
         return data
 
 
-class CardsViewPLayer(ListView):
-    model = Card
-    template_name = 'cards/card-list.html'
-    paginate_by = 50
-    context_object_name = 'cards'
+class CardsViewPLayer(CardsListView):
 
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')

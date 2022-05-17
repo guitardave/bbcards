@@ -8,7 +8,7 @@ from players.models import Player
 
 
 class CardSet(models.Model):
-    year = models.IntegerField(default=datetime.now().year, max_length=4)
+    year = models.IntegerField(default=datetime.now().year)
     card_set_name = models.CharField(max_length=45, default=None)
     date_entered = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(null=True)
