@@ -72,6 +72,6 @@ def weather(request):
     wind_g = data['current']['gust_mph']
 
     report = f'It is currently {temp}C ({temp_f}F) ' \
-             f'and {cond} with winds of {wind} (gusts up to {wind_g}) in {loc}, {st}'
+             f'and {cond} with winds of {wind} mph (gusts up to {wind_g} mph) in {loc}, {st}'
 
     return render(request, 'users/weather.html', {'title': 'Weather Information', 'report': report})
