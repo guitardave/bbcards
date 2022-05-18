@@ -26,14 +26,7 @@
                             <td>{{ p.player_lname }}</td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group" aria-label="btn-grp">
-                                    <a class="btn btn-sm btn-light" href="{% url 'cards:card-list-player' p.slug %}"><i class="fa fa-list"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                    {% endfor %}
-                </tbody>
-                </table>
+                                    <a class="btn btn-sm btn-light" href="{% url 'cards:card-list-player' p.slug %}"><i class="fa fa-list"></i>View List
                 {% include 'cards/pag.html' %}
             </div>
         </div>

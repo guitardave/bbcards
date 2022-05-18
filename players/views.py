@@ -1,7 +1,4 @@
-from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from .models import Player
 from .forms import PlayerForm
@@ -11,9 +8,8 @@ class PlayerList(ListView):
 	model = Player
 	template_name = 'players/player_list.html'
 	context_object_name = 'players'
-
-	def get_queryset(self):
-		return Player.objects.all().order_by('player_lname')
+	paginate_by = 30
+	ordering = 'player_lname'
 
 	def get_context_data(self, *, object_list=None, **kwargs):
 		data = super(PlayerList, self).get_context_data(**kwargs)

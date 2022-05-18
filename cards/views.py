@@ -1,12 +1,8 @@
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
 from .models import Card, CardSet
-from players.models import Player
 
 
 def home(request):
@@ -32,9 +28,7 @@ class CardSetList(ListView):
     template_name = 'cards/cardset-list.html'
     context_object_name = 'cards'
     paginate_by = 50
-
-    def get_queryset(self):
-        return CardSet.objects.all().order_by('year')
+    ordering = 'year'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         data = super(CardSetList, self).get_context_data(**kwargs)
@@ -94,42 +88,28 @@ class CardsListView(ListView):
     template_name = 'cards/card-list.html'
     paginate_by = 50
     context_object_name = 'cards'
+    ordering = 'card_set_id__slug'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        data = super(CardsListView, self).get_context_data(**kwargs)
+        data['title'] = 'Cards List'
+        data['cards'] = self.get_queryset()
+        return data
 
 
 class CardsView(CardsListView):
-
     def get_queryset(self):
         return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(CardsView, self).get_context_data(**kwargs)
-        data['title'] = 'Cards List'
-        data['cards'] = self.get_queryset()
-        return data
-
 
 class CardsViewAll(CardsListView):
-
     def get_queryset(self):
         return Card.objects.all().order_by('card_set_id__slug')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(CardsViewAll, self).get_context_data(**kwargs)
-        data['title'] = 'Cards List'
-        data['cards'] = self.get_queryset()
-        return data
-
 
 class CardsViewPLayer(CardsListView):
-
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(CardsViewPLayer, self).get_context_data(**kwargs)
-        data['title'] = 'Cards List'
-        data['cards'] = self.get_queryset()
-        return data
 
 
 class CardsDetail(DetailView):
