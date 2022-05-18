@@ -4,7 +4,7 @@ from . import views
 app_name = 'cards'
 
 urlpatterns = [
-    path('', views.CardsViewAll.as_view(), name='card-list-all'),
+    path('', views.CardsListView.as_view(), name='card-list-all'),
     path('sets/', views.CardSetList.as_view(), name='cardsets'),
     path('sets/new/', views.CardSetCreate.as_view(), name='cardsets-new'),
     path('sets/<slug:slug>/update/', views.CardSetUpdate.as_view(), name='cardsets-upd'),

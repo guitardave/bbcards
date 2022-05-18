@@ -102,11 +102,6 @@ class CardsView(CardsListView):
         return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
 
-class CardsViewAll(CardsListView):
-    def get_queryset(self):
-        return Card.objects.all().order_by('card_set_id__slug')
-
-
 class CardsViewPLayer(CardsListView):
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
