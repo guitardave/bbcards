@@ -1,6 +1,7 @@
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
 from .models import Card, CardSet
 
@@ -81,6 +82,39 @@ class CardNewSet(LoginRequiredMixin, CreateView):
         data['title'] = 'Add Card - ' + obj.slug
         data['out'] = self.context_object_name
         return data
+
+
+def pagination(request, qs):
+    paginator = Paginator(qs, 50)
+    page = request.GET.get('page', 1)
+    try:
+        cards = paginator.page(page)
+    except PageNotAnInteger:
+        cards = paginator.page(1)
+    except EmptyPage:
+        cards = paginator.page(paginator.num_pages)
+    return cards
+
+
+def card_list_view(request, qs):
+    cards = pagination(request, qs)
+    context = {'title': 'Cards List', 'cards': cards}
+    return render(request, 'cards/card-list.html', context)
+
+
+def card_set_list(request):
+    c_list = Card.objects.all().order_by('card_set_id__slug')
+    return card_list_view(request, c_list)
+
+
+def card_list(request, slug):
+    c_list = Card.objects.filter(card_set_id__slug=slug).order_by('card_set_id__slug')
+    return card_list_view(request, c_list)
+
+
+def cards_list_player(request, slug):
+    c_list = Card.objects.filter(player_id__slug=slug).order_by('card_set_id__slug')
+    return card_list_view(request, c_list)
 
 
 class CardsListView(ListView):
