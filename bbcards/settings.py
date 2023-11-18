@@ -64,7 +64,7 @@ ROOT_URLCONF = 'bbcards.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,7 +90,7 @@ LOGIN_URL = 'users:login'
 if os.getenv("DATABASE_URL", None) is None:
     raise Exception("DATABASE_URL environment variable not defined")
 DATABASES = {
-    "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
+    "default": dj_database_url.parse(os.getenv('DATABASE_URL')),
 }
 
 

@@ -1,21 +1,21 @@
-{% if out.has_other_pages %}
+{% if cards.has_other_pages %}
 
-        {% if out.has_previous %}
+        {% if cards.has_previous %}
             <a class="btn btn-sm btn-light mb-4" href="?page=1">First</a>
-            <a class="btn btn-sm btn-light mb-4" href="?page={{ out.previous_page_number }}">Previous</a>
+            <a class="btn btn-sm btn-light mb-4" href="?page={{ cards.previous_page_number }}">Previous</a>
         {% endif %}
 
-        {% for num in out.paginator.page_range %}
-            {% if out.number == num %}
+        {% for num in cards.paginator.page_range %}
+            {% if cards.number == num %}
                 <a class="btn btn-sm btn-outline-light mb-4" href="?page={{ num }}">{{ num }}</a>
-            {% elif num > out.number|add:'-3' and num > out.number|add:'3' %}
+            {% elif num > cards.number|add:'-3' and num > out.number|add:'3' %}
                 <a class="btn btn-sm btn-light mb-4" href="?page={{ num }}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
-        {% if out.has_next %}
-            <a class="btn btn-sm btn-light mb-4" href="?page={{ out.next_page_number }}">Next</a>
-            <a class="btn btn-sm btn-light mb-4" href="?page={{ out.paginator.num_pages }}">Last</a>
+        {% if cards.has_next %}
+            <a class="btn btn-sm btn-light mb-4" href="?page={{ cards.next_page_number }}">Next</a>
+            <a class="btn btn-sm btn-light mb-4" href="?page={{ cards.paginator.num_pages }}">Last</a>
         {% endif %}
 
     {% endif %}
