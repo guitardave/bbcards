@@ -8,4 +8,5 @@ urlpatterns = [
 	path('<slug:slug>/detail/', views.PlayerDetail.as_view(), name='players-det'),
 	path('new/', views.player_add, name='players-new'),
 	path('<slug:slug>/update/', views.PlayerUpdate.as_view(), name='players-upd'),
+	path('<int:pk>/update/async/', views.player_update_async, name='players-upd-async'),
 ]

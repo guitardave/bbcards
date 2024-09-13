@@ -1,0 +1,11 @@
+<td><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
+<td>{{ card.card_set_id.year }}</td>
+<td><a href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
+<td>{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
+<td>{{ card.card_num }}</td>
+<td>
+    <a class="m-1" href="{% url 'cards:card-det' card.id %}"><i class="fa fa-edit"></i></a>
+{#                                            {% if user.is_authenticated %}#}
+{#                                                <a class="m-1" href="{% url 'cards:card-new-set' card.card_set_id.slug %}"><i class="fa fa-plus"></i></a>#}
+{#                                            {% endif %}#}
+</td>

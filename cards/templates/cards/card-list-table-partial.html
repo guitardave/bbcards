@@ -1,0 +1,19 @@
+<table class="display" id="myTable">
+    <thead>
+        <tr>
+            <th>Player Name</th>
+            <th>Year</th>
+            <th>Set</th>
+            <th>Subset/Info</th>
+            <th>Card Num</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for card in cards %}
+            <tr id="tr-c{{ card.id }}">
+                {% include 'cards/card-list-tr-partial.html' %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

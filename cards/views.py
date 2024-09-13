@@ -22,6 +22,14 @@ class CardSetCreate(LoginRequiredMixin, CreateView):
         return data
 
 
+def card_set_create(request):
+    if request.method == 'POST':
+        form = CardCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+    return render(request, 'cards/cardset-list-table-partial.html', {'cards': CardSet.objects.all()})
+
+
 def card_set_list(request):
     if request.method == 'POST':
         form = CardSetForm(request.POST)
@@ -48,15 +56,15 @@ class CardSetList(ListView):
         return data
 
 
-def card_set_update(request, slug):
-    obj = CardSet.objects.get(slug=slug)
+def card_set_update_async(request, pk: int):
+    obj = CardSet.objects.get(pk=pk)
     if request.method == 'POST':
-        form = CardUpdateForm(request.POST, instance=obj)
+        form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-            return render(request, 'cards/cardset-list-table-partial.html', {'cards': CardSet.objects.all()})
+            return render(request, 'cards/cardset-list-tr-partial.html', {'card': obj, 'success': True})
     form = CardSetForm(instance=obj)
-    return render(request, 'cards/cardset-form.html', {'form': form})
+    return render(request, 'cards/cardset-form.html', {'form': form, 'obj': obj})
 
 
 class CardCreate(LoginRequiredMixin, CreateView):
@@ -124,18 +132,11 @@ class CardsListView(ListView):
     context_object_name = 'cards'
     ordering = 'card_set_id__slug'
 
-
-class CardsViewSet(CardsListView):
-    def get_queryset(self):
-        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_subset')
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        card_set = CardSet.objects.get(slug=self.kwargs.get('slug'))
-        data = super(CardsViewSet, self).get_context_data(**kwargs)
-        data['title'] = f'Cards List {card_set.year} {card_set.card_set_name}'
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data()
+        data['title'] = 'All Cards'
         data['cards'] = self.get_queryset()
-        data['card_set'] = card_set
-        data['form'] = CardCreateForm(**{'set': card_set.slug})
+        data['form'] = CardCreateForm()
         return data
 
     def post(self, *args, **kwargs):
@@ -143,17 +144,46 @@ class CardsViewSet(CardsListView):
         if form.is_valid():
             form.save()
             messages.success(self.request, 'Card has been created')
-            return redirect('cards:card-list-set', slug=self.kwargs.get('slug'))
+        return redirect('cards:card-list')
+
+
+class CardsViewSet(CardsListView):
+    def get_card_set(self):
+        return CardSet.objects.get(slug=self.kwargs.get('slug'))
+
+    def get_queryset(self):
+        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_subset')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        card_set = self.get_card_set()
+        data = super(CardsViewSet, self).get_context_data(**kwargs)
+        data['title'] = f'{card_set.year} {card_set.card_set_name}'
+        data['cards'] = self.get_queryset()
+        data['card_set'] = card_set
+        data['form'] = CardCreateForm(**{'set': card_set.slug})
+        return data
+
+    def post(self, *args, **kwargs):
+        card_set = self.get_card_set()
+        form = CardCreateForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(self.request,
+                             f'Card for set {card_set.year} {card_set.card_set_name} has been created')
+        return redirect('cards:card-list-set', slug=self.kwargs.get('slug'))
 
 
 class CardsViewPlayer(CardsListView):
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
+    def get_player(self):
+        return Player.objects.get(slug=self.kwargs.get('slug'))
+
     def get_context_data(self, *, object_list=None, **kwargs):
-        player = Player.objects.get(slug=self.kwargs.get('slug'))
+        player = self.get_player()
         data = super(CardsViewPlayer, self).get_context_data(**kwargs)
-        data['title'] = f'Cards List {player.player_fname} {player.player_lname}'
+        data['title'] = f'{player.player_fname} {player.player_lname}'
         data['cards'] = self.get_queryset()
         data['player'] = player
         data['form'] = CardCreateForm(**{'player': player.slug})
@@ -163,8 +193,9 @@ class CardsViewPlayer(CardsListView):
         form = CardCreateForm(self.request.POST)
         if form.is_valid():
             form.save()
-            messages.success(self.request, 'Card has been created')
-            return redirect('cards:card-list-player', slug=self.kwargs.get('slug'))
+            messages.success(self.request,
+                             f'Card for player {self.get_player().player_lname} has been created')
+        return redirect('cards:card-list-player', slug=self.kwargs.get('slug'))
 
 
 class CardsDetail(DetailView):
@@ -180,8 +211,9 @@ class CardsDetail(DetailView):
         data['title'] = f''' 
             {obj.card_set_id.year} 
             {obj.card_set_id.card_set_name} 
-            {obj.card_subset if obj.card_subset else ""} 
-            {obj.card_num}
+            {obj.player_id.player_fname} {obj.player_id.player_lname}  
+            {'(' + obj.card_subset + ')' if obj.card_subset else ""} 
+            #{obj.card_num}
             '''
         data['object'] = obj
         kwargs = {'pk': kwargs.get('pk')}
@@ -189,11 +221,11 @@ class CardsDetail(DetailView):
         return data
 
     def post(self, *args, **kwargs):
-        form = CardUpdateForm(self.request.POST)
+        form = CardUpdateForm(self.request.POST, instance=self.get_object(), **kwargs)
         if form.is_valid():
             form.save()
             messages.success(self.request, 'Card has been updated')
-            return redirect('cards:card-det', pk=kwargs.get('pk'))
+        return redirect('cards:card-det', pk=kwargs.get('pk'))
 
 
 class CardUpdate(LoginRequiredMixin, UpdateView):
@@ -216,4 +248,10 @@ class CardUpdate(LoginRequiredMixin, UpdateView):
 
 def card_update(request, pk):
     obj = Card.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = CardUpdateForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return render(request, 'cards/card-list-tr-partial.html', {'card': obj})
     return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj)})
+

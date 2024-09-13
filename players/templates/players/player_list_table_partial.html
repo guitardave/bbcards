@@ -1,0 +1,16 @@
+<table class="display" id="myTable">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in players %}
+            <tr id="tr-p{{ p.id }}">
+                {% include 'players/player_list_tr_partial.html' %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

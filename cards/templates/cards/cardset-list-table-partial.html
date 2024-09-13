@@ -1,22 +1,16 @@
 <table class="display" id="myTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Year</th>
-                                            <th>Card Set</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for card in cards %}
-                                        <tr>
-                                            <td>{{ card.year }}</td>
-                                            <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
-                                            <td>
-                                                {% if user.is_authenticated %}
-                                                    <a class="m-1" href="#update" hx-get="{% url 'cards:cardsets-upd' card.slug %}" hx-target="#cardset-form" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Card Set</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for card in cards %}
+        <tr id="tr-s{{ card.id }}">
+            {% include 'cards/cardset-list-tr-partial.html' %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

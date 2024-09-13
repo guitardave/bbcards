@@ -69,3 +69,14 @@ class PlayerUpdate(LoginRequiredMixin, UpdateView):
 		data['title'] = 'Update Player - ' + '{} {}'.format(obj.player_fname, obj.player_lname)
 		data['out'] = self.context_object_name
 		return data
+
+
+def player_update_async(request, pk: int):
+	player = Player.objects.get(pk=pk)
+	if request.method == 'POST':
+		form = PlayerForm(request.POST, instance=player)
+		if form.is_valid():
+			form.save()
+			return render(request, 'players/player_list_tr_partial.html', {'p': player, 'success': True})
+	context = {'form': PlayerForm(instance=player), 'obj': player}
+	return render(request, 'players/player_form.html', context)
