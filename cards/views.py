@@ -198,60 +198,12 @@ class CardsViewPlayer(CardsListView):
         return redirect('cards:card-list-player', slug=self.kwargs.get('slug'))
 
 
-class CardsDetail(DetailView):
-    model = Card
-    template_name = 'cards/card-detail.html'
-
-    def get_object(self, *args, **kwargs):
-        return Card.objects.get(pk=self.kwargs.get('pk'))
-
-    def get_context_data(self, **kwargs):
-        obj = self.get_object()
-        data = super(CardsDetail, self).get_context_data(**kwargs)
-        data['title'] = f''' 
-            {obj.card_set_id.year} 
-            {obj.card_set_id.card_set_name} 
-            {obj.player_id.player_fname} {obj.player_id.player_lname}  
-            {'(' + obj.card_subset + ')' if obj.card_subset else ""} 
-            #{obj.card_num}
-            '''
-        data['object'] = obj
-        kwargs = {'pk': kwargs.get('pk')}
-        data['form'] = CardUpdateForm(instance=obj, **kwargs)
-        return data
-
-    def post(self, *args, **kwargs):
-        form = CardUpdateForm(self.request.POST, instance=self.get_object(), **kwargs)
-        if form.is_valid():
-            form.save()
-            messages.success(self.request, 'Card has been updated')
-        return redirect('cards:card-det', pk=kwargs.get('pk'))
-
-
-class CardUpdate(LoginRequiredMixin, UpdateView):
-    model = Card
-    template_name = 'cards/card-form.html'
-    form_class = CardUpdateForm
-    context_object_name = 'out'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['pk'] = self.kwargs['pk']
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        data = super(CardUpdate, self).get_context_data(**kwargs)
-        data['title'] = 'Update Card Details'
-        data['out'] = self.context_object_name
-        return data
-
-
-def card_update(request, pk):
+def card_update_async(request, pk: int):
     obj = Card.objects.get(pk=pk)
     if request.method == 'POST':
         form = CardUpdateForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-            return render(request, 'cards/card-list-tr-partial.html', {'card': obj})
-    return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj)})
+            return render(request, 'cards/card-list-tr-partial.html', {'card': obj, 'success': True})
+    return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj), 'obj': obj})
 
