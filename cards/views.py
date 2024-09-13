@@ -36,7 +36,7 @@ def card_set_list(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Card set has been created')
-            return redirect('cards:cardsets')
+        return redirect('cards:cardsets')
     form = CardSetForm
     context = {'cards': CardSet.objects.all().order_by('year', 'card_set_name'), 'form': form, 'title': 'Card Sets'}
     return render(request, 'cards/cardset-list.html', context)
@@ -62,7 +62,7 @@ def card_set_update_async(request, pk: int):
         form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-            return render(request, 'cards/cardset-list-tr-partial.html', {'card': obj, 'success': True})
+        return render(request, 'cards/cardset-list-tr-partial.html', {'card': obj, 'success': True})
     form = CardSetForm(instance=obj)
     return render(request, 'cards/cardset-form.html', {'form': form, 'obj': obj})
 
@@ -123,7 +123,7 @@ class CardList(LoginRequiredMixin, ListView):
         if form.is_valid():
             form.save()
             messages.success(self.request, 'Card has been created')
-            return redirect('cards:card-list')
+        return redirect('cards:card-list')
 
 
 class CardsListView(ListView):

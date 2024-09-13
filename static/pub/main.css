@@ -81,3 +81,9 @@ th, td {color: #e1e1e1;}
 @-webkit-keyframes fade-out{0%{opacity:1}to{opacity:0}}
 @keyframes fade-out{0%{opacity:1}to{opacity:0}}
 .fade-out{-webkit-animation-name:fade-out;animation-name:fade-out}
+
+@media only screen and (max-width: 900px) {
+        .one{
+            display: none;
+        }
+    }
