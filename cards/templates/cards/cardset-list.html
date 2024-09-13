@@ -20,26 +20,9 @@
                                 <h1>{{ title }}</h1>
                             </div>
                             <div class="card-body">
-                                <table class="display" id="myTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Year</th>
-                                            <th>Card Set</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for card in cards %}
-                                        <tr>
-                                            <td>{{ card.year }}</td>
-                                            <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
-                                            <td>
-                                                <a class="m-1" href="{% url 'cards:cardsets-upd' card.slug %}"><i class="fa fa-edit"></i></a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+                                <div id="cardset-div">
+                                    {% include 'cards/cardset-list-table-partial.html' %}
+                                </div>
                             </div>
                             <div class="card-footer">
                                 <small class="text-muted">

@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 class Player(models.Model):
     player_fname = models.CharField(max_length=50, default=None)
     player_lname = models.CharField(max_length=50, default=None)
-    slug = models.SlugField(null=True)
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return '%s %s' % (self.player_fname, self.player_lname)

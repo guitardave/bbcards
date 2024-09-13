@@ -51,19 +51,6 @@ class PlayerDetail(DetailView):
 			return redirect('players:players-det', slug=kwargs['slug'])
 
 
-class PlayerNew(LoginRequiredMixin, CreateView):
-	model = Player
-	template_name = 'players/player_form.html'
-	form_class = PlayerForm
-	context_object_name = 'out'
-
-	def get_context_data(self, **kwargs):
-		data = super(PlayerNew, self).get_context_data(**kwargs)
-		data['title'] = 'Add New Player'
-		data['out'] = self.context_object_name
-		return data
-
-
 def player_add(request):
 	if request.method == 'POST':
 		pass

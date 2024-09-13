@@ -11,7 +11,7 @@ class CardSet(models.Model):
     year = models.IntegerField(default=datetime.now().year)
     card_set_name = models.CharField(max_length=45, default=None)
     date_entered = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(null=True)
+    slug = models.SlugField(unique=True)
     
     def __str__(self):
         return '%s %s' % (str(self.year), self.card_set_name)

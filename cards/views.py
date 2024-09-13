@@ -52,18 +52,15 @@ class CardSetList(ListView):
         return data
 
 
-class CardSetUpdate(LoginRequiredMixin, UpdateView):
-    model = CardSet
-    template_name = 'cards/cardset-form.html'
-    form_class = CardSetForm
-    context_object_name = 'out'
-
-    def get_context_data(self, **kwargs):
-        obj = CardSet.objects.get(slug=self.kwargs['slug'])
-        data = super(CardSetUpdate, self).get_context_data(**kwargs)
-        data['title'] = 'Update - ' + '{} {}'.format(obj.year, obj.card_set_name)
-        data['out'] = self.context_object_name
-        return data
+def card_set_update(request, slug):
+    obj = CardSet.objects.get(slug=slug)
+    if request.method == 'POST':
+        form = CardUpdateForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return render(request, 'cards/cardset-list-table-partial.html', {'cards': CardSet.objects.all()})
+    form = CardSetForm(instance=obj)
+    return render(request, 'cards/cardset-form.html', {'form': form})
 
 
 class CardCreate(LoginRequiredMixin, CreateView):
@@ -162,7 +159,7 @@ class CardsDetail(DetailView):
     def get_context_data(self, **kwargs):
         obj = self.get_object()
         data = super(CardsDetail, self).get_context_data(**kwargs)
-        data['title'] = f'''Card Detail - 
+        data['title'] = f''' 
             {obj.card_set_id.year} 
             {obj.card_set_id.card_set_name} 
             {obj.card_subset if obj.card_subset else ""} 
@@ -197,3 +194,8 @@ class CardUpdate(LoginRequiredMixin, UpdateView):
         data['title'] = 'Update Card Details'
         data['out'] = self.context_object_name
         return data
+
+
+def card_update(request, pk):
+    obj = Card.objects.get(pk=pk)
+    return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj)})
