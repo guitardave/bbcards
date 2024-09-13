@@ -5,7 +5,13 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Cardsets Home" "cards:cardsets" %}
-    {% breadcrumb "Card List" "cards:card-list" %}
+    {% breadcrumb "Card List" "cards:card-list-all" %}
+    {% if card_set %}
+        {% breadcrumb card_set.card_set_name "cards:card-list-set" card_set.slug %}
+    {% endif %}
+    {% if player %}
+        {% breadcrumb player.player_lname "cards:card-list-player" player.slug %}
+    {% endif %}
 {% endblock breadcrumbs %}
 {% block content %}
     <div class="container">
@@ -38,7 +44,9 @@
                                         <td>{{ card.card_num }}</td>
                                         <td>
                                             <a class="m-1" href="{% url 'cards:card-det' card.id %}"><i class="fa fa-info"></i></a>
-                                            <a class="m-1" href="{% url 'cards:card-new-set' card.card_set_id.slug %}"><i class="fa fa-plus"></i></a>
+                                            {% if user.is_authenticated %}
+                                                <a class="m-1" href="{% url 'cards:card-new-set' card.card_set_id.slug %}"><i class="fa fa-plus"></i></a>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

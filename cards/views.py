@@ -4,13 +4,9 @@ from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 
+from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
 from .models import Card, CardSet
-
-
-def home(request):
-    context = {'title': 'Cards Home'}
-    return render(request, 'cards/home.html', context)
 
 
 class CardSetCreate(LoginRequiredMixin, CreateView):
@@ -102,12 +98,16 @@ class CardList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Card.objects.filter(
-            card_set_id__slug=self.kwargs['slug']).order_by('year', 'card_set_name', 'card_num')
+            card_set_id__slug=self.kwargs['slug']
+        ).order_by(
+            'card_set_id__year', 'card_set_id__card_set_name', 'card_num'
+        )
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
+        kwargs = {'set': self.kwargs['slug']}
         data['title'] = 'Card List'
-        data['form'] = CardCreateForm
+        data['form'] = CardCreateForm(**kwargs)
         return data
 
     def post(self, *args, **kwargs):
@@ -124,11 +124,18 @@ class CardsListView(ListView):
     context_object_name = 'cards'
     ordering = 'card_set_id__slug'
 
+
+class CardsViewSet(CardsListView):
+    def get_queryset(self):
+        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_subset')
+
     def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(CardsListView, self).get_context_data(**kwargs)
-        data['title'] = 'Cards List'
+        card_set = CardSet.objects.get(slug=self.kwargs.get('slug'))
+        data = super(CardsViewSet, self).get_context_data(**kwargs)
+        data['title'] = f'Cards List {card_set.year} {card_set.card_set_name}'
         data['cards'] = self.get_queryset()
-        data['form'] = CardCreateForm
+        data['card_set'] = card_set
+        data['form'] = CardCreateForm(**{'set': card_set.slug})
         return data
 
     def post(self, *args, **kwargs):
@@ -136,17 +143,28 @@ class CardsListView(ListView):
         if form.is_valid():
             form.save()
             messages.success(self.request, 'Card has been created')
-            return redirect('cards:card-list')
-
-
-class CardsView(CardsListView):
-    def get_queryset(self):
-        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
+            return redirect('cards:card-list-set', slug=self.kwargs.get('slug'))
 
 
 class CardsViewPlayer(CardsListView):
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        player = Player.objects.get(slug=self.kwargs.get('slug'))
+        data = super(CardsViewPlayer, self).get_context_data(**kwargs)
+        data['title'] = f'Cards List {player.player_fname} {player.player_lname}'
+        data['cards'] = self.get_queryset()
+        data['player'] = player
+        data['form'] = CardCreateForm(**{'player': player.slug})
+        return data
+
+    def post(self, *args, **kwargs):
+        form = CardCreateForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(self.request, 'Card has been created')
+            return redirect('cards:card-list-player', slug=self.kwargs.get('slug'))
 
 
 class CardsDetail(DetailView):
@@ -166,7 +184,7 @@ class CardsDetail(DetailView):
             {obj.card_num}
             '''
         data['object'] = obj
-        kwargs = {'pk': self.kwargs.get('pk')}
+        kwargs = {'pk': kwargs.get('pk')}
         data['form'] = CardUpdateForm(instance=obj, **kwargs)
         return data
 

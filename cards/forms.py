@@ -11,6 +11,15 @@ class CardCreateForm(forms.ModelForm):
         model = Card
         fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image',)
 
+    def __init__(self, *args, **kwargs):
+        card_set = kwargs.pop('set') if 'set' in kwargs else None
+        player = kwargs.pop('player') if 'player' in kwargs else None
+        super(CardCreateForm, self).__init__(*args, **kwargs)
+        if card_set:
+            self.fields['card_set_id'].initial = CardSet.objects.get(slug=card_set)
+        if player:
+            self.fields['player_id'].initial = Player.objects.get(slug=player)
+
 
 class CardCreateSetForm(forms.ModelForm):
     player_id = forms.ModelChoiceField(queryset=Player.objects.all().order_by('player_lname'))
