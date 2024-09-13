@@ -32,12 +32,23 @@ class PlayerDetail(DetailView):
 	model = Player
 	template_name = 'players/player_detail.html'
 
+	def get_instance(self):
+		return Player.objects.get(slug=self.kwargs['slug'])
+
 	def get_context_data(self, **kwargs):
-		obj = Player.objects.get(slug=self.kwargs['slug'])
+		obj = self.get_instance()
 		data = super(PlayerDetail, self).get_context_data(**kwargs)
 		data['title'] = '{} {}'.format(obj.player_fname, obj.player_lname)
 		data['object'] = obj
+		data['form'] = PlayerForm(instance=obj)
 		return data
+
+	def post(self, *args, **kwargs):
+		form = PlayerForm(self.request.POST, instance=self.get_instance())
+		if form.is_valid():
+			form.save()
+			messages.success(self.request, 'Player was successfully saved.')
+			return redirect('players:players-det', slug=kwargs['slug'])
 
 
 class PlayerNew(LoginRequiredMixin, CreateView):
