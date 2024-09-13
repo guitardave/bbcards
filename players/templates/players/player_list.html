@@ -1,40 +1,70 @@
 {% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Players Home" "players:players-home" %}
 {% endblock breadcrumbs %}
 {% block content %}
-    {% load static %}
     <div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <h1>{{ title }}</h1>
         <div class="row">
-            <div class="col-sm-12 col-md-8 col-lg-8">
-                {% include 'cards/pag.html' %}
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Name </th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for p in players %}
-                        <tr>
-                            <td>{{ p.player_fname }}</td>
-                            <td>{{ p.player_lname }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group" aria-label="btn-grp">
-                                    <a class="btn btn-sm btn-light" href="{% url 'cards:card-list-player' p.slug %}">View List</a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% include 'cards/pag.html' %}
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>{{ title }}</h1>
+                    </div>
+                    <div class="card-body">
+                        <table class="display" id="myTable">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in players %}
+                                    <tr>
+                                        <td>{{ p.player_fname }}</td>
+                                        <td>{{ p.player_lname }}</td>
+                                        <td>
+                                            <a class="m-1" href="{% url 'cards:card-list-player' p.slug %}"><i class="fa fa-list-alt"></i></a>
+                                            {% if request.user.id %}
+                                                <a class="m-1" href="#edit" hx-get="" hx-target="" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            DC
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-header">
+                        Enter new Player
+                    </div>
+                    <div class="card-body">
+                        <div id="player-form">
+                            {% include 'players/player_form.html' %}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        let table = new DataTable('#myTable')
+    </script>
 {% endblock content %}

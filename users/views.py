@@ -23,7 +23,7 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect('/')
         else:
-            messages.info(request, 'Login Failed')
+            messages.warning(request, 'Login Failed')
             context['form'] = AuthenticationForm()
     else:
         context['form'] = AuthenticationForm()
@@ -32,7 +32,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    messages.success(request, 'logout successful')
+    messages.info(request, 'logout successful')
     return HttpResponseRedirect('/users/')
 
 
@@ -55,8 +55,8 @@ class UserUpdate(LoginRequiredMixin, UpdateView):
 
 
 def weather(request):
-    API_URI = os.environ.get('WX_API')
-    with urlopen(API_URI) as response:
+    api_uri = os.environ.get('WX_API')
+    with urlopen(api_uri) as response:
         source = response.read()
 
     data = json.loads(source)

@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from .models import Player
 from .forms import PlayerForm
@@ -15,7 +17,15 @@ class PlayerList(ListView):
 		data = super(PlayerList, self).get_context_data(**kwargs)
 		data['title'] = 'Player List'
 		data['players'] = self.get_queryset()
+		data['form'] = PlayerForm()
 		return data
+
+	def post(self, *args, **kwargs):
+		form = PlayerForm(self.request.POST)
+		if form.is_valid():
+			form.save()
+			messages.success(self.request, 'Your player was successfully saved.')
+			return redirect('players:players-home')
 
 
 class PlayerDetail(DetailView):
@@ -41,6 +51,12 @@ class PlayerNew(LoginRequiredMixin, CreateView):
 		data['title'] = 'Add New Player'
 		data['out'] = self.context_object_name
 		return data
+
+
+def player_add(request):
+	if request.method == 'POST':
+		pass
+	return render(request, '', {})
 
 
 class PlayerUpdate(LoginRequiredMixin, UpdateView):

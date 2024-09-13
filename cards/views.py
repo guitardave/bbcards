@@ -2,6 +2,8 @@ from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
+
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
 from .models import Card, CardSet
 
@@ -22,6 +24,18 @@ class CardSetCreate(LoginRequiredMixin, CreateView):
         data['out'] = self.context_object_name
         data['title'] = 'Create Card Set'
         return data
+
+
+def card_set_list(request):
+    if request.method == 'POST':
+        form = CardSetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Card set has been created')
+            return redirect('cards:cardsets')
+    form = CardSetForm
+    context = {'cards': CardSet.objects.all().order_by('year', 'card_set_name'), 'form': form, 'title': 'Card Sets'}
+    return render(request, 'cards/cardset-list.html', context)
 
 
 class CardSetList(ListView):
@@ -84,43 +98,32 @@ class CardNewSet(LoginRequiredMixin, CreateView):
         return data
 
 
-def pagination(request, qs):
-    paginator = Paginator(qs, 50)
-    page = request.GET.get('page', 1)
-    try:
-        cards = paginator.page(page)
-    except PageNotAnInteger:
-        cards = paginator.page(1)
-    except EmptyPage:
-        cards = paginator.page(paginator.num_pages)
-    return cards
+class CardList(LoginRequiredMixin, ListView):
+    model = Card
+    template_name = 'cards/card-list.html'
+    context_object_name = 'cards'
 
+    def get_queryset(self):
+        return Card.objects.filter(
+            card_set_id__slug=self.kwargs['slug']).order_by('year', 'card_set_name', 'card_num')
 
-def card_list_view(request, qs):
-    cards = pagination(request, qs)
-    context = {'title': 'Cards List', 'cards': cards}
-    return render(request, 'cards/card-list.html', context)
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data()
+        data['title'] = 'Card List'
+        data['form'] = CardCreateForm
+        return data
 
-
-def card_set_list(request):
-    c_list = Card.objects.all().order_by('card_set_id__slug')
-    return card_list_view(request, c_list)
-
-
-def card_list(request, slug):
-    c_list = Card.objects.filter(card_set_id__slug=slug).order_by('card_set_id__slug')
-    return card_list_view(request, c_list)
-
-
-def cards_list_player(request, slug):
-    c_list = Card.objects.filter(player_id__slug=slug).order_by('card_set_id__slug')
-    return card_list_view(request, c_list)
+    def post(self, *args, **kwargs):
+        form = CardCreateForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(self.request, 'Card has been created')
+            return redirect('cards:card-list')
 
 
 class CardsListView(ListView):
     model = Card
     template_name = 'cards/card-list.html'
-    paginate_by = 50
     context_object_name = 'cards'
     ordering = 'card_set_id__slug'
 
@@ -128,7 +131,15 @@ class CardsListView(ListView):
         data = super(CardsListView, self).get_context_data(**kwargs)
         data['title'] = 'Cards List'
         data['cards'] = self.get_queryset()
+        data['form'] = CardCreateForm
         return data
+
+    def post(self, *args, **kwargs):
+        form = CardCreateForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(self.request, 'Card has been created')
+            return redirect('cards:card-list')
 
 
 class CardsView(CardsListView):
@@ -136,7 +147,7 @@ class CardsView(CardsListView):
         return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
 
-class CardsViewPLayer(CardsListView):
+class CardsViewPlayer(CardsListView):
     def get_queryset(self):
         return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
 
@@ -145,12 +156,29 @@ class CardsDetail(DetailView):
     model = Card
     template_name = 'cards/card-detail.html'
 
+    def get_object(self, *args, **kwargs):
+        return Card.objects.get(pk=self.kwargs.get('pk'))
+
     def get_context_data(self, **kwargs):
-        obj = Card.objects.get(pk=self.kwargs.get('pk'))
+        obj = self.get_object()
         data = super(CardsDetail, self).get_context_data(**kwargs)
-        data['title'] = 'Card Detail - ' + obj.card_num
+        data['title'] = f'''Card Detail - 
+            {obj.card_set_id.year} 
+            {obj.card_set_id.card_set_name} 
+            {obj.card_subset if obj.card_subset else ""} 
+            {obj.card_num}
+            '''
         data['object'] = obj
+        kwargs = {'pk': self.kwargs.get('pk')}
+        data['form'] = CardUpdateForm(instance=obj, **kwargs)
         return data
+
+    def post(self, *args, **kwargs):
+        form = CardUpdateForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(self.request, 'Card has been updated')
+            return redirect('cards:card-det', pk=kwargs.get('pk'))
 
 
 class CardUpdate(LoginRequiredMixin, UpdateView):
@@ -169,20 +197,3 @@ class CardUpdate(LoginRequiredMixin, UpdateView):
         data['title'] = 'Update Card Details'
         data['out'] = self.context_object_name
         return data
-
-
-def card_search(request):
-    context = {'title': 'Card Search'}
-    if request.method == 'POST':
-        form = SearchForm(request.POST)
-        cards = []
-        if form.is_valid():
-            cards.append(dict(Card.objects.filter(card_set_id__card__card_subset__icontains=request.POST['search'])))
-            cards.append(dict(Card.objects.filter(card_set_id__card_set_name__icontains=request.POST['search'])))
-            context['cards'] = cards
-            context['form'] = SearchForm()
-        return render(request, 'cards/card-search.html', context)
-    else:
-        form = SearchForm()
-        context['form'] = form
-    return render(request, 'cards/card-search.html', context)

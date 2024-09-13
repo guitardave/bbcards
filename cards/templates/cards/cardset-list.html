@@ -1,39 +1,82 @@
 {% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Cardsets Home" "cards:cardsets" %}
 {% endblock breadcrumbs %}
 {% block content %}
-    {% load static %}
+
 	<div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <h1>{{ title }}</h1>
+
         <div class="row">
-            <div class="col-sm-12 col-md-10 col-lg-10">
-            {% include 'cards/pag.html' %}
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Card Set</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for card in cards %}
-                        <tr>
-                            <td>{{ card.year }}</td>
-                            <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
-                            <td>
-                                <a class="m-1" href="{% url 'cards:cardsets-upd' card.slug %}"><i class="fa fa-edit"></i></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% include 'cards/pag.html' %}
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h1>{{ title }}</h1>
+                            </div>
+                            <div class="card-body">
+                                <table class="display" id="myTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>Card Set</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for card in cards %}
+                                        <tr>
+                                            <td>{{ card.year }}</td>
+                                            <td><a href="{% url 'cards:card-list' card.slug %}">{{ card.card_set_name }}</a></td>
+                                            <td>
+                                                <a class="m-1" href="{% url 'cards:cardsets-upd' card.slug %}"><i class="fa fa-edit"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        {% if user.is_authenticated %}
+                            <div class="card">
+                                <div class="card-header">
+                                    New Cardset
+                                </div>
+                                <div class="card-body">
+                                    <div id="cardset-form">
+                                        {% include 'cards/cardset-form.html' %}
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        let table = new DataTable('#myTable', {
+                sort: [[0,1]],
+                lengthMenu: [
+                    [50, 100, 250, -1],
+                    [50, 100, 250, 'All']
+                ],
+                pageLength: 50
+            });
+    </script>
 {% endblock content %}
