@@ -18,6 +18,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# CSRF_COOKIE_SECURE = True
+
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS')
 
@@ -48,10 +50,18 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    'api.apps.ApiConfig',
     'cards.apps.CardsConfig',
     'players.apps.PlayersConfig',
     'users.apps.UsersConfig',
@@ -69,9 +79,12 @@ INSTALLED_APPS = [
     'django_htmx',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,6 +107,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cards.custom_context_processor.copyright_year',
             ],
         },
     },
@@ -106,8 +120,6 @@ WSGI_APPLICATION = 'bbcards.wsgi.application'
 LOGIN_URL = 'users:login'
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 
 if os.getenv("DATABASE_URL", None) is None:
     raise Exception("DATABASE_URL environment variable not defined")
@@ -117,7 +129,6 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -136,7 +147,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -149,11 +159,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 # AWS access information for S3 bucket
-
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
@@ -175,9 +181,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
