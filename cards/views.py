@@ -12,23 +12,28 @@ from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, Card
 from .models import Card, CardSet
 
 
+def get_card_set_list():
+    return CardSet.objects.all().order_by('year', 'card_set_name')
+
+
 @login_required(login_url='/users/')
 def card_set_create_async(request):
     message = ''
     if request.method == 'POST':
         set_year = request.POST['year']
         set_name = request.POST['card_set_name']
+        full_set_name = f'{set_year} {set_name}'
         check = CardSet.objects.filter(card_set_name=set_name, year=set_year)
         if not check.exists():
             form = CardSetForm(request.POST)
             if form.is_valid():
                 form.save()
-                message = '<i class="fa fa-check"></i> Card Set has been added'
+                message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
-            message = '<i class="fa fa-remove"></i> Card Set already exists'
+            message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
-                      'cards': CardSet.objects.all().order_by('year', 'card_set_name'),
+                      'cards': get_card_set_list(),
                       'title': 'Card Sets',
                       'c_message': message
                   }
@@ -44,7 +49,7 @@ def card_set_list(request):
         return redirect('cards:cardsets')
     form = CardSetForm
     context = {
-        'cards': CardSet.objects.all().order_by('year', 'card_set_name'),
+        'cards': get_card_set_list(),
         'form': form,
         'title': 'Card Sets',
         'card_title': 'Add Card Set',
@@ -85,6 +90,8 @@ class CardsListView(ListView):
         data['title'] = 'Last 50 Cards'
         data['cards'] = self.get_queryset()
         data['form'] = CardCreateForm()
+        data['card_title'] = 'Add Card'
+        data['loaded'] = datetime.datetime.now()
         return data
 
     def post(self, *args, **kwargs):
@@ -104,6 +111,8 @@ class CardsViewAll(CardsListView):
         data['title'] = 'All Cards'
         data['cards'] = self.get_queryset()
         data['form'] = CardCreateForm
+        data['card_title'] = 'Add Card'
+        data['loaded'] = datetime.datetime.now()
         return data
 
 
@@ -116,7 +125,7 @@ class CardsViewSet(CardsListView):
         return f'{card_set.year} {card_set.card_set_name}'
 
     def get_queryset(self):
-        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug')).order_by('card_subset')
+        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug'))
 
     def get_context_data(self, *, object_list=None, **kwargs):
         card_set = self.get_object()
@@ -125,6 +134,8 @@ class CardsViewSet(CardsListView):
         data['cards'] = self.get_queryset()
         data['card_set'] = card_set
         data['form'] = CardCreateForm(**{'set': card_set.slug})
+        data['card_title'] = 'Add Card - by Card Set'
+        data['loaded'] = datetime.datetime.now()
         return data
 
     def post(self, *args, **kwargs):
@@ -138,7 +149,7 @@ class CardsViewSet(CardsListView):
 
 class CardsViewPlayer(CardsListView):
     def get_queryset(self):
-        return Card.objects.filter(player_id__slug=self.kwargs.get('slug')).order_by('card_set_id__slug')
+        return Card.objects.filter(player_id__slug=self.kwargs.get('slug'))
 
     def get_object(self):
         return Player.objects.get(slug=self.kwargs.get('slug'))
@@ -154,6 +165,8 @@ class CardsViewPlayer(CardsListView):
         data['cards'] = self.get_queryset()
         data['player'] = player
         data['form'] = CardCreateForm(**{'player': player.slug})
+        data['card_title'] = 'Add Card - by Player'
+        data['loaded'] = datetime.datetime.now()
         return data
 
     def post(self, *args, **kwargs):
@@ -173,7 +186,12 @@ def card_update_async(request, pk: int):
         if form.is_valid():
             form.save()
             return render(request, 'cards/card-list-tr-partial.html', {'card': obj, 'success': True})
-    return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj), 'obj': obj})
+    context = {
+        'form': CardUpdateForm(instance=obj), 'obj': obj,
+        'card_title': 'Update Card',
+        'loaded': datetime.datetime.now()
+    }
+    return render(request, 'cards/card-form.html', context)
 
 
 @login_required(login_url='/users/')
@@ -185,3 +203,9 @@ def card_create_async(request):
             messages.success(request, 'Card has been created')
     cards = Card.objects.all()
     return render(request, 'cards/card-list-table-partial.html', {'cards': cards})
+
+
+@login_required(login_url='/users/')
+def card_form_refresh(request):
+    context = {'card_title': 'Add Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
+    return render(request, 'cards/card-form.html', context)

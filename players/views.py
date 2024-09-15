@@ -22,6 +22,7 @@ class PlayerList(ListView):
         data['players'] = self.get_queryset()
         data['form'] = PlayerForm()
         data['loaded'] = datetime.datetime.now()
+        data['card_title'] = 'Add Player'
         return data
 
     def post(self, *args, **kwargs):

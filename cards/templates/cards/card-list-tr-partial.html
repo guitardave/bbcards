@@ -5,7 +5,7 @@
 <td style="text-align: right">{{ card.card_num }}</td>
 {% if user.is_authenticated %}
     <td>
-        <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
+        <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
         {% if success %}
             <span class="fade-out"><small class="text-muted"><i class="fa fa-check"></i></small></span>
         {% endif %}

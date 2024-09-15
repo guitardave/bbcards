@@ -1,23 +1,44 @@
 {% load crispy_forms_tags %}
-<article class="media content-section">
-      <div class="media-body text-light">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-12">{{ form|crispy }}</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-sm-8">
+                <h2>{{ card_title }}</h2>
             </div>
-            <div class="row">
-                <div class="col-sm-12">&nbsp;</div>
+            <div class="col-sm-4 me-auto text-end">
+                <a href="#refresh" hx-get="{% url 'cards:card-form-refresh' %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-refresh"></i></a>
             </div>
-            <div class="row">
-                <div class="col-sm-12 me-auto text-end">
-                    {% if obj %}
-                        <button class="btn btn-sm btn-dark" hx-post="{% url 'cards:card-upd-async' obj.id %}" hx-target="#tr-c{{ obj.id }}" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
-                    {% else %}
-                        <button class="btn btn-sm btn-dark"><i class="fa fa-save"></i></button>
-                    {% endif %}
-                </div>
-            </div>
-        </form>
-      </div>
-</article>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="card-form">
+            <article class="media content-section">
+                  <div class="media-body text-light">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-sm-12">{{ form|crispy }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">&nbsp;</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 me-auto text-end">
+                                {% if obj %}
+                                    <button class="btn btn-sm btn-dark" hx-post="{% url 'cards:card-upd-async' obj.id %}" hx-target="#tr-c{{ obj.id }}" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-dark"><i class="fa fa-save"></i></button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                  </div>
+            </article>
+        </div>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">
+            <i class="fa fa-refresh"></i> {{ loaded|date:'m/d/Y h:i:s A' }}
+        </small>
+    </div>
+</div>
