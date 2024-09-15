@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,6 +21,7 @@ class PlayerList(ListView):
         data['title'] = 'Player List'
         data['players'] = self.get_queryset()
         data['form'] = PlayerForm()
+        data['loaded'] = datetime.datetime.now()
         return data
 
     def post(self, *args, **kwargs):
@@ -63,5 +66,16 @@ def player_update_async(request, pk: int):
         if form.is_valid():
             form.save()
             return render(request, 'players/player_list_tr_partial.html', {'p': player, 'success': True})
-    context = {'form': PlayerForm(instance=player), 'obj': player}
+    context = {
+        'form': PlayerForm(instance=player),
+        'obj': player,
+        'card_title': 'Update Player',
+        'loaded': datetime.datetime.now()
+    }
+    return render(request, 'players/player_form.html', context)
+
+
+@login_required(login_url='/users/')
+def player_form_refresh(request):
+    context = {'card_title': 'Add Player', 'loaded': datetime.datetime.now(), 'form': PlayerForm}
     return render(request, 'players/player_form.html', context)

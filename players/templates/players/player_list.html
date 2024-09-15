@@ -18,20 +18,8 @@
             </div>
             {% if user.is_authenticated %}
                 <div class="col-sm-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Enter new Player</h2>
-                        </div>
-                        <div class="card-body">
-                            <div id="player-form" class="fade-in">
-                                {% include 'players/player_form.html' %}
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <small class="text-muted">
-                                {% if message %}{{ message }}{% endif %}
-                            </small>
-                        </div>
+                    <div id="player-form-div">
+                        {% include 'players/player_form.html'%}
                     </div>
                 </div>
             {% endif %}

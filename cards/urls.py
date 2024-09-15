@@ -13,5 +13,6 @@ urlpatterns = [
     path('sets/', views.card_set_list, name='cardsets'),
     path('sets/new/async/', views.card_set_create_async, name='cardsets-new-async'),
     path('sets/<int:pk>/update/async/', views.card_set_update_async, name='cardsets-upd-async'),
+    path('sets/refresh/async/', views.card_set_form_refresh, name='cardsets-form-refresh')
 ]
 

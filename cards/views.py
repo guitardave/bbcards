@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -21,9 +23,9 @@ def card_set_create_async(request):
             form = CardSetForm(request.POST)
             if form.is_valid():
                 form.save()
-                message = 'Card Set has been added'
+                message = '<i class="fa fa-check"></i> Card Set has been added'
         else:
-            message = 'Card Set already exists'
+            message = '<i class="fa fa-remove"></i> Card Set already exists'
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
                       'cards': CardSet.objects.all().order_by('year', 'card_set_name'),
@@ -41,7 +43,13 @@ def card_set_list(request):
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
     form = CardSetForm
-    context = {'cards': CardSet.objects.all().order_by('year', 'card_set_name'), 'form': form, 'title': 'Card Sets'}
+    context = {
+        'cards': CardSet.objects.all().order_by('year', 'card_set_name'),
+        'form': form,
+        'title': 'Card Sets',
+        'card_title': 'Add Card Set',
+        'loaded': datetime.datetime.now()
+    }
     return render(request, 'cards/cardset-list.html', context)
 
 
@@ -53,21 +61,14 @@ def card_set_update_async(request, pk: int):
         if form.is_valid():
             form.save()
         return render(request, 'cards/cardset-list-tr-partial.html', {'card': obj, 'success': True})
-    form = CardSetForm(instance=obj)
-    return render(request, 'cards/cardset-form.html', {'form': form, 'obj': obj})
+    context = {'form': CardSetForm(instance=obj), 'obj': obj, 'card_title': 'Update Card Set', 'loaded': datetime.datetime.now()}
+    return render(request, 'cards/cardset-form.html', context)
 
 
-class CardCreate(LoginRequiredMixin, CreateView):
-    model = Card
-    form_class = CardCreateForm
-    template_name = 'cards/card-form.html'
-    context_object_name = 'out'
-
-    def get_context_data(self, **kwargs):
-        data = super(CardCreate, self).get_context_data(**kwargs)
-        data['title'] = 'Enter New Card'
-        data['out'] = self.context_object_name
-        return data
+@login_required(login_url='/users/')
+def card_set_form_refresh(request):
+    context = {'card_title': 'Add Card Set', 'form': CardSetForm, 'loaded': datetime.datetime.now()}
+    return render(request, 'cards/cardset-form.html', context)
 
 
 class CardsListView(ListView):

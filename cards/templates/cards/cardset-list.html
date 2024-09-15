@@ -7,7 +7,6 @@
     {% breadcrumb "Card Sets" "cards:cardsets" %}
 {% endblock breadcrumbs %}
 {% block content %}
-
 	<div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
@@ -18,20 +17,8 @@
             </div>
             {% if user.is_authenticated %}
                 <div class="col-sm-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>New Cardset</h2>
-                        </div>
-                        <div class="card-body">
-                            <div id="cardset-form">
-                                {% include 'cards/cardset-form.html' %}
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <small class="text-muted">
-                                {% if message %}{{ message }}{% endif %}
-                            </small>
-                        </div>
+                    <div id="cardset-form">
+                        {% include 'cards/cardset-form.html' %}
                     </div>
                 </div>
             {% endif %}
