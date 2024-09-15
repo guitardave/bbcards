@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
@@ -209,3 +210,19 @@ def card_create_async(request):
 def card_form_refresh(request):
     context = {'card_title': 'Add Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/card-form.html', context)
+
+
+@login_required(login_url='/users/')
+def card_search(request):
+    cards = []
+    search = ''
+    if request.method == 'POST':
+        search = request.POST['search']
+        cards = Card.objects.filter(
+            Q(card_set_id__card_set_name__icontains=search) |
+            Q(card_subset__icontains=search) |
+            Q(player_id__player_lname__icontains=search) |
+            Q(player_id__player_fname__icontains=search)
+        ).order_by('card_set_id__year', 'card_set_id__card_set_name', 'player_id__player_lname')
+    context = {'cards': cards, 'title': f'Search "{search}"', 'form': CardCreateForm}
+    return render(request, 'cards/card-list.html', context)
