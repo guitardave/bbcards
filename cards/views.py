@@ -2,14 +2,12 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import redirect, render
+from django.views.generic import ListView
 from django.contrib import messages
 
 from players.models import Player
-from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, CardCreateSetForm
+from .forms import CardSetForm, CardUpdateForm, CardCreateForm
 from .models import Card, CardSet
 
 

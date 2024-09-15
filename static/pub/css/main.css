@@ -1,28 +1,28 @@
 @import url("/static/cards/font-awesome.min.css");
 
 body {
-  background-color: #333333;
+  /*background-color: #333333;*/
   color: #eee
 }
 
-h1 {
-  font-size: 24px;
-  font-weight: bold;
-}
+/*h1 {*/
+/*  font-size: 24px;*/
+/*  font-weight: bold;*/
+/*}*/
 
-h2 {
-  font-size: 20px;
-  font-weight: bold;
-}
+/*h2 {*/
+/*  font-size: 20px;*/
+/*  font-weight: bold;*/
+/*}*/
 
-table td {font-size: 13px;}
+/*table td {font-size: 13px;}*/
 
 .small-header {
   font-size: 12px;
 }
 
 .content-section {
-  background-color: #2f2f2f;
+  /*background-color: #2f2f2f;*/
   padding: 10px 20px;
   border: 1px solid #888888;
   border-radius: 3px;

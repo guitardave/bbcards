@@ -2,9 +2,8 @@ import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
+from django.views.generic import ListView
 from .models import Player
 from .forms import PlayerForm
 

@@ -1,0 +1,32 @@
+@font-face {
+    font-family: OldSport02Athletic;
+    src: url('/static/cards/fonts/OldSport02AthleticNcv-E0gj.ttf') format('truetype')
+}
+@font-face {
+    font-family: Lato;
+    src: url('/static/cards/fonts/Lato-Regular.ttf') format('truetype')
+}
+body, td {
+    font-family: Lato, serif;
+    font-size: 16px;
+}
+input, select, option {
+    font-family: Lato, serif;
+}
+th, h1, h2 {
+    font-family: OldSport02Athletic, serif;
+    font-weight: normal;
+}
+th {
+    font-size: 14px;
+}
+a {
+    text-decoration: none;
+}
+.nav-item .nav-link {
+    font-family: OldSport02Athletic, serif;
+    font-size: 32px;
+}
+.p_short {
+    line-height: 14px;
+}
