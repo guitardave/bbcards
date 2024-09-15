@@ -183,10 +183,19 @@ class CardsViewPlayer(CardsListView):
 def card_update_async(request, pk: int):
     obj = Card.objects.get(pk=pk)
     if request.method == 'POST':
+        success = False
         form = CardUpdateForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-            return render(request, 'cards/card-list-tr-partial.html', {'card': obj, 'success': True})
+            success = True
+            message = '<i class="fa fa-check"></i>'
+        else:
+            message = '<i class="fa fa-remove"></i> Error'
+        return render(
+            request,
+            'cards/card-list-tr-partial.html',
+            {'card': Card.objects.get(pk=pk), 'success': success, 'message': message}
+        )
     context = {
         'form': CardUpdateForm(instance=obj), 'obj': obj,
         'card_title': 'Update Card',
