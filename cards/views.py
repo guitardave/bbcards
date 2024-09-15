@@ -12,6 +12,7 @@ from .models import Card, CardSet
 
 @login_required(login_url='/users/')
 def card_set_create_async(request):
+    message = ''
     if request.method == 'POST':
         set_year = request.POST['year']
         set_name = request.POST['card_set_name']
@@ -20,10 +21,16 @@ def card_set_create_async(request):
             form = CardSetForm(request.POST)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Card Set has been added')
+                message = 'Card Set has been added'
         else:
-            messages.warning(request, 'Card Set already exists')
-    return render(request, 'cards/cardset-list-table-partial.html', {'cards': CardSet.objects.all()})
+            message = 'Card Set already exists'
+    return render(request, 'cards/cardset-list-card-partial.html',
+                  {
+                      'cards': CardSet.objects.all().order_by('year', 'card_set_name'),
+                      'title': 'Card Sets',
+                      'c_message': message
+                  }
+                  )
 
 
 def card_set_list(request):

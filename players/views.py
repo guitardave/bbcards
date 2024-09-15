@@ -55,20 +55,6 @@ def player_add_async(request):
     return render(request, 'players/player_list_card_partial.html', context)
 
 
-class PlayerUpdate(LoginRequiredMixin, UpdateView):
-    model = Player
-    template_name = 'players/player_form.html'
-    form_class = PlayerForm
-    context_object_name = 'out'
-
-    def get_context_data(self, **kwargs):
-        obj = Player.objects.get(slug=self.kwargs['slug'])
-        data = super(PlayerUpdate, self).get_context_data(**kwargs)
-        data['title'] = 'Update Player - ' + '{} {}'.format(obj.player_fname, obj.player_lname)
-        data['out'] = self.context_object_name
-        return data
-
-
 @login_required(login_url="/users/")
 def player_update_async(request, pk: int):
     player = Player.objects.get(pk=pk)

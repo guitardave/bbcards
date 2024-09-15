@@ -12,7 +12,7 @@
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
             <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
-                <div id="player-card">
+                <div id="player-card" class="fade-in">
                     {% include 'players/player_list_card_partial.html' %}
                 </div>
             </div>
@@ -23,7 +23,7 @@
                             <h2>Enter new Player</h2>
                         </div>
                         <div class="card-body">
-                            <div id="player-form">
+                            <div id="player-form" class="fade-in">
                                 {% include 'players/player_form.html' %}
                             </div>
                         </div>
