@@ -105,8 +105,8 @@ def get_cards_by_set(request, set_id: int):
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def get_card(request, pk: int):
-    card = Card.objects.get(pk=pk)
+def get_card(request, card_id: int):
+    card = Card.objects.get(pk=card_id)
     serializer = CardSerializer(card)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
