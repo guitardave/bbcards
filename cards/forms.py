@@ -1,6 +1,17 @@
 from datetime import datetime
 from django import forms
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
 from .models import *
+
+
+def validate_int(value):
+    if not int(value):
+        raise ValidationError(
+            _("%(value)s is not an integer"),
+            params={'value': value}
+        )
 
 
 class CardCreateSetForm(forms.ModelForm):
@@ -17,11 +28,25 @@ class CardCreateSetForm(forms.ModelForm):
 
 
 class CardForm(forms.ModelForm):
-    player_id = forms.ModelChoiceField(label='Player', queryset=Player.objects.all().order_by('player_lname'))
-    card_set_id = forms.ModelChoiceField(label='Card Set',
-                                         queryset=CardSet.objects.all().order_by('year', 'card_set_name'))
-    card_subset = forms.CharField(label='Card Subset/Info', required=False)
-    card_num = forms.CharField(label='Card number')
+    player_id = forms.ModelChoiceField(
+        label='Player',
+        queryset=Player.objects.all().order_by('player_lname'),
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'})
+    )
+    card_set_id = forms.ModelChoiceField(
+        label='Card Set',
+        queryset=CardSet.objects.all().order_by('year', 'card_set_name'),
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'})
+    )
+    card_subset = forms.CharField(
+        label='Card Subset/Info',
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'})
+    )
+    card_num = forms.CharField(
+        label='Card number',
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'})
+    )
 
     class Meta:
         model = Card
@@ -46,7 +71,17 @@ class CardUpdateForm(CardForm):
 
 
 class CardSetForm(forms.ModelForm):
-    year = forms.IntegerField(max_value=datetime.now().year)
+    year = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        label='Set Year',
+        validators=[validate_int],
+        required=True
+    )
+    card_set_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        label='Card Set Name',
+        required=True
+    )
 
     class Meta:
         model = CardSet
