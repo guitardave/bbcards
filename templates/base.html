@@ -35,8 +35,20 @@
             font-family: OldSport02Athletic;
             src: url('/static/cards/fonts/OldSport02AthleticNcv-E0gj.ttf') format('truetype')
         }
-        body, th, td {
+        @font-face {
+            font-family: Lato;
+            src: url('/static/cards/fonts/Lato-Regular.ttf') format('truetype')
+        }
+        body, th, td, input, select {
+            font-family: Lato, serif;
+            {#font-size: 18px;#}
+        }
+        h1, h2 {
             font-family: OldSport02Athletic, serif;
+        }
+        .nav-item .nav-link {
+            font-family: OldSport02Athletic, serif;
+            font-size: 32px;
         }
         a {text-decoration: none}
     </style>

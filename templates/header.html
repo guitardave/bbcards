@@ -9,18 +9,18 @@
       <div class="collapse navbar-collapse" id="navbarToggle">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'players:players-home' %}">Players</a>
+                <a class="nav-link m-2" href="{% url 'players:players-home' %}">Players</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'cards:cardsets' %}">Card Sets</a>
+                <a class="nav-link m-2" href="{% url 'cards:cardsets' %}">Card Sets</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'cards:card-list-all' %}">All Cards</a>
+                <a class="nav-link m-2" href="{% url 'cards:card-list-all' %}">All Cards</a>
             </li>
         </ul>
         <!-- Navbar Right Side -->
         <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
+            <li class="nav-item align-middle">
                 <form method="post" action="{% url 'cards:search' %}">
                     {% csrf_token %}
                     <div class="input-group">
