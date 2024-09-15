@@ -1,45 +1,39 @@
+
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Players Home" "players:players-home" %}
+    {% breadcrumb "Player List" "players:players-home" %}
 {% endblock breadcrumbs %}
 {% block content %}
     <div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
             <div class="col-sm-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h1>{{ title }}</h1>
-                    </div>
-                    <div class="card-body">
-                        <div id="player-div">
-                            {% include 'players/player_list_table_partial.html' %}
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">
-                        </small>
-                    </div>
+                <div id="player-card">
+                    {% include 'players/player_list_card_partial.html' %}
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Enter new Player</h2>
-                    </div>
-                    <div class="card-body">
-                        <div id="player-form">
-                            {% include 'players/player_form.html' %}
+                {% if user.is_authenticated %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Enter new Player</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="player-form">
+                                {% include 'players/player_form.html' %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">
+
+                            </small>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <small class="text-muted"></small>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>

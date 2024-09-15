@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
@@ -9,25 +10,23 @@ from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm, Card
 from .models import Card, CardSet
 
 
-class CardSetCreate(LoginRequiredMixin, CreateView):
-    model = CardSet
-    form_class = CardSetForm
-    template_name = 'cards/cardset-form.html'
-    context_object_name = 'out'
-
-    def get_context_data(self, **kwargs):
-        data = super(CardSetCreate, self).get_context_data(**kwargs)
-        data['out'] = self.context_object_name
-        data['title'] = 'Create Card Set'
-        return data
-
-
+@login_required(login_url="/users/")
 def card_set_create(request):
+    message = ''
     if request.method == 'POST':
-        form = CardCreateForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-    return render(request, 'cards/cardset-list-table-partial.html', {'cards': CardSet.objects.all()})
+        set_year = request.POST['year']
+        set_name = request.POST['card_set_name']
+        check = CardSet.objects.filter(card_set_name=set_name, year=set_year)
+        if not check.exists():
+            form = CardSetForm(request.POST or None)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Card Set entered successfully')
+        else:
+            messages.warning(request, 'Card Set already exists')
+
+    context = {'cards': CardSet.objects.all(), 'message': message}
+    return render(request, 'cards/cardset-list-tr-partial.html', context)
 
 
 def card_set_list(request):
@@ -42,20 +41,7 @@ def card_set_list(request):
     return render(request, 'cards/cardset-list.html', context)
 
 
-class CardSetList(ListView):
-    model = CardSet
-    template_name = 'cards/cardset-list.html'
-    context_object_name = 'cards'
-    paginate_by = 50
-    ordering = 'year'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(CardSetList, self).get_context_data(**kwargs)
-        data['title'] = 'Card Sets'
-        data['cards'] = self.get_queryset()
-        return data
-
-
+@login_required(login_url="/users/")
 def card_set_update_async(request, pk: int):
     obj = CardSet.objects.get(pk=pk)
     if request.method == 'POST':
@@ -198,6 +184,7 @@ class CardsViewPlayer(CardsListView):
         return redirect('cards:card-list-player', slug=self.kwargs.get('slug'))
 
 
+@login_required(login_url="/users/")
 def card_update_async(request, pk: int):
     obj = Card.objects.get(pk=pk)
     if request.method == 'POST':
@@ -206,4 +193,3 @@ def card_update_async(request, pk: int):
             form.save()
             return render(request, 'cards/card-list-tr-partial.html', {'card': obj, 'success': True})
     return render(request, 'cards/card-form.html', {'form': CardUpdateForm(instance=obj), 'obj': obj})
-

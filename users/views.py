@@ -52,26 +52,3 @@ class UserUpdate(LoginRequiredMixin, UpdateView):
         user.set_password(password)
         user.save()
         return redirect('users:user-profile', self.kwargs.get('pk'))
-
-
-def weather(request):
-    api_uri = os.environ.get('WX_API')
-    with urlopen(api_uri) as response:
-        source = response.read()
-
-    data = json.loads(source)
-
-    print(json.dumps(data, indent=2))
-
-    loc = data['location']['name']
-    st = data['location']['region']
-    temp = data['current']['temp_c']
-    temp_f = data['current']['temp_f']
-    cond = data['current']['condition']['text']
-    wind = data['current']['wind_mph']
-    wind_g = data['current']['gust_mph']
-
-    report = f'It is currently {temp}C ({temp_f}F) ' \
-             f'and {cond} with winds of {wind} mph (gusts up to {wind_g} mph) in {loc}, {st}'
-
-    return render(request, 'users/weather.html', {'title': 'Weather Information', 'report': report})

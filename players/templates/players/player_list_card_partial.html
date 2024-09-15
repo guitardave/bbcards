@@ -1,0 +1,42 @@
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-sm-8">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="col-sm-4 me-auto text-end">
+                <div id="message-div">
+                    <small class="text-muted">
+                        {{ message|safe }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="player-div">
+            <table class="display" id="myTable">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in players %}
+                        <tr id="tr-p{{ p.id }}" class="player-row">
+                            {% include 'players/player_list_tr_partial.html' %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">
+
+        </small>
+    </div>
+</div>

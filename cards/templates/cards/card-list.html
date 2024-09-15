@@ -4,7 +4,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Cardsets" "cards:cardsets" %}
+    {% breadcrumb "Card Sets" "cards:cardsets" %}
     {% breadcrumb "Card List" "cards:card-list-all" %}
     {% if card_set %}
         {% breadcrumb card_set.card_set_name "cards:card-list-set" card_set.slug %}
