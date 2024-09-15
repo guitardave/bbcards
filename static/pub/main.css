@@ -74,13 +74,31 @@ th, td {color: #e1e1e1;}
   background-color: #2b2b2b;
 }
 
-@-webkit-keyframes fade-out{0%{opacity:0}to{opacity:1}}
-@keyframes fade-in{0%{opacity:0}to{opacity:1}}
-.fade-in{-webkit-animation-name:fade-in;animation-name:fade-in}
+.successfully-saved.hide-opacity{
+    opacity: 0;
+}
 
-@-webkit-keyframes fade-out{0%{opacity:1}to{opacity:0}}
-@keyframes fade-out{0%{opacity:1}to{opacity:0}}
-.fade-out{-webkit-animation-name:fade-out;animation-name:fade-out}
+.successfully-saved {
+    transition: opacity 3s ease-in-out;
+    opacity: 1;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 2s linear;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
+}
+
+.scroll {
+  max-height: 640px;
+  overflow-y: scroll;
+}
 
 @media only screen and (max-width: 900px) {
         .one{

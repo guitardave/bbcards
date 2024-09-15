@@ -11,13 +11,13 @@
     <div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
                 <div id="player-card">
                     {% include 'players/player_list_card_partial.html' %}
                 </div>
             </div>
-            <div class="col-sm-4">
-                {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
+                <div class="col-sm-4">
                     <div class="card">
                         <div class="card-header">
                             <h2>Enter new Player</h2>
@@ -29,15 +29,15 @@
                         </div>
                         <div class="card-footer">
                             <small class="text-muted">
-
+                                {% if message %}{{ message }}{% endif %}
                             </small>
                         </div>
                     </div>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
     </div>
-    <script>
-        let table = new DataTable('#myTable')
-    </script>
+{#    <script>#}
+{#        let table = new DataTable('#myTable')#}
+{#    </script>#}
 {% endblock content %}

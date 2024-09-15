@@ -17,21 +17,24 @@
     <div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
                 <div class="card">
                     <div class="card-header">
                         <h1>{{ title }}</h1>
                     </div>
                     <div class="card-body">
+                        {% include '_search_filter.html' %}
+                    </div>
+                    <div class="card-body scroll">
                         {% include 'cards/card-list-table-partial.html' %}
                     </div>
                     <div class="card-footer">
-                        <small class="text-muted"></small>
+                        <small class="text-muted">{{ cards|length }}</small>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
+                <div class="col-sm-4">
                     <div class="card">
                         <div class="card-header">
                             <h2>Add new card</h2>
@@ -43,21 +46,21 @@
                         </div>
                         <div class="card-footer"><small class="text-muted"></small></div>
                     </div>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
     </div>
-    <script>
-        let table = new DataTable(
-            '#myTable',
-            {
-                sort: [[0,1]],
-                lengthMenu: [
-                    [50, 100, 250, -1],
-                    [50, 100, 250, 'All']
-                ],
-                pageLength: 50
-            });
-    </script>
+{#    <script>#}
+{#        let table = new DataTable(#}
+{#            '#myTable',#}
+{#            {#}
+{#                sort: [[0,1]],#}
+{#                lengthMenu: [#}
+{#                    [50, 100, 250, -1],#}
+{#                    [50, 100, 250, 'All']#}
+{#                ],#}
+{#                pageLength: 50#}
+{#            });#}
+{#    </script>#}
 
 {% endblock content %}

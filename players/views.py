@@ -48,10 +48,10 @@ def player_add_async(request):
                 message = f'<i class="fa fa-check"></i> {f_name} {l_name} entered successfully'
         else:
             message = f'<i class="fa fa-remove"></i> {f_name} {l_name} already exists'
-    players = Player.objects.all()
-    obj = Player.objects.last()
-    # context = {'title': 'Player List', 'p_success': success, 'players': players, 'message': message}
-    context = {'p': obj, 'success': success, 'message': message}
+    players = Player.objects.all().order_by('player_lname')
+    # obj = Player.objects.last()
+    context = {'title': 'Player List', 'p_success': success, 'players': players, 'message': message}
+    # context = {'p': obj, 'success': success, 'message': message}
     return render(request, 'players/player_list_card_partial.html', context)
 
 
