@@ -31,8 +31,12 @@
     {% django_htmx_script %}
 
     <style>
+        @font-face {
+            font-family: OldSport02Athletic;
+            src: url('/static/cards/fonts/OldSport02AthleticNcv-E0gj.ttf') format('truetype')
+        }
         body, th, td {
-            font-family: "Kristen ITC", serif;
+            font-family: OldSport02Athletic, serif;
         }
         a {text-decoration: none}
     </style>
@@ -86,8 +90,8 @@
                 let value = $(this).val().toLowerCase();
                 $("#myTable tr").filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                    $("#searchCount").html()
                 });
+                $("#n-results").html($('#filter-table tbody tr').length + ' rows')
             });
         });
     </script>
