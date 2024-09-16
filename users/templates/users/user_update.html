@@ -20,20 +20,8 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>{{ c_title }}</h2>
-                    </div>
-                    <div class="card-body">
-                        <div id="user-form-div">
-                            {% include 'users/user_form_template.html' %}
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">
-                            <b>Last login: </b>{{ object.last_login }}
-                        </small>
-                    </div>
+                <div id="user-update-div">
+                    {% include 'users/user_management_form_partial.html' %}
                 </div>
             </div>
             <div class="col-sm-4">&nbsp;</div>

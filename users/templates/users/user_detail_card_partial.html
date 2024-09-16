@@ -1,13 +1,13 @@
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-9">
                 <h1>{{ object.first_name }} {{ object.last_name }}</h1>
             </div>
             <div class="col-sm-2 me-auto text-end"><small class="text-muted">{{ message|safe }}</small></div>
-            <div class="col-sm-2 me-auto text-end">
-                <a class="m-1" href="{% url 'users:user-update-password' object.id %}" title="Set password"><i class="fa fa-lock"></i></a>
-                <a class="m-1" href="{% url 'users:user-profile' object.id%}" title="Update profile"><i class="fa fa-edit"></i></a>
+            <div class="col-sm-1 me-auto text-end">
+                <a class="m-1" href="#passwd" hx-get="{% url 'users:user-update-password' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Set password"><i class="fa fa-lock"></i></a>
+                <a class="m-1" href="#update" hx-get="{% url 'users:user-update-async' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Update profile"><i class="fa fa-edit"></i></a>
             </div>
         </div>
     </div>

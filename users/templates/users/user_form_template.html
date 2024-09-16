@@ -13,12 +13,16 @@
             </div>
             <div class="row">
                 <div class="col-sm-12 me-auto text-end">
-                    {% if upd %}
-                        <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-upd' upd %}" hx-target="#tr-u{{ upd }}" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
-                    {% elif my_id %}
-                        <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-update-async' my_id %}" hx-target="#user-card-div" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                    {% if update_pw %}
+                        <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-update-password' update_pw %}" hx-target="#user-card-div" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
                     {% else %}
-                        <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-new' %}" hx-target="#user-list-div" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                        {% if upd %}
+                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-upd' upd %}" hx-target="#tr-u{{ upd }}" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                        {% elif my_id %}
+                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-update-async' my_id %}" hx-target="#user-card-div" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                        {% else %}
+                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-new' %}" hx-target="#user-list-div" hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

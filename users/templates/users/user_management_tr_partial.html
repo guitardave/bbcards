@@ -4,7 +4,7 @@
 <td>{{ u.favorite_player.player_fname }} {{ u.favorite_player.player_lname }}</td>
 <td>{{ u.last_login }}</td>
 <td>
-    <a class="m-1" href="{% url 'users:user-update-password' u.id %}" title="Change password"><i class="fa fa-lock"></i></a>
+{#    <a class="m-1" href="#passwd" hx-get="{% url 'users:user-update-password' u.id %}" hx-target="#user-form-card" hx-swap="innerHTML" title="Change password"><i class="fa fa-lock"></i></a>#}
     <a class="m-1" href="#loaduser" hx-get="{% url 'users:user-management-upd' u.id %}" hx-target="#user-form-card" hx-swap="innerHTML" title="Update profile"><i class="fa fa-edit"></i></a>
     {% if u_success %}<span class="m-1">{{ message|safe }}</span>{% endif %}
 </td>

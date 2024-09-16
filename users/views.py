@@ -150,8 +150,8 @@ def user_update(request, pk):
             print(form.errors)
         return render(request, 'users/user_detail_card_partial.html',
                       {'object': user, 'message': message})
-    return render(request, 'users/user_form_template.html',
-                  {'my_id': pk, 'form': UserForm(instance=user)})
+    return render(request, 'users/user_management_form_partial.html',
+                  {'my_id': pk, 'form': UserForm(instance=user), 'c_title': 'User Update'})
 
 
 @login_required(login_url='/users/')
@@ -161,13 +161,16 @@ def password_update(request, pk: int):
         form = SetPasswordForm(user, data=request.POST or None)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Password updated successfully')
-            return redirect('users:user-update', pk)
+            # messages.success(request, 'Password updated successfully')
+            message = '<i class="fa fa-check"></i> Password Updated'
         else:
-            messages.warning(request, form.errors)
+            # messages.warning(request, form.errors)
+            message = '<i class="fa fa-remove"></i> Update failed'
+        return render(request, 'users/user_detail_card_partial.html',
+                      {'object': user, 'message': message})
     form = SetPasswordForm(user)
-    return render(request, 'users/user_update.html',
-                  {'title': 'Update Password', 'form': form, 'object': user, 'c_title': 'Reset password'}
+    return render(request, 'users/user_management_form_partial.html',
+                  {'update_pw': user.id, 'form': form, 'object': user, 'c_title': 'Reset password'}
                   )
 
 
