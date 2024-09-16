@@ -1,0 +1,24 @@
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-sm-9">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="col-sm-3">
+                <small class="text-muted">{{ c_message }}</small>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body">
+        {% include '_search_filter.html' %}
+    </div>
+    <div class="card-body scroll">
+        <div id="cards-table">
+            {% include 'cards/card-list-table-partial.html' %}
+        </div>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">{{ cards|length }}</small>
+    </div>
+</div>

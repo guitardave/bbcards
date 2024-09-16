@@ -24,6 +24,11 @@ class CardSet(models.Model):
         return reverse('cards:cardsets')
 
 
+class CardLast50Mgr(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().all().order_by('-id')[:50]
+
+
 class Card(models.Model):
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     card_num = models.CharField(max_length=50, default=None)
@@ -31,7 +36,10 @@ class Card(models.Model):
     card_subset = models.CharField(max_length=100, default=None, null=True, blank=True)
     card_image = models.FileField(upload_to='upload/', default=None, null=True, blank=True)
     date_entered = models.DateTimeField(auto_now_add=True)
-    
+
+    objects = models.Manager()
+    last_50 = CardLast50Mgr()
+
     def __str__(self):
         return self.card_num
         

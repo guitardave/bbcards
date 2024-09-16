@@ -82,7 +82,7 @@ class CardsListView(ListView):
     ordering = 'card_set_id__slug'
 
     def get_queryset(self):
-        return Card.objects.all().order_by('-id')[:50]
+        return Card.last_50.all()
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
@@ -204,13 +204,16 @@ def card_update_async(request, pk: int):
 
 @login_required(login_url='/users/')
 def card_create_async(request):
+    c_message = None
+    new_id = None
     if request.method == 'POST':
         form = CardCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Card has been created')
-    cards = Card.objects.all()
-    return render(request, 'cards/card-list-table-partial.html', {'cards': cards})
+            new_id = Card.objects.last().id
+            c_message = '<i class="fa fa-check"></i> Success'
+    context = {'title': 'Last 50 Cards', 'new_id': new_id, 'cards': Card.last_50.all(), 'c_message': c_message}
+    return render(request, 'cards/card-list-table-partial.html', context)
 
 
 @login_required(login_url='/users/')
