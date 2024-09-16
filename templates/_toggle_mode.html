@@ -1,4 +1,4 @@
-{% if mode == 'dark' %}
+{% if request.COOKIES.toggle_mode == 'dark' %}
     <i class="fa fa-sun-o"></i>
 {% else %}
     <i class="fa fa-moon-o"></i>

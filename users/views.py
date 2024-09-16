@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import UpdateView, DetailView
 from .models import CardUser
-from .forms import UserForm
+from .forms import UserForm, LoginForm
 
 
 def login_view(request):
@@ -24,9 +24,9 @@ def login_view(request):
             return HttpResponseRedirect('/')
         else:
             messages.warning(request, 'Login Failed')
-            context['form'] = AuthenticationForm()
+            context['form'] = LoginForm()
     else:
-        context['form'] = AuthenticationForm()
+        context['form'] = LoginForm()
     return render(request, 'users/login.html', context)
 
 
