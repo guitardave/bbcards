@@ -1,24 +1,52 @@
 {% extends "base.html" %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.last_name "users:user-detail" object.id %}
+    {% breadcrumb object.last_name "users:user-profile" object.id %}
     {% breadcrumb "User Update" "users:user-update" object.id %}
 {% endblock breadcrumbs %}
 {% block content %}
-    {% load static %}
 	<div class="container">
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <h1>{{ title }}</h1>
         <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <input type="submit" name="submit" value="Submit">
-                </form>
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Update Profile</h2>
+                    </div>
+                    <div class="card-body">
+                        <article class="media content-section">
+                            <div class="media-body text-light">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            {{ form|crispy }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">&nbsp;</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 me-auto text-end">
+                                            <button class="btn btn-lg btn-outline-secondary"><i class="fa fa-save"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            <b>Last login: </b>{{ object.last_login }}
+                        </small>
+                    </div>
+                </div>
             </div>
+            <div class="col-sm-4">&nbsp;</div>
         </div>
     </div>
 
