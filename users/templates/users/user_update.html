@@ -15,12 +15,19 @@
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
             <div class="col-sm-8">
+                <div id="user-card-div">
+                    {% include 'users/user_detail_card_partial.html' %}
+                </div>
+            </div>
+            <div class="col-sm-4">
                 <div class="card">
                     <div class="card-header">
-                        <h1>{{ title }}</h1>
+                        <h2>{{ c_title }}</h2>
                     </div>
                     <div class="card-body">
-                        {% include 'users/user_form_template.html' %}
+                        <div id="user-form-div">
+                            {% include 'users/user_form_template.html' %}
+                        </div>
                     </div>
                     <div class="card-footer">
                         <small class="text-muted">

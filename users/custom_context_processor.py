@@ -6,4 +6,6 @@ def toggle_mode_ctx(request):
 
 
 def user_full_name_ctx(request):
+    if request.user.is_anonymous:
+        return ''
     return {'user_full_name': '%s %s' % (request.user.first_name, request.user.last_name)}

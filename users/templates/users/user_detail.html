@@ -13,28 +13,7 @@
         <h1>{{ title }}</h1>
         <div class="row">
             <div class="col-sm-8">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-sm-10">
-                                <h2>{{ object.first_name }} {{ object.last_name }}</h2>
-                            </div>
-                            <div class="col-sm-2 me-auto text-end">
-                                <a class="m-1" href="{% url 'users:user-update-password' object.id %}" title="Set password"><i class="fa fa-lock"></i></a>
-                                <a class="m-1" href="{% url 'users:user-update' object.id%}" title="Update profile"><i class="fa fa-edit"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <b>Username: </b>{{ object.username }}<br>
-                        <b>Favorite Player:</b> {{ object.favorite_player }}
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">
-                            <b>Last login: </b>{{ object.last_login }}
-                        </small>
-                    </div>
-                </div>
+                {% include 'users/user_detail_card_partial.html' %}
             </div>
             <div class="col-sm-4">&nbsp;</div>
         </div>

@@ -59,6 +59,22 @@ def user_management_list(request):
 
 
 @login_required(login_url='/users/')
+def user_management_create(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            message = 'User added successfully'
+            context = {
+                'users': CardUser.objects.filter(is_active=True).order_by('first_name'),
+                'message': message
+            }
+            return render(request, 'users/user_management_table_partial.html', context)
+    context = {'form': UserForm}
+    return render(request, 'users/user_management_form_partial.html', context)
+
+
+@login_required(login_url='/users/')
 def user_management_update(request, pk: int):
     user = CardUser.objects.get(pk=pk)
     message, u_success = '', False
@@ -84,7 +100,20 @@ def user_management_update(request, pk: int):
 
 class UserDetail(LoginRequiredMixin, DetailView):
     model = CardUser
-    template_name = 'users/user_detail.html'
+    template_name = 'users/user_update.html'
+
+    def get_object(self, queryset=None):
+        return CardUser.objects.get(pk=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        user = self.get_object()
+        data = super().get_context_data()
+        data['title'] = '%s %s' % (user.first_name, user.last_name)
+        data['object'] = user
+        data['form'] = UserForm(instance=user)
+        data['my_id'] = user.id
+        data['c_title'] = 'Update User'
+        return data
 
 
 class UserUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -109,6 +138,23 @@ class UserUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 
 @login_required(login_url='/users/')
+def user_update(request, pk):
+    user = CardUser.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = UserForm(instance=user, data=request.POST or None)
+        if form.is_valid():
+            form.save()
+            message = '<i class="fa fa-check"></i> Success'
+        else:
+            message = '<i class="fa fa-remove"></i> Error'
+            print(form.errors)
+        return render(request, 'users/user_detail_card_partial.html',
+                      {'object': user, 'message': message})
+    return render(request, 'users/user_form_template.html',
+                  {'my_id': pk, 'form': UserForm(instance=user)})
+
+
+@login_required(login_url='/users/')
 def password_update(request, pk: int):
     user = CardUser.objects.get(pk=pk)
     if request.method == 'POST':
@@ -116,12 +162,12 @@ def password_update(request, pk: int):
         if form.is_valid():
             form.save()
             messages.success(request, 'Password updated successfully')
-            return redirect('users:user-profile', pk)
+            return redirect('users:user-update', pk)
         else:
             messages.warning(request, form.errors)
     form = SetPasswordForm(user)
     return render(request, 'users/user_update.html',
-                  {'title': 'Update Password', 'form': form, 'object': user}
+                  {'title': 'Update Password', 'form': form, 'object': user, 'c_title': 'Reset password'}
                   )
 
 

@@ -1,0 +1,19 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>First/Last</th>
+            <th>Email</th>
+            <th>Fave player</th>
+            <th>Last login</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        {% for u in users %}
+            <tr id="tr-u{{ u.id }}">
+                {% include 'users/user_management_tr_partial.html' %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
