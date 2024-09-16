@@ -103,7 +103,7 @@ class CardsListView(ListView):
 
 class CardsViewAll(CardsListView):
     def get_queryset(self):
-        return Card.objects.all()
+        return Card.list_all.all()
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data()

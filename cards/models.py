@@ -29,6 +29,15 @@ class CardLast50Mgr(models.Manager):
         return super().get_queryset().all().order_by('-id')[:50]
 
 
+class CardsAllMgr(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().all().order_by(
+            'player_id__player_fname',
+            'card_set_id__year',
+            'card_set_id__card_set_name'
+        )
+
+
 class Card(models.Model):
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     card_num = models.CharField(max_length=50, default=None)
@@ -39,6 +48,7 @@ class Card(models.Model):
 
     objects = models.Manager()
     last_50 = CardLast50Mgr()
+    list_all = CardsAllMgr()
 
     def __str__(self):
         return self.card_num
