@@ -7,7 +7,7 @@
     <td>
         <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
         {% if message %}
-            <span class="fade-in"><small class="text-muted">{{message|safe}}</small></span>
+            <span class=""><small class="text-muted fade-out">{{message|safe}}</small></span>
         {% endif %}
     </td>
 {% endif %}

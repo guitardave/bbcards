@@ -30,3 +30,21 @@ a {
 .p_short {
     line-height: 14px;
 }
+
+.row-count {
+    font-size: 24px;
+}
+
+.fade-out {
+  animation: fadeOut ease 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

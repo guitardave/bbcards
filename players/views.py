@@ -19,6 +19,7 @@ class PlayerList(ListView):
         data = super(PlayerList, self).get_context_data(**kwargs)
         data['title'] = 'Player List'
         data['players'] = self.get_queryset()
+        data['rs_len'] = self.get_queryset().count()
         data['form'] = PlayerForm()
         data['loaded'] = datetime.datetime.now()
         data['card_title'] = 'Add Player'
@@ -51,9 +52,16 @@ def player_add_async(request):
                 message = f'<i class="fa fa-check"></i> {f_name} {l_name} entered successfully'
         else:
             message = f'<i class="fa fa-remove"></i> {f_name} {l_name} already exists'
-    players = Player.objects.all().order_by('player_lname')
-    # obj = Player.objects.last()
-    context = {'title': 'Player List', 'p_success': success, 'players': players, 'message': message}
+    players = Player.list_all.all()
+    new_id = Player.objects.last().id
+    context = {
+        'title': 'Player List',
+        'p_success': success,
+        'players': players,
+        'rs_len': players.count(),
+        'new_id': new_id,
+        'message': message
+    }
     # context = {'p': obj, 'success': success, 'message': message}
     return render(request, 'players/player_list_card_partial.html', context)
 

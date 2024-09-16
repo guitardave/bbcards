@@ -30,9 +30,11 @@ def card_set_create_async(request):
                 message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
             message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
+    cards = get_card_set_list()
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
-                      'cards': get_card_set_list(),
+                      'cards': cards,
+                      'rs_len': len(cards),
                       'title': 'Card Sets',
                       'c_message': message
                   }
@@ -47,8 +49,10 @@ def card_set_list(request):
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
     form = CardSetForm
+    cards = get_card_set_list()
     context = {
-        'cards': get_card_set_list(),
+        'cards': cards,
+        'rs_len': len(cards),
         'form': form,
         'title': 'Card Sets',
         'card_title': 'Add Card Set',
@@ -88,6 +92,7 @@ class CardsListView(ListView):
         data = super().get_context_data()
         data['title'] = 'Last 50 Cards'
         data['cards'] = self.get_queryset()
+        data['rs_len'] = self.get_queryset().count()
         data['form'] = CardCreateForm()
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
@@ -109,6 +114,7 @@ class CardsViewAll(CardsListView):
         data = super().get_context_data()
         data['title'] = 'All Cards'
         data['cards'] = self.get_queryset()
+        data['rs_len'] = len(data['cards'])
         data['form'] = CardCreateForm
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
@@ -131,6 +137,7 @@ class CardsViewSet(CardsListView):
         data = super(CardsViewSet, self).get_context_data(**kwargs)
         data['title'] = f'{self.get_card_set()}'
         data['cards'] = self.get_queryset()
+        data['rs_len'] = self.get_queryset().count()
         data['card_set'] = card_set
         data['form'] = CardCreateForm(**{'set': card_set.slug})
         data['card_title'] = 'Add Card - by Card Set'
@@ -162,6 +169,7 @@ class CardsViewPlayer(CardsListView):
         data = super(CardsViewPlayer, self).get_context_data(**kwargs)
         data['title'] = f'{self.get_player_name()}'
         data['cards'] = self.get_queryset()
+        data['rs_len'] = self.get_queryset().count()
         data['player'] = player
         data['form'] = CardCreateForm(**{'player': player.slug})
         data['card_title'] = 'Add Card - by Player'
@@ -212,7 +220,14 @@ def card_create_async(request):
             form.save()
             new_id = Card.objects.last().id
             c_message = '<i class="fa fa-check"></i> Success'
-    context = {'title': 'Last 50 Cards', 'new_id': new_id, 'cards': Card.last_50.all(), 'c_message': c_message}
+    cards = Card.last_50.all()
+    context = {
+        'title': 'Last 50 Cards',
+        'new_id': new_id,
+        'cards': cards,
+        'rs_len': cards.count(),
+        'c_message': c_message
+    }
     return render(request, 'cards/card-list-table-partial.html', context)
 
 
@@ -234,5 +249,5 @@ def card_search(request):
             Q(player_id__player_lname__icontains=search) |
             Q(player_id__player_fname__icontains=search)
         ).order_by('card_set_id__year', 'card_set_id__card_set_name', 'player_id__player_lname')
-    context = {'cards': cards, 'title': f'Search "{search}"', 'form': CardCreateForm}
+    context = {'cards': cards, 'rs_len': len(cards), 'title': f'Search "{search}"', 'form': CardCreateForm}
     return render(request, 'cards/card-list.html', context)

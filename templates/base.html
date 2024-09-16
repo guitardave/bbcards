@@ -81,7 +81,9 @@
                 $("#myTable tr").filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
-                $('#n-results').html($('tr:visible').length-1 + ' rows')
+                let v = $('tr:visible').length-1;
+                let ttl = $('tr').length-1
+                $('#n-results').html('<span class="row-count">' + v.toString() + ' of ' + ttl + ' rows</span>')
             });
         });
 
