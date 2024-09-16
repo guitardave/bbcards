@@ -17,26 +17,7 @@
                         <h1>{{ title }}</h1>
                     </div>
                     <div class="card-body">
-                        <article class="media content-section">
-                            <div class="media-body text-light">
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            {{ form|crispy }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-12">&nbsp;</div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-12 me-auto text-end">
-                                            <button class="btn btn-lg btn-outline-secondary"><i class="fa fa-save"></i></button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </article>
+                        {% include 'users/user_form_template.html' %}
                     </div>
                     <div class="card-footer">
                         <small class="text-muted">

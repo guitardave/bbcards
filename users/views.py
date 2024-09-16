@@ -37,6 +37,22 @@ def logout_view(request):
     return redirect('users:login')
 
 
+@login_required(login_url='/users/')
+def user_management_list(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'Unauthorized Access')
+        return redirect('users:user-profile', request.user.id)
+    if request.method == 'POST':
+        form = UserForm(request.POST or None)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'User saved successfully')
+            return redirect('users:user-management')
+    form = UserForm
+    context = {'title': 'User Management', 'form': form, 'users': CardUser.objects.filter(is_active=True)}
+    return render(request, 'users/user_management.html', context)
+
+
 class UserDetail(LoginRequiredMixin, DetailView):
     model = CardUser
     template_name = 'users/user_detail.html'
