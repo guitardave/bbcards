@@ -4,7 +4,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.last_name "users:user-detail" object.id %}
+    {% breadcrumb object.first_name "users:user-detail" object.id %}
 {#    {% breadcrumb "User Update" "users:user-update" object.id %}#}
 {% endblock breadcrumbs %}
 {% block content %}

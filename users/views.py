@@ -49,8 +49,37 @@ def user_management_list(request):
             messages.success(request, 'User saved successfully')
             return redirect('users:user-management')
     form = UserForm
-    context = {'title': 'User Management', 'form': form, 'users': CardUser.objects.filter(is_active=True)}
+    context = {
+        'title': 'User Management',
+        'form': form,
+        'users': CardUser.objects.filter(is_active=True),
+        'c_title': 'Add User'
+    }
     return render(request, 'users/user_management.html', context)
+
+
+@login_required(login_url='/users/')
+def user_management_update(request, pk: int):
+    user = CardUser.objects.get(pk=pk)
+    message, u_success = '', False
+    context = {
+        'c_title': 'Update User',
+        'u': user,
+        'form': UserForm(instance=user),
+        'upd': user.id
+    }
+    if request.method == 'POST':
+        form = UserForm(instance=user, data=request.POST or None)
+        if form.is_valid():
+            form.save()
+            message = '<i class="fa fa-check"></i>'
+            u_success = True
+        else:
+            message = '<i class="fa fa-remove"></i>'
+        context['message'] = message
+        context['u_success'] = u_success
+        return render(request, 'users/user_management_tr_partial.html', context)
+    return render(request, 'users/user_management_form_partial.html', context)
 
 
 class UserDetail(LoginRequiredMixin, DetailView):
@@ -65,14 +94,14 @@ class UserUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     context_object_name = 'obj'
     success_message = 'User updated successfully'
 
-    def get_queryset(self):
-        return CardUser.objects.filter(pk=self.kwargs['pk'])
+    def get_object(self, **kwargs):
+        return CardUser.objects.get(pk=self.kwargs['pk'])
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
         data['title'] = 'Update User Profile'
         data['obj'] = self.context_object_name
-        data['object'] = self.get_queryset()
+        data['object'] = self.get_object()
         return data
 
     def get_success_url(self):

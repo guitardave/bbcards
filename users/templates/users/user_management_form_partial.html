@@ -1,0 +1,18 @@
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-sm-8">
+                <h2>{{ c_title }}</h2>
+            </div>
+            <div class="col-sm-4 me-auto text-end">
+                {{ message|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% include 'users/user_form_template.html' %}
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">&nbsp;</small>
+    </div>
+</div>

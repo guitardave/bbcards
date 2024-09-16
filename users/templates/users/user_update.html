@@ -4,7 +4,10 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.last_name "users:user-profile" object.id %}
+    {% if request.user.is_superuser %}
+        {% breadcrumb 'User Management' 'users:user-management' %}
+    {% endif %}
+    {% breadcrumb object.first_name "users:user-profile" object.id %}
     {% breadcrumb "User Update" "users:user-update" object.id %}
 {% endblock breadcrumbs %}
 {% block content %}

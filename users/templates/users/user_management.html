@@ -4,8 +4,9 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.last_name "users:user-detail" object.id %}
-{#    {% breadcrumb "User Update" "users:user-update" object.id %}#}
+    {% if request.user.is_superuser %}
+        {% breadcrumb 'User Management' 'users:user-management' %}
+    {% endif %}
 {% endblock breadcrumbs %}
 {% block content %}
 	<div class="container">
@@ -14,7 +15,14 @@
             <div class="col-sm-8">
                 <div class="card">
                     <div class="card-header">
-                        <h1>{{ title }}</h1>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <h1>{{ title }}</h1>
+                            </div>
+                            <div class="col-sm-4">
+                                {{ c_message }}
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         {% include '_search_filter.html' %}
@@ -25,20 +33,16 @@
                                 <tr>
                                     <th>Username</th>
                                     <th>First/Last</th>
+                                    <th>Email</th>
+                                    <th>Fave player</th>
                                     <th>Last login</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="myTable">
                                 {% for u in users %}
-                                    <tr>
-                                        <td>{{ u.username }}</td>
-                                        <td>{{ u.first_name }} {{ u.last_name }}</td>
-                                        <td>{{ u.last_login }}</td>
-                                        <td>
-                                            <a class="m-1" href=""><i class="fa fa-lock"></i></a>
-                                            <a class="m-1" href=""><i class="fa fa-edit"></i></a>
-                                        </td>
+                                    <tr id="tr-u{{ u.id }}">
+                                        {% include 'users/user_management_tr_partial.html' %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -50,16 +54,8 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Add User</h2>
-                    </div>
-                    <div class="card-body">
-                        {% include 'users/user_form_template.html' %}
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">&nbsp;</small>
-                    </div>
+                <div id="user-form-card">
+                    {% include 'users/user_management_form_partial.html' %}
                 </div>
             </div>
         </div>
