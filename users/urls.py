@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('<int:pk>/update', views.UserUpdate.as_view(), name='user-update'),
     path('<int:pk>/profile', views.UserDetail.as_view(), name='user-profile'),
+    path('toggle_mode/', views.toggle_view_mode, name='toggle_mode'),
+    path('toggle_mode/<str:mode>/', views.toggle_view_mode, name='toggle_mode'),
 ]

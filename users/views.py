@@ -7,7 +7,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import PasswordResetCompleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import UpdateView, DetailView
 from .models import CardUser
 from .forms import UserForm
@@ -52,3 +52,17 @@ class UserUpdate(LoginRequiredMixin, UpdateView):
         user.set_password(password)
         user.save()
         return redirect('users:user-profile', self.kwargs.get('pk'))
+
+
+def toggle_view_mode(request, mode: str = None):
+    if mode is not None:
+        if mode == 'dark':
+            response = HttpResponse('<i class="fa fa-sun-o"></i>')
+            response.set_cookie('toggle_mode', 'dark')
+        else:
+            response = HttpResponse('<i class="fa fa-moon-o"></i>')
+            response.set_cookie('toggle_mode', None)
+    else:
+        response = HttpResponse('<i class="fa fa-moon-o"></i>')
+        response.set_cookie('toggle_mode', None)
+    return response

@@ -2,7 +2,11 @@
 {% load django_htmx %}
 {% load django_bootstrap_breadcrumbs %}
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+{% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}
+    <html lang="en" data-bs-theme="dark">
+{% else %}
+    <html lang="en" data-bs-theme="">
+{% endif %}
 <head>
 	<!-- Required meta tags -->
     <meta charset="utf-8">
@@ -82,19 +86,26 @@
                 $('#n-results').html($('tr:visible').length-1 + ' rows')
             });
         });
-        
+                
         $('#toggle-link').on('click', function () {
             let html_tag = $('html');
             let mode = html_tag.data('bs-theme');
             let this_mode;
             if (mode !== 'dark') {
                 this_mode = 'dark';
-                $('#toggle-mode').html('<i class="fa fa-sun-o"></i>')
+                {#$('#toggle-mode').html('<i class="fa fa-sun-o"></i>')#}
             } else {
-                this_mode = '';
-                $('#toggle-mode').html('<i class="fa fa-moon-o"></i>')
+                this_mode = null;
+                {#$('#toggle-mode').html('<i class="fa fa-moon-o"></i>')#}
             }
             html_tag.attr('data-bs-theme', this_mode);
+            $.ajax({
+                url: '/users/toggle_mode/'+this_mode+'/',
+                type: 'GET',
+                success: function(res) {
+                    $('#toggle-mode').html(res);
+                }
+            })
         });
     </script>
 </body>
