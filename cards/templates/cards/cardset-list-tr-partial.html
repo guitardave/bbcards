@@ -5,8 +5,8 @@
         <a class="m-1" href="{% url 'cards:card-list-set' card.slug %}" title="View Cards List"><i class="fa fa-list-alt"></i></a>
         {% if user.is_authenticated %}
             <a class="m-1" href="#update" hx-get="{% url 'cards:cardsets-upd-async' card.id %}" hx-target="#cardset-form" hx-swap="innerHTML" title="Update"><i class="fa fa-edit"></i></a>
-            {% if success %}
-                <span class="fade-out"><small class="text-muted"><i class="fa fa-check"></i></small></span>
+            {% if t_message %}
+                <span class="fade-out"><small class="text-muted">{{ t_message|safe }}</small></span>
             {% endif %}
         {% endif %}
     </td>

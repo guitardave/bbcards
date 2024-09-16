@@ -17,7 +17,7 @@ def get_card_set_list():
 
 @login_required(login_url='/users/')
 def card_set_create_async(request):
-    message = ''
+    c_message = ''
     if request.method == 'POST':
         set_year = request.POST['year']
         set_name = request.POST['card_set_name']
@@ -27,16 +27,16 @@ def card_set_create_async(request):
             form = CardSetForm(request.POST)
             if form.is_valid():
                 form.save()
-                message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
+                c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
-            message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
+            c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
     cards = get_card_set_list()
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
                       'cards': cards,
                       'rs_len': len(cards),
                       'title': 'Card Sets',
-                      'c_message': message
+                      'c_message': c_message
                   }
                   )
 
@@ -68,8 +68,17 @@ def card_set_update_async(request, pk: int):
         form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-        return render(request, 'cards/cardset-list-tr-partial.html', {'card': obj, 'success': True})
-    context = {'form': CardSetForm(instance=obj), 'obj': obj, 'card_title': 'Update Card Set', 'loaded': datetime.datetime.now()}
+            t_message = '<i class="fa fa-check"></i>'
+        else:
+            t_message = '<i class="fa fa-remove"></i> Error'
+        context = {'card': obj, 'success': True, 't_message': t_message}
+        return render(request, 'cards/cardset-list-tr-partial.html', context)
+    context = {
+        'form': CardSetForm(instance=obj),
+        'obj': obj,
+        'card_title': 'Update Card Set',
+        'loaded': datetime.datetime.now()
+    }
     return render(request, 'cards/cardset-form.html', context)
 
 
@@ -194,13 +203,13 @@ def card_update_async(request, pk: int):
         if form.is_valid():
             form.save()
             success = True
-            message = '<i class="fa fa-check"></i>'
+            t_message = '<i class="fa fa-check"></i>'
         else:
-            message = '<i class="fa fa-remove"></i> Error'
+            t_message = '<i class="fa fa-remove"></i> Error'
         return render(
             request,
             'cards/card-list-tr-partial.html',
-            {'card': Card.objects.get(pk=pk), 'success': success, 'message': message}
+            {'card': Card.objects.get(pk=pk), 'success': success, 't_message': t_message}
         )
     context = {
         'form': CardUpdateForm(instance=obj), 'obj': obj,
@@ -212,21 +221,21 @@ def card_update_async(request, pk: int):
 
 @login_required(login_url='/users/')
 def card_create_async(request):
-    c_message = None
+    t_message = None
     new_id = None
     if request.method == 'POST':
         form = CardCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             new_id = Card.objects.last().id
-            c_message = '<i class="fa fa-check"></i> Success'
+            t_message = '<i class="fa fa-check"></i> Success'
     cards = Card.last_50.all()
     context = {
         'title': 'Last 50 Cards',
         'new_id': new_id,
         'cards': cards,
         'rs_len': cards.count(),
-        'c_message': c_message
+        't_message': t_message
     }
     return render(request, 'cards/card-list-table-partial.html', context)
 

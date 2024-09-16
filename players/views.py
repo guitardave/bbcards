@@ -73,7 +73,11 @@ def player_update_async(request, pk: int):
         form = PlayerForm(request.POST, instance=player)
         if form.is_valid():
             form.save()
-            return render(request, 'players/player_list_tr_partial.html', {'p': player, 'success': True})
+            t_message = '<i class="fa fa-check"></i>'
+        else:
+            t_message = '<i class="fa fa-remove"></i> Error'
+        return render(request, 'players/player_list_tr_partial.html',
+                      {'p': player, 'success': True, 't_message': t_message})
     context = {
         'form': PlayerForm(instance=player),
         'obj': player,

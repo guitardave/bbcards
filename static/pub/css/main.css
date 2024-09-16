@@ -74,27 +74,6 @@ a.article-title:hover {
   background-color: #2b2b2b;
 }
 
-.successfully-saved.hide-opacity{
-    opacity: 0;
-}
-
-.successfully-saved {
-    transition: opacity 3s ease-in-out;
-    opacity: 1;
-}
-
-.visible {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 2s linear;
-}
-
-.hidden {
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s 2s, opacity 2s linear;
-}
-
 .scroll {
   max-height: 640px;
   overflow-y: scroll;

@@ -6,8 +6,8 @@
 {% if user.is_authenticated %}
     <td>
         <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
-        {% if message %}
-            <span class=""><small class="text-muted fade-out">{{message|safe}}</small></span>
+        {% if t_message %}
+            <span class=""><small class="text-muted fade-out">{{ t_message|safe }}</small></span>
         {% endif %}
     </td>
 {% endif %}

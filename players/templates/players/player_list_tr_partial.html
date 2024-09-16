@@ -5,9 +5,9 @@
     {% if user.is_authenticated %}
         <a class="m-1" href="#update" hx-get="{% url 'players:players-upd-async' p.id %}" hx-target="#player-form-div" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
     {% endif %}
-    {% if success %}
-        <span class="visible">
-            <small class="text-muted"><i class="fa fa-check"></i></small>
+    {% if t_message %}
+        <span class="fade-out">
+            <small class="text-muted">{{t_message|safe}}</small>
         </span>
     {% endif %}
 </td>
