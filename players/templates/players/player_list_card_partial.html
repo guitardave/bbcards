@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-4 me-auto text-end">
                 <div id="message-div">
-                    <small class="text-muted">
+                    <small class="text-muted fade-out">
                         {{ message|safe }}
                     </small>
                 </div>
@@ -26,8 +26,8 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="myTable">
-                    {% for p in players %}
+                <tbody id="my-table">
+                    {% for p in rs %}
                         <tr id="tr-p{{ p.id }}" class="player-row">
                             {% include 'players/player_list_tr_partial.html' %}
                         </tr>
@@ -37,8 +37,6 @@
         </div>
     </div>
     <div class="card-footer">
-        <small class="text-muted">
-            {{ players|length }}
-        </small>
+        <small class="text-muted">{{ rs|length }}</small>
     </div>
 </div>

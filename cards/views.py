@@ -35,8 +35,7 @@ def card_set_create_async(request):
     new_id = Card.objects.last().id
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
-                      'cards': cards,
-                      'rs_len': len(cards),
+                      'rs': cards,
                       'new_id': new_id,
                       'title': 'Card Sets',
                       'c_message': c_message
@@ -54,8 +53,7 @@ def card_set_list(request):
     form = CardSetForm
     cards = get_card_set_list()
     context = {
-        'cards': cards,
-        'rs_len': len(cards),
+        'rs': cards,
         'form': form,
         'title': 'Card Sets',
         'card_title': 'Add Card Set',
@@ -103,8 +101,7 @@ class CardsListView(ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
         data['title'] = 'Last 50 Cards'
-        data['cards'] = self.get_queryset()
-        data['rs_len'] = self.get_queryset().count()
+        data['rs'] = self.get_queryset()
         data['form'] = CardCreateForm()
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
@@ -125,8 +122,7 @@ class CardsViewAll(CardsListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
         data['title'] = 'All Cards'
-        data['cards'] = self.get_queryset()
-        data['rs_len'] = len(data['cards'])
+        data['rs'] = self.get_queryset()
         data['form'] = CardCreateForm
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
@@ -148,8 +144,7 @@ class CardsViewSet(CardsListView):
         card_set = self.get_object()
         data = super(CardsViewSet, self).get_context_data(**kwargs)
         data['title'] = f'{self.get_card_set()}'
-        data['cards'] = self.get_queryset()
-        data['rs_len'] = self.get_queryset().count()
+        data['rs'] = self.get_queryset()
         data['card_set'] = card_set
         data['form'] = CardCreateForm(**{'set': card_set.slug})
         data['card_title'] = 'Add Card - by Card Set'
@@ -180,8 +175,7 @@ class CardsViewPlayer(CardsListView):
         player = self.get_object()
         data = super(CardsViewPlayer, self).get_context_data(**kwargs)
         data['title'] = f'{self.get_player_name()}'
-        data['cards'] = self.get_queryset()
-        data['rs_len'] = self.get_queryset().count()
+        data['rs'] = self.get_queryset()
         data['player'] = player
         data['form'] = CardCreateForm(**{'player': player.slug})
         data['card_title'] = 'Add Card - by Player'
@@ -233,9 +227,8 @@ def card_delete_async(request, pk: int):
         obj.delete()
         c_message = 'Item deleted successfully'
     context = {
-        'cards': cards if cards else Card.last_50.all(),
+        'rs': cards if cards else Card.last_50.all(),
         'c_message': c_message,
-        'rs_len': len(cards),
         'title': 'Last 50 Cards' if not player else f'{player.player_fname} {player.player_lname}'
     }
     return render(request, 'cards/card-list-card-partial.html', context)
@@ -255,8 +248,7 @@ def card_create_async(request):
     context = {
         'title': 'Last 50 Cards',
         'new_id': new_id,
-        'cards': cards,
-        'rs_len': cards.count(),
+        'rs': cards,
         # 't_message': t_message
     }
     return render(request, 'cards/card-list-card-partial.html', context)
@@ -268,17 +260,33 @@ def card_form_refresh(request):
     return render(request, 'cards/card-form.html', context)
 
 
+def card_search_rs(search: str):
+    return Card.objects.filter(
+        Q(card_set_id__card_set_name__icontains=search) |
+        Q(card_subset__icontains=search) |
+        Q(player_id__player_lname__icontains=search) |
+        Q(player_id__player_fname__icontains=search)
+    ).order_by(
+        'card_set_id__year',
+        'card_set_id__card_set_name',
+        'player_id__player_lname'
+    )
+
+
 @login_required(login_url='/users/')
 def card_search(request):
     cards = []
     search = ''
     if request.method == 'POST':
         search = request.POST['search']
-        cards = Card.objects.filter(
-            Q(card_set_id__card_set_name__icontains=search) |
-            Q(card_subset__icontains=search) |
-            Q(player_id__player_lname__icontains=search) |
-            Q(player_id__player_fname__icontains=search)
-        ).order_by('card_set_id__year', 'card_set_id__card_set_name', 'player_id__player_lname')
-    context = {'cards': cards, 'rs_len': len(cards), 'title': f'Search "{search}"', 'form': CardCreateForm}
+        cards = card_search_rs(search)
+    context = {'rs': cards, 'title': f'Search "{search}"', 'form': CardCreateForm}
     return render(request, 'cards/card-list.html', context)
+
+
+@login_required(login_url='/users/')
+def card_image(request, pk: int):
+    obj = Card.objects.get(pk=pk)
+    card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
+    context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
+    return render(request, 'cards/card-image.html', context)

@@ -9,8 +9,8 @@
             {% if user.is_authenticated %}<th>Actions</th>{% endif %}
         </tr>
     </thead>
-    <tbody id="myTable">
-        {% for card in cards %}
+    <tbody id="my-table">
+        {% for card in rs %}
             <tr id="tr-c{{ card.id }}">
                 {% include 'cards/card-list-tr-partial.html' %}
             </tr>

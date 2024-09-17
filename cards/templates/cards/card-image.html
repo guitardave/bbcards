@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Card Sets" "cards:cardsets" %}
+    {% breadcrumb object.player_id 'cards:card-list-player' object.player_id.slug %}
+    {% breadcrumb card_string '' %}
+{% endblock breadcrumbs %}
+{% block content %}
+	<div class="container">
+        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <a id="go-back" href="#back" onclick="history.back()"><i class="fa fa-arrow-left"></i></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                &nbsp;
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subtitle">
+                            {{ card_string }}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if object.card_image %}
+                            <img class="card-img img-responsive" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            {{ object.card_image }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">&nbsp;</div>
+        </div>
+    </div>
+{% endblock %}

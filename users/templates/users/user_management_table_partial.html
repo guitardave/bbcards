@@ -9,8 +9,8 @@
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody id="myTable">
-        {% for u in users %}
+    <tbody id="my-table">
+        {% for u in rs %}
             <tr id="tr-u{{ u.id }}">
                 {% include 'users/user_management_tr_partial.html' %}
             </tr>

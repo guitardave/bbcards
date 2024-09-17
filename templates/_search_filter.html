@@ -3,13 +3,13 @@
         <br>
         <div id="n-results" class="align-middle">
             <span class="row-count">
-                {{ rs_len }} of {{ rs_len }} rows
+                {{ rs|length }} of {{ rs|length }} rows
             </span>
         </div>
     </div>
     <div class="col-sm-4 me-auto text-end">
-        <label for="myInput"></label>
-        <input type="text" id="myInput" class="form-control form-control-lg" placeholder="Filter results...">
+        <label for="my-input"></label>
+        <input type="text" id="my-input" class="form-control form-control-lg" placeholder="Filter results...">
         <span class="m-1" id="filterResults"></span>
     </div>
 </div>

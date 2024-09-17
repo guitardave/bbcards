@@ -4,20 +4,33 @@
 <td class="one">{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
 <td style="text-align: right">{{ card.card_num }}</td>
 {% if user.is_authenticated %}
-    <td>
-        {% if request.user.is_superuser %}
-            <a class="m-2" href="#delete" hx-post="{% url 'cards:card-delete-async' card.id %}" hx-target="#card-list-card" hx-swap="innerHTML"><i class="fa fa-trash"></i></a>
-        {% endif %}
-        <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
-        <span class="fade-out m-1">
-            {% if t_message %}
-                <small class="text-muted">{{t_message|safe}}</small>
-            {% endif %}
-            {% if new_id and new_id == card.id %}
-                <small class="text-muted">
-                    <i class="fa fa-star"></i>
-                </small>
-            {% endif %}
-        </span>
+    <td colspan="2">
+        <div class="row">
+            <div class="col-sm-3">
+                {% if card.card_image %}
+                    <a href="{% url 'cards:card-image' card.id %}"><i class="fa fa-image"></i></a>
+                {% endif %}
+            </div>
+            <div class="col-sm-3">
+                {% if request.user.is_superuser %}
+                    <a href="#delete" hx-post="{% url 'cards:card-delete-async' card.id %}" hx-target="#card-list-card" hx-swap="innerHTML"><i class="fa fa-trash"></i></a>
+                {% endif %}
+            </div>
+            <div class="col-sm-3">
+                <a href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
+            </div>
+            <div class="col-sm-3">
+                <span class="fade-out">
+                    {% if t_message %}
+                        <small class="text-muted">{{t_message|safe}}</small>
+                    {% endif %}
+                    {% if new_id and new_id == card.id %}
+                        <small class="text-muted">
+                            <i class="fa fa-star"></i>
+                        </small>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
     </td>
 {% endif %}

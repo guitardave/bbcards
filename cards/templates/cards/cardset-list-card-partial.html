@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-4 me-auto text-end">
                 <div id="cardset-message">
-                    <small class="text-muted">
+                    <small class="text-muted fade-out">
                         {{ c_message|safe }}
                     </small>
                 </div>
@@ -22,8 +22,6 @@
         </div>
     </div>
     <div class="card-footer">
-        <small class="text-muted">
-            {{cards|length}}
-        </small>
+        <small class="text-muted">{{ rs|length }}</small>
     </div>
 </div>

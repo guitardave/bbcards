@@ -76,9 +76,9 @@
     </div>
     <script>
         $(document).ready(function () {
-            $("#myInput").on("keyup", function () {
+            $("#my-input").on("keyup", function () {
                 let value = $(this).val().toLowerCase();
-                $("#myTable tr").filter(function () {
+                $("#my-table tr").filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
                 let v = $('tr:visible').length-1;

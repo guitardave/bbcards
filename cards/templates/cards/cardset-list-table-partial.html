@@ -6,8 +6,8 @@
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody id="myTable">
-    {% for card in cards %}
+    <tbody id="my-table">
+    {% for card in rs %}
         <tr id="tr-s{{ card.id }}">
             {% include 'cards/cardset-list-tr-partial.html' %}
         </tr>

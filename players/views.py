@@ -18,8 +18,7 @@ class PlayerList(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         data = super(PlayerList, self).get_context_data(**kwargs)
         data['title'] = 'Player List'
-        data['players'] = self.get_queryset()
-        data['rs_len'] = self.get_queryset().count()
+        data['rs'] = self.get_queryset()
         data['form'] = PlayerForm()
         data['loaded'] = datetime.datetime.now()
         data['card_title'] = 'Add Player'
@@ -57,8 +56,7 @@ def player_add_async(request):
     context = {
         'title': 'Player List',
         # 'p_success': success,
-        'players': players,
-        'rs_len': players.count(),
+        'rs': players,
         'new_id': new_id,
         'message': message
     }
