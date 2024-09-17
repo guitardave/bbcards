@@ -1,4 +1,6 @@
-{% if xport_result %}
+{% if xport_result and xport_result|length > 0 %}
 {#    <i class="fa fa-check"></i>#}
     <a href="{{ xport_url }}" target="_blank" title="Download file"><i class="fa fa-download"></i></a>
+{% else %}
+    <span class="text-muted" title="Download unavailable"><i class="fa fa-download"></i></span>
 {% endif %}
