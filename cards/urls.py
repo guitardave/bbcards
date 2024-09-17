@@ -18,4 +18,5 @@ urlpatterns = [
     path('sets/<int:pk>/update/async/', views.card_set_update_async, name='cardsets-upd-async'),
     path('sets/form/refresh/async/', views.card_set_form_refresh, name='cardsets-form-refresh'),
     path('search/', views.card_search, name='search'),
+    path('xport/async/', views.card_list_export_vw, name='cards-export')
 ]

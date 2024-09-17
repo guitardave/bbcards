@@ -1,12 +1,21 @@
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-{% if rs_dict %}8{% else %}10{% endif %}">
                 <h1>{{ title }}</h1>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <small class="text-muted fade-out">{{ c_message }}</small>
             </div>
+            {% if rs_dict %}
+                <div class="col-sm-2 me-auto text-end">
+                    <a href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Download Excel file"><i class="fa fa-file-excel-o"></i></a>
+                    <br>
+                    <span id="export-msg" class="text-muted">
+                        {% include 'cards/card-list-export-msg-partial.html' %}
+                    </span>
+                </div>
+            {% endif %}
         </div>
 
     </div>

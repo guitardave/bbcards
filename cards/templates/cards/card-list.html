@@ -5,12 +5,16 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Card Sets" "cards:cardsets" %}
-    {% breadcrumb "Card List" "cards:card-list-all" %}
+    {% breadcrumb "Card List All" "cards:card-list-all" %}
     {% if card_set %}
         {% breadcrumb card_set.card_set_name "cards:card-list-set" card_set.slug %}
     {% endif %}
     {% if player %}
         {% breadcrumb player.player_lname "cards:card-list-player" player.slug %}
+    {% endif %}
+    {% if search %}
+        {% breadcrumb 'Search' 'cards:search' %}
+        {% breadcrumb search 'cards:card-list-search' %}
     {% endif %}
 {% endblock breadcrumbs %}
 {% block content %}

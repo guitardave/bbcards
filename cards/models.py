@@ -5,6 +5,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 from players.models import Player
+from users.models import CardUser
 
 
 class CardSet(models.Model):
@@ -55,3 +56,12 @@ class Card(models.Model):
         
     def get_absolute_url(self):
         return reverse('cards:card-det', kwargs={'pk': self.id})
+
+
+class CardListExport(models.Model):
+    user = models.ForeignKey(CardUser, on_delete=models.DO_NOTHING)
+    file_name = models.CharField(max_length=200)
+    date_entered = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file_name

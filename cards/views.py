@@ -1,15 +1,19 @@
 import datetime
+import os
 
+import boto3
+import openpyxl
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.contrib import messages
+from openpyxl.workbook import Workbook
 
 from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm
-from .models import Card, CardSet
+from .models import Card, CardSet, CardListExport
 
 
 def get_card_set_list():
@@ -105,6 +109,8 @@ class CardsListView(ListView):
         data['form'] = CardCreateForm()
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
+        self.request.session['rs'] = card_list_dict(data['rs'])
+        data['rs_dict'] = self.request.session['rs'] if 'rs' in self.request.session else []
         return data
 
     def post(self, *args, **kwargs):
@@ -126,6 +132,8 @@ class CardsViewAll(CardsListView):
         data['form'] = CardCreateForm
         data['card_title'] = 'Add Card'
         data['loaded'] = datetime.datetime.now()
+        self.request.session['rs'] = card_list_dict(data['rs'])
+        data['rs_dict'] = self.request.session['rs'] if 'rs' in self.request.session else []
         return data
 
 
@@ -149,6 +157,8 @@ class CardsViewSet(CardsListView):
         data['form'] = CardCreateForm(**{'set': card_set.slug})
         data['card_title'] = 'Add Card - by Card Set'
         data['loaded'] = datetime.datetime.now()
+        self.request.session['rs'] = card_list_dict(data['rs'])
+        data['rs_dict'] = self.request.session['rs'] if 'rs' in self.request.session else []
         return data
 
     def post(self, *args, **kwargs):
@@ -180,6 +190,8 @@ class CardsViewPlayer(CardsListView):
         data['form'] = CardCreateForm(**{'player': player.slug})
         data['card_title'] = 'Add Card - by Player'
         data['loaded'] = datetime.datetime.now()
+        self.request.session['rs'] = card_list_dict(data['rs'])
+        data['rs_dict'] = self.request.session['rs'] if 'rs' in self.request.session else []
         return data
 
     def post(self, *args, **kwargs):
@@ -260,6 +272,14 @@ def card_form_refresh(request):
     return render(request, 'cards/card-form.html', context)
 
 
+@login_required(login_url='/users/')
+def card_image(request, pk: int):
+    obj = Card.objects.get(pk=pk)
+    card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
+    context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
+    return render(request, 'cards/card-image.html', context)
+
+
 def card_search_rs(search: str):
     return Card.objects.filter(
         Q(card_set_id__card_set_name__icontains=search) |
@@ -280,13 +300,92 @@ def card_search(request):
     if request.method == 'POST':
         search = request.POST['search']
         cards = card_search_rs(search)
-    context = {'rs': cards, 'title': f'Search "{search}"', 'form': CardCreateForm}
+        request.session['rs'] = card_list_dict(cards)
+    context = {
+        'rs': cards,
+        'title': f'Search "{search}"',
+        'form': CardCreateForm,
+        'search': search,
+        'rs_dict': request.session['rs'] if 'rs' in request.session else []
+    }
     return render(request, 'cards/card-list.html', context)
 
 
+class ExportScriptsExcel:
+    DEST_DIR = 'static/bbcards/export_data/'
+
+    def __init__(self, rs: list[dict[str, str]], file_name: str) -> None:
+        self.file_name = file_name
+        self.rs = rs
+
+    def create_file(self) -> Workbook:
+        wb = openpyxl.Workbook()
+        wb.save(self.file_name)
+        return wb
+
+    def populate_excel_file(self) -> Workbook:
+        rs = self.rs
+        self.create_file()
+        wb = openpyxl.load_workbook(self.file_name)
+        ws = wb.active
+        for i, s in enumerate(rs):
+            ws.cell(i + 1, 1).value = s['player_name']
+            ws.cell(i + 1, 2).value = s['year']
+            ws.cell(i + 1, 3).value = s['set_name']
+            ws.cell(i + 1, 4).value = s['info']
+            ws.cell(i + 1, 5).value = s['num']
+        wb.save(self.file_name)
+        return wb
+
+    def upload_excel(self) -> None:
+        wb = self.populate_excel_file()
+        client = boto3.Session(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_SECRET_ACCESS_KEY')).resource('s3')
+        bucket = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+        result = client.Bucket(bucket).upload_file(self.file_name, self.DEST_DIR+self.file_name)
+        print(result)
+        return result
+
+    def run_process(self) -> None:
+        self.upload_excel()
+        os.remove(self.file_name)
+
+
+def export_list_save(request, file_name: str):
+    export = CardListExport(user_id=request.user.id, file_name=file_name)
+    export.save()
+
+
+def card_list_dict(cards) -> list[dict]:
+    return [
+            {
+                'player_name': c.player_id.player_fname + ' ' + c.player_id.player_lname,
+                'year': c.card_set_id.year,
+                'set_name': c.card_set_id.card_set_name,
+                'info': c.card_subset,
+                'num': c.card_num
+            } for c in cards]
+
+
+def card_list_export(rs: list[dict]) -> str:
+    file_name = ''
+    if len(rs) > 0:
+        f_date = datetime.datetime.strftime(datetime.datetime.today(), '%m_%d_%Y__%H_%M_%S')
+        file_name = f"bbcards_card_list_export_{str(f_date)}.xlsx"
+        xl = ExportScriptsExcel(rs, file_name)
+        # dest_file = xl.DEST_DIR + file_name
+        xl.run_process()
+    return file_name
+
+
 @login_required(login_url='/users/')
-def card_image(request, pk: int):
-    obj = Card.objects.get(pk=pk)
-    card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
-    context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
-    return render(request, 'cards/card-image.html', context)
+@csrf_exempt
+def card_list_export_vw(request):
+    result = card_list_export(request.session['rs']) if 'rs' in request.session else ''
+    if len(result) > 0:
+        export_list_save(request, result)
+        request.session['rs'] = None
+    context = {
+        'xport_result': result,
+        'xport_url': 'https://jojodave.s3.amazonaws.com/static/bbcards/export_data/'+result
+    }
+    return render(request, 'cards/card-list-export-msg-partial.html', context)
