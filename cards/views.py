@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.contrib import messages
 
@@ -222,6 +223,25 @@ def card_update_async(request, pk: int):
 
 
 @login_required(login_url='/users/')
+@csrf_exempt
+def card_delete_async(request, pk: int):
+    c_message, cards, player = None, None, None
+    obj = Card.objects.filter(pk=pk)
+    if obj.exists():
+        cards = Card.objects.filter(player_id_id=obj[0].player_id_id)
+        player = Player.objects.get(id=obj[0].player_id_id)
+        obj.delete()
+        c_message = 'Item deleted successfully'
+    context = {
+        'cards': cards if cards else Card.last_50.all(),
+        'c_message': c_message,
+        'rs_len': len(cards),
+        'title': 'Last 50 Cards' if not player else f'{player.player_fname} {player.player_lname}'
+    }
+    return render(request, 'cards/card-list-card-partial.html', context)
+
+
+@login_required(login_url='/users/')
 def card_create_async(request):
     # t_message = None
     new_id = None
@@ -239,7 +259,7 @@ def card_create_async(request):
         'rs_len': cards.count(),
         # 't_message': t_message
     }
-    return render(request, 'cards/card-list-table-partial.html', context)
+    return render(request, 'cards/card-list-card-partial.html', context)
 
 
 @login_required(login_url='/users/')
