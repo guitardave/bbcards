@@ -177,10 +177,10 @@ def password_update(request, pk: int):
 def toggle_view_mode(request, mode: str = None):
     if mode is not None:
         if mode == 'dark':
-            response = HttpResponse('<i class="fa fa-sun-o"></i>')
+            response = HttpResponse('<i class="fa fa-sun-o"></i> Switch to Light')
             response.set_cookie('toggle_mode', 'dark')
         else:
-            response = HttpResponse('<i class="fa fa-moon-o"></i>')
+            response = HttpResponse('<i class="fa fa-moon-o"></i> Switch to Dark')
             response.set_cookie('toggle_mode', None)
     else:
         response = HttpResponse('<i class="fa fa-moon-o"></i>')

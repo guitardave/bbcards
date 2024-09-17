@@ -56,7 +56,7 @@ def player_add_async(request):
     new_id = Player.objects.last().id
     context = {
         'title': 'Player List',
-        'p_success': success,
+        # 'p_success': success,
         'players': players,
         'rs_len': players.count(),
         'new_id': new_id,

@@ -5,9 +5,14 @@
     {% if user.is_authenticated %}
         <a class="m-1" href="#update" hx-get="{% url 'players:players-upd-async' p.id %}" hx-target="#player-form-div" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
     {% endif %}
-    {% if t_message %}
-        <span class="fade-out">
+    <span class="fade-out m-1">
+        {% if t_message %}
             <small class="text-muted">{{t_message|safe}}</small>
-        </span>
-    {% endif %}
+        {% endif %}
+        {% if new_id and new_id == p.id %}
+            <small class="text-muted">
+                <i class="fa fa-star"></i>
+            </small>
+        {% endif %}
+    </span>
 </td>

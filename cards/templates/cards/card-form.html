@@ -2,10 +2,10 @@
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-10">
                 <h2>{{ card_title }}</h2>
             </div>
-            <div class="col-sm-4 me-auto text-end">
+            <div class="col-sm-2 me-auto text-end">
                 <a href="#refresh" hx-get="{% url 'cards:card-form-refresh' %}" hx-target="#card-form-card" hx-swap="innerHTML"><i class="fa fa-refresh"></i></a>
             </div>
         </div>
@@ -13,7 +13,7 @@
     <div class="card-body">
         <div id="card-form">
             <article class="media content-section">
-                  <div class="media-body text-light">
+                  <div class="media-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="row">

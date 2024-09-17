@@ -36,7 +36,7 @@ a {
 }
 
 .fade-out {
-  animation: fadeOut ease 15s;
+  animation: fadeOut ease 10s;
   animation-fill-mode: forwards;
 }
 

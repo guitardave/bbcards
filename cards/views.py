@@ -31,10 +31,12 @@ def card_set_create_async(request):
         else:
             c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
     cards = get_card_set_list()
+    new_id = Card.objects.last().id
     return render(request, 'cards/cardset-list-card-partial.html',
                   {
                       'cards': cards,
                       'rs_len': len(cards),
+                      'new_id': new_id,
                       'title': 'Card Sets',
                       'c_message': c_message
                   }
@@ -221,21 +223,21 @@ def card_update_async(request, pk: int):
 
 @login_required(login_url='/users/')
 def card_create_async(request):
-    t_message = None
+    # t_message = None
     new_id = None
     if request.method == 'POST':
         form = CardCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             new_id = Card.objects.last().id
-            t_message = '<i class="fa fa-check"></i> Success'
+            # t_message = '<i class="fa fa-check"></i> Success'
     cards = Card.last_50.all()
     context = {
         'title': 'Last 50 Cards',
         'new_id': new_id,
         'cards': cards,
         'rs_len': cards.count(),
-        't_message': t_message
+        # 't_message': t_message
     }
     return render(request, 'cards/card-list-table-partial.html', context)
 
