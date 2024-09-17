@@ -15,7 +15,7 @@ from django.contrib import messages
 from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm
 from .models import Card, CardSet, CardListExport
-from decorators.my_decorators import error_handling
+# from decorators.my_decorators import error_handling
 
 
 def get_card_set_list():
