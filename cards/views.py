@@ -302,17 +302,23 @@ def card_image(request, pk: int):
         return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
 
 
-def card_search_rs(search: str):
-    return Card.objects.filter(
-        Q(card_set_id__card_set_name__icontains=search) |
-        Q(card_subset__icontains=search) |
-        Q(player_id__player_lname__icontains=search) |
-        Q(player_id__player_fname__icontains=search)
-    ).order_by(
-        'card_set_id__year',
-        'card_set_id__card_set_name',
-        'player_id__player_lname'
-    )
+def card_search_rs(search: str) -> list:
+    searches = search.split(' ')
+    rs = []
+    for search in searches:
+        rs = Card.objects.filter(
+            Q(card_set_id__card_set_name__icontains=search) |
+            Q(card_subset__icontains=search) |
+            Q(player_id__player_lname__icontains=search) |
+            Q(player_id__player_fname__icontains=search) |
+            (Q(player_id__player_fname__icontains=search) & Q(player_id__player_lname__icontains=search)) |
+            (Q(card_set_id__year__icontains=search) & (Q(card_set_id__card_set_name__icontains=search)))
+        ).order_by(
+            'card_set_id__year',
+            'card_set_id__card_set_name',
+            'player_id__player_lname'
+        )
+    return rs
 
 
 @login_required(login_url='/users/')
