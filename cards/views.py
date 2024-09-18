@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import Any
 
 import openpyxl
 from openpyxl.workbook import Workbook
@@ -278,7 +279,7 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
                 obj = CardSet.objects.get(slug=type_slug)
                 cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
                     'card_set_id__year', 'card_set_id__card_set_name')
-                title = obj.year + ' ' + obj.card_set_name
+                title = str(obj.year) + ' ' + obj.card_set_name
         else:
             cards = Card.last_50.all()
             title = 'Last 50 Cards'
@@ -288,16 +289,20 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
             'rs': cards,
         }
         return render(request, 'cards/card-list-card-partial.html', context)
+    except TypeError:
+        message = 'TypeError'
+        status_code = 500
+        explanation = 'The server encountered an error. Please try again later'
     except Exception as e:
         status_code = 500
-        message = 'There has been an error'
+        message = 'There has been an error: %s' % e
         explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    return JsonResponse({'message': message, 'explanation': explanation}, status=status_code)
 
 
 @login_required(login_url='/users/')
 def card_form_refresh(request):
-    context = {'card_title': 'Add Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
+    context = {'card_title': 'Add New Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/card-form.html', context)
 
 
@@ -347,6 +352,7 @@ def card_search(request):
             'title': f'Search "{search}"',
             'form': CardCreateForm,
             'search': search,
+            'card_title': 'Add New Card'
         }
         return render(request, 'cards/card-list.html', dict(context, **card_list_context(request, cards)))
     except Exception as e:
@@ -382,17 +388,16 @@ class ExportScriptsExcel:
         wb.save(self.file_name)
         return wb
 
-    def upload_excel(self) -> None:
+    def upload_excel(self) -> Any:
         wb = self.populate_excel_file()
         client = boto3.Session(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_SECRET_ACCESS_KEY')).resource('s3')
         bucket = os.environ.get('AWS_STORAGE_BUCKET_NAME')
         result = client.Bucket(bucket).upload_file(self.file_name, self.DEST_DIR + self.file_name)
+
+        os.remove(self.file_name)
+
         print(result)
         return result
-
-    def run_process(self) -> None:
-        self.upload_excel()
-        os.remove(self.file_name)
 
 
 def export_list_save(request, file_name: str):
@@ -408,7 +413,8 @@ def card_list_dict(cards) -> list[dict]:
             'set_name': c.card_set_id.card_set_name,
             'info': c.card_subset,
             'num': c.card_num
-        } for c in cards]
+        } for c in cards
+    ]
 
 
 def card_list_export(rs: list[dict]) -> str:
@@ -417,8 +423,7 @@ def card_list_export(rs: list[dict]) -> str:
         f_date = datetime.datetime.strftime(datetime.datetime.today(), '%m_%d_%Y__%H_%M_%S')
         file_name = f"bbcards_card_list_export_{str(f_date)}.xlsx"
         xl = ExportScriptsExcel(rs, file_name)
-        # dest_file = xl.DEST_DIR + file_name
-        xl.run_process()
+        xl.upload_excel()
     return file_name
 
 

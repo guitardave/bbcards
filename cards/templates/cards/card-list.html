@@ -25,6 +25,7 @@
                 <div id="card-list-card">
                     {% include 'cards/card-list-card-partial.html' %}
                 </div>
+                <div class="row"><div class="col-sm-12">&nbsp;</div></div>
             </div>
             {% if user.is_authenticated %}
                 <div class="col-sm-4">
@@ -35,17 +36,5 @@
             {% endif %}
         </div>
     </div>
-{#    <script>#}
-{#        let table = new DataTable(#}
-{#            '#myTable',#}
-{#            {#}
-{#                sort: [[0,1]],#}
-{#                lengthMenu: [#}
-{#                    [50, 100, 250, -1],#}
-{#                    [50, 100, 250, 'All']#}
-{#                ],#}
-{#                pageLength: 50#}
-{#            });#}
-{#    </script>#}
 
 {% endblock content %}
