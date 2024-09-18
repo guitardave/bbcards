@@ -3,33 +3,23 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
 from .models import Player
 from .forms import PlayerForm
 
 
-class PlayerList(ListView):
-    model = Player
-    template_name = 'players/player_list.html'
-    context_object_name = 'players'
-    paginate_by = 30
-    ordering = 'player_lname'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        data = super(PlayerList, self).get_context_data(**kwargs)
-        data['title'] = 'Player List'
-        data['rs'] = self.get_queryset()
-        data['form'] = PlayerForm()
-        data['loaded'] = datetime.datetime.now()
-        data['card_title'] = 'Add Player'
-        return data
-
-    def post(self, *args, **kwargs):
-        form = PlayerForm(self.request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(self.request, 'Your player was successfully saved.')
-            return redirect('players:players-home')
+# @cache_page(60*5)
+def player_list(request):
+    players = Player.list_all.all()
+    context = {
+        'title': 'Player List',
+        'rs': players,
+        'form': PlayerForm,
+        'loaded': datetime.datetime.now(),
+        'card_title': 'Add Player'
+    }
+    return render(request, 'players/player_list.html', context)
 
 
 @login_required(login_url="/users/")

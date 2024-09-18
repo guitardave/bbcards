@@ -124,7 +124,6 @@ def card_list_context(request, queryset: QuerySet) -> dict[str, str]:
     request.session['rs'] = d_card_list
     return dict(
         rs=queryset,
-        card_title='Add Card - Player',
         loaded=datetime.datetime.now(),
         rs_dict=request.session['rs'] if 'rs' in request.session else []
     )
@@ -200,6 +199,7 @@ class CardsViewPlayer(CardsListView):
         data['title'] = f'{self.get_player_name()}'
         data['player'] = player
         data['form'] = CardCreateForm(**{'player': player.slug})
+        data['card_title'] = 'Add Card - Player'
         d_2 = card_list_context(self.request, self.get_queryset())
         return dict(data, **d_2)
 
@@ -260,7 +260,7 @@ def card_delete_async(request, pk: int):
 
 
 @login_required(login_url='/users/')
-def card_create_async(request):
+def card_create_async(request, card_type: str = None, type_slug: str = None):
     try:
         new_id = None
         if request.method == 'POST':
@@ -268,9 +268,22 @@ def card_create_async(request):
             if form.is_valid():
                 form.save()
                 new_id = Card.objects.last().id
-        cards = Card.last_50.all()
+        if card_type and type_slug:
+            if card_type == 'player':
+                obj = Player.objects.get(slug=type_slug)
+                cards = Card.objects.filter(player_id__slug=type_slug).order_by(
+                    'card_set_id__year', 'card_set_id__card_set_name')
+                title = obj.player_fname + ' ' + obj.player_lname
+            else:
+                obj = CardSet.objects.get(slug=type_slug)
+                cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
+                    'card_set_id__year', 'card_set_id__card_set_name')
+                title = obj.year + ' ' + obj.card_set_name
+        else:
+            cards = Card.last_50.all()
+            title = 'Last 50 Cards'
         context = {
-            'title': 'Last 50 Cards',
+            'title': title,
             'new_id': new_id,
             'rs': cards,
         }
