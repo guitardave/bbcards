@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'django_bcrypt',
     'django_bootstrap_breadcrumbs',
+    'django_bootstrap5',
     'django_htmx',
     'rest_framework',
     'rest_framework.authtoken',
@@ -122,12 +123,31 @@ WSGI_APPLICATION = 'bbcards.wsgi.application'
 
 LOGIN_URL = 'users:login'
 
-# Database
+# Databases
 
 if os.getenv("DATABASE_URL", None) is None:
     raise Exception("DATABASE_URL environment variable not defined")
 DATABASES = {
     "default": dj_database_url.parse(os.getenv('DATABASE_URL')),
+}
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_USER = os.environ.get('REDIS_USER')
+REDIS_PW = os.environ.get('REDIS_PW')
+
+REDIS_URI = f'rediss://{REDIS_USER}:{REDIS_PW}@{REDIS_HOST}:{REDIS_PORT}'
+
+
+# Caching
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URI,
+        "KEY_PREFIX": "bbcards",
+        "TIMEOUT": 60 * 15,  # in seconds: 60 * 15 (15 minutes)
+    }
 }
 
 
