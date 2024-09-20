@@ -102,6 +102,14 @@
                     $('#toggle-mode').html(res);
                 }
             })
+            if (this_mode === 'dark') {
+                $('#my-navbar').addClass('bg-dark').removeClass('bg-primary');
+                $('#search-btn').addClass('btn-dark').addClass('btn-outline-secondary').removeClass('btn-outline-light').removeClass('btn-primary');
+            }
+            else {
+                $('#my-navbar').addClass('bg-primary').removeClass('bg-dark');
+                $('#search-btn').addClass('btn-primary').addClass('btn-outline-light').removeClass('btn-outline-secondary').removeClass('btn-dark');
+            }
         });
     </script>
 </body>

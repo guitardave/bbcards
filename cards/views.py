@@ -273,12 +273,12 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
             if card_type == 'player':
                 obj = Player.objects.get(slug=type_slug)
                 cards = Card.objects.filter(player_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name')
+                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
                 title = obj.player_fname + ' ' + obj.player_lname
             else:
                 obj = CardSet.objects.get(slug=type_slug)
                 cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name')
+                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
                 title = str(obj.year) + ' ' + obj.card_set_name
         else:
             cards = Card.last_50.all()
@@ -355,11 +355,15 @@ def card_search(request):
             'card_title': 'Add New Card'
         }
         return render(request, 'cards/card-list.html', dict(context, **card_list_context(request, cards)))
+    except ValueError as e:
+        status_code = 500
+        message = 'Value Error: %s' % e
+        explanation = 'The Server has encountered an error'
     except Exception as e:
         status_code = 500
-        message = 'There has been an error'
+        message = 'There has been an error: %s' % e
         explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    return JsonResponse({'message': message, 'explanation': explanation}, status=status_code)
 
 
 class ExportScriptsExcel:
