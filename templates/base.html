@@ -6,7 +6,7 @@
 {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}
     <html lang="en" data-bs-theme="dark">
 {% else %}
-    <html lang="en" data-bs-theme="">
+    <html lang="en">
 {% endif %}
 <head>
 	<!-- Required meta tags -->
@@ -89,26 +89,40 @@
                 $('#n-results').html('<span class="row-count">' + v.toString() + ' of ' + ttl + ' rows</span>')
             });
         });
-
         $('#toggle-link').on('click', function () {
             let html_tag = $('html');
-            let mode = html_tag.data('bs-theme');
+            let mode = html_tag.attr('data-bs-theme');
             let this_mode = mode ? null : 'dark';
             html_tag.attr('data-bs-theme', this_mode);
             $.ajax({
                 url: '/users/toggle_mode/'+this_mode+'/',
                 type: 'GET',
                 success: function(res) {
-                    $('#toggle-mode').html(res);
+                    $('#toggle-link').html(res);
                 }
-            })
+            });
+            
+            console.log(this_mode);
+            
             if (this_mode === 'dark') {
-                $('#my-navbar').addClass('bg-dark').removeClass('bg-primary');
-                $('#search-btn').addClass('btn-dark').addClass('btn-outline-secondary').removeClass('btn-outline-light').removeClass('btn-primary');
+                $('#my-navbar')
+                    .addClass('bg-dark')
+                    .removeClass('bg-primary');
+                $('#search-btn')
+                    .addClass('btn-dark')
+                    .addClass('btn-outline-secondary')
+                    .removeClass('btn-outline-light')
+                    .removeClass('btn-primary');
             }
             else {
-                $('#my-navbar').addClass('bg-primary').removeClass('bg-dark');
-                $('#search-btn').addClass('btn-primary').addClass('btn-outline-light').removeClass('btn-outline-secondary').removeClass('btn-dark');
+                $('#my-navbar')
+                    .addClass('bg-primary')
+                    .removeClass('bg-dark');
+                $('#search-btn')
+                    .addClass('btn-primary')
+                    .addClass('btn-outline-light')
+                    .removeClass('btn-outline-secondary')
+                    .removeClass('btn-dark');
             }
         });
     </script>

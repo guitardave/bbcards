@@ -44,7 +44,7 @@
                               <a class="dropdown-item" href="{% url 'users:user-management' %}"><i class="fa fa-users"></i> User Management</a>
                           {% endif %}
 {#                          <a class="dropdown-item" href="#togglemode" id="toggle-link" hx-post="{% url 'users:toggle_mode' mode %}" hx-target="#toggle-mode" hx-swap="innerHTML"><span id="toggle-mode">{% include '_toggle_mode.html' %}</span></a>#}
-                          <a class="dropdown-item" href="#togglemode" id="toggle-link"><span id="toggle-mode">{% include '_toggle_mode.html' %}</span></a>
+                          <a class="dropdown-item toggleMode" href="#togglemode" id="toggle-link">{% include '_toggle_mode.html' %}</a>
                           <a class="dropdown-item" href="{% url 'users:logout' %}"><i class="fa fa-sign-out"></i> Logout</a>
                       {% else %}
                           <a class="dropdown-item" href="{% url 'users:login' %}"><i class="fa fa-sign-in"></i> Login</a>
