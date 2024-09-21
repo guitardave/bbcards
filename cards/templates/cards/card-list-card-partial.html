@@ -9,15 +9,17 @@
             </div>
 {#            {% if rs_dict %}#}
                 <div class="col-sm-2 me-auto text-end">
-                    {% if rs|length > 0 %}
-                        <a href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
-                    {% else %}
-                        <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
+                    {% if user.is_authenticated %}
+                        {% if rs|length > 0 %}
+                            <a href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
+                        {% else %}
+                            <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
+                        {% endif %}
+                        <br>
+                        <span id="export-msg" class="text-muted">
+                            {% include 'cards/card-list-export-msg-partial.html' %}
+                        </span>
                     {% endif %}
-                    <br>
-                    <span id="export-msg" class="text-muted">
-                        {% include 'cards/card-list-export-msg-partial.html' %}
-                    </span>
                 </div>
 {#            {% endif %}#}
         </div>
