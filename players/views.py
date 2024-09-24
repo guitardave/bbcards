@@ -5,11 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
+
+from decorators.my_decorators import error_handling
 from .models import Player
 from .forms import PlayerForm
 
 
 # @cache_page(60*5)
+@error_handling
 def player_list(request):
     players = Player.list_all.all()
     context = {
@@ -23,6 +26,7 @@ def player_list(request):
 
 
 @login_required(login_url="/users/")
+@error_handling
 def player_add_async(request):
     success = False
     message = ''
@@ -55,6 +59,7 @@ def player_add_async(request):
 
 
 @login_required(login_url="/users/")
+@error_handling
 def player_update_async(request, pk: int):
     player = Player.objects.get(pk=pk)
     if request.method == 'POST':
@@ -76,6 +81,7 @@ def player_update_async(request, pk: int):
 
 
 @login_required(login_url='/users/')
+@error_handling
 def player_form_refresh(request):
     context = {'card_title': 'Add Player', 'loaded': datetime.datetime.now(), 'form': PlayerForm}
     return render(request, 'players/player_form.html', context)

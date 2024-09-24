@@ -3,10 +3,12 @@ import os
 from typing import Any
 
 import openpyxl
+from django.db.models.functions import Cast
+from django.utils import timezone
 from openpyxl.workbook import Workbook
 import boto3
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, IntegerField
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -16,7 +18,7 @@ from django.contrib import messages
 from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm
 from .models import Card, CardSet, CardListExport
-# from decorators.my_decorators import error_handling
+from decorators.my_decorators import error_handling
 
 
 def get_card_set_list():
@@ -24,6 +26,7 @@ def get_card_set_list():
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_set_create_async(request):
     try:
         c_message = ''
@@ -56,68 +59,53 @@ def card_set_create_async(request):
         return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
 
 
+@error_handling
 def card_set_list(request):
-    try:
-        if request.method == 'POST':
-            form = CardSetForm(request.POST)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Card set has been created')
-            return redirect('cards:cardsets')
-        form = CardSetForm
-        cards = get_card_set_list()
-        context = {
-            'rs': cards,
-            'form': form,
-            'title': 'Card Sets',
-            'card_title': 'Add Card Set',
-            'loaded': datetime.datetime.now()
-        }
-        return render(request, 'cards/cardset-list.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    if request.method == 'POST':
+        form = CardSetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Card set has been created')
+        return redirect('cards:cardsets')
+    form = CardSetForm
+    cards = get_card_set_list()
+    context = {
+        'rs': cards,
+        'form': form,
+        'title': 'Card Sets',
+        'card_title': 'Add Card Set',
+        'loaded': datetime.datetime.now()
+    }
+    return render(request, 'cards/cardset-list.html', context)
 
 
 @login_required(login_url="/users/")
+@error_handling
 def card_set_update_async(request, pk: int):
-    try:
-        obj = CardSet.objects.get(pk=pk)
-        if request.method == 'POST':
-            form = CardSetForm(request.POST, instance=obj)
-            if form.is_valid():
-                form.save()
-                t_message = '<i class="fa fa-check"></i>'
-            else:
-                t_message = '<i class="fa fa-remove"></i> Error'
-            context = {'card': obj, 'success': True, 't_message': t_message}
-            return render(request, 'cards/cardset-list-tr-partial.html', context)
-        context = {
-            'form': CardSetForm(instance=obj),
-            'obj': obj,
-            'card_title': 'Update Card Set',
-            'loaded': datetime.datetime.now()
-        }
-        return render(request, 'cards/cardset-form.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    obj = CardSet.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = CardSetForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            t_message = '<i class="fa fa-check"></i>'
+        else:
+            t_message = '<i class="fa fa-remove"></i> Error'
+        context = {'card': obj, 'success': True, 't_message': t_message}
+        return render(request, 'cards/cardset-list-tr-partial.html', context)
+    context = {
+        'form': CardSetForm(instance=obj),
+        'obj': obj,
+        'card_title': 'Update Card Set',
+        'loaded': datetime.datetime.now()
+    }
+    return render(request, 'cards/cardset-form.html', context)
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_set_form_refresh(request):
-    try:
-        context = {'card_title': 'Add Card Set', 'form': CardSetForm, 'loaded': datetime.datetime.now()}
-        return render(request, 'cards/cardset-form.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    context = {'card_title': 'Add Card Set', 'form': CardSetForm, 'loaded': datetime.datetime.now()}
+    return render(request, 'cards/cardset-form.html', context)
 
 
 def card_list_context(request, queryset: QuerySet) -> dict[str, str]:
@@ -170,7 +158,11 @@ class CardsViewSet(CardsListView):
         return f'{card_set.year} {card_set.card_set_name}'
 
     def get_queryset(self):
-        return Card.objects.filter(card_set_id__slug=self.kwargs.get('slug'))
+        return Card.objects.filter(
+            card_set_id__slug=self.kwargs.get('slug')
+        ).annotate(
+            card_num_field=Cast('card_num', IntegerField())
+        ).order_by('card_num_field')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         card_set = self.get_object()
@@ -185,7 +177,9 @@ class CardsViewSet(CardsListView):
 
 class CardsViewPlayer(CardsListView):
     def get_queryset(self):
-        return Card.objects.filter(player_id__slug=self.kwargs.get('slug'))
+        return Card.objects.filter(
+            player_id__slug=self.kwargs.get('slug')
+        ).order_by('card_set_id__year', 'card_set_id__slug')
 
     def get_object(self):
         return Player.objects.get(slug=self.kwargs.get('slug'))
@@ -205,119 +199,111 @@ class CardsViewPlayer(CardsListView):
         return dict(data, **d_2)
 
 
+@login_required(login_url='/users/')
+@error_handling
+def load_cards_async(request, c_type: int, data: int):
+    if c_type == 3:  # by player
+        rs = Card.objects.filter(player_id_id=data).order_by('card_set_id__slug')
+    elif c_type == 2:  # by card set
+        rs = Card.objects.filter(card_set_id_id=data).order_by('card_set_id__slug')
+    else:  # last 50
+        rs = Card.list_all.all().order_by('-id')[:50]
+    context = {'rs': rs, 'loaded': timezone.now()}
+    return render(request, 'cards/card-list-table-partial.html', context)
+
+
 @login_required(login_url="/users/")
+@error_handling
 def card_update_async(request, pk: int):
-    try:
-        obj = Card.objects.get(pk=pk)
-        if request.method == 'POST':
-            success = False
-            form = CardUpdateForm(request.POST, instance=obj)
-            if form.is_valid():
-                form.save()
-                success = True
-                t_message = '<i class="fa fa-check"></i>'
-            else:
-                t_message = '<i class="fa fa-remove"></i> Error'
-            return render(
-                request,
-                'cards/card-list-tr-partial.html',
-                {'card': Card.objects.get(pk=pk), 'success': success, 't_message': t_message}
-            )
-        context = {
-            'form': CardUpdateForm(instance=obj), 'obj': obj,
-            'card_title': 'Update Card',
-            'loaded': datetime.datetime.now()
-        }
-        return render(request, 'cards/card-form.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    obj = Card.objects.get(pk=pk)
+    if request.method == 'POST':
+        success = False
+        form = CardUpdateForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            success = True
+            t_message = '<i class="fa fa-check"></i>'
+        else:
+            t_message = '<i class="fa fa-remove"></i> Error'
+        return render(
+            request,
+            'cards/card-list-tr-partial.html',
+            {'card': Card.objects.get(pk=pk), 'success': success, 't_message': t_message}
+        )
+    context = {
+        'form': CardUpdateForm(instance=obj), 'obj': obj,
+        'card_title': 'Update Card',
+        'loaded': datetime.datetime.now()
+    }
+    return render(request, 'cards/card-form.html', context)
 
 
 @login_required(login_url='/users/')
 @csrf_exempt
+@error_handling
 def card_delete_async(request, pk: int):
-    try:
-        c_message, cards, player = None, None, None
-        obj = Card.objects.filter(pk=pk)
-        if obj.exists():
-            cards = Card.objects.filter(player_id_id=obj[0].player_id_id)
-            player = Player.objects.get(id=obj[0].player_id_id)
-            obj.delete()
-            c_message = 'Item deleted successfully'
-        context = {
-            'rs': cards if cards else Card.last_50.all(),
-            'c_message': c_message,
-            'title': 'Last 50 Cards' if not player else f'{player.player_fname} {player.player_lname}'
-        }
-        return render(request, 'cards/card-list-card-partial.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+
+    c_message, cards, player = None, None, None
+    obj = Card.objects.filter(pk=pk)
+    if obj.exists():
+        cards = Card.objects.filter(player_id_id=obj[0].player_id_id)
+        player = Player.objects.get(id=obj[0].player_id_id)
+        obj.delete()
+        c_message = 'Item deleted successfully'
+    context = {
+        'rs': cards if cards else Card.last_50.all(),
+        'c_message': c_message,
+        'title': 'Last 50 Cards' if not player else f'{player.player_fname} {player.player_lname}'
+    }
+    return render(request, 'cards/card-list-card-partial.html', context)
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
-    try:
-        new_id = None
-        if request.method == 'POST':
-            form = CardCreateForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                new_id = Card.objects.last().id
-        if card_type and type_slug:
-            if card_type == 'player':
-                obj = Player.objects.get(slug=type_slug)
-                cards = Card.objects.filter(player_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
-                title = obj.player_fname + ' ' + obj.player_lname
-            else:
-                obj = CardSet.objects.get(slug=type_slug)
-                cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
-                title = str(obj.year) + ' ' + obj.card_set_name
+
+    new_id = None
+    if request.method == 'POST':
+        form = CardCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            new_id = Card.objects.last().id
+    if card_type and type_slug:
+        if card_type == 'player':
+            obj = Player.objects.get(slug=type_slug)
+            cards = Card.objects.filter(player_id__slug=type_slug).order_by(
+                'card_set_id__year', 'card_set_id__card_set_name')
+            title = obj.player_fname + ' ' + obj.player_lname
         else:
-            cards = Card.last_50.all()
-            title = 'Last 50 Cards'
-        context = {
-            'title': title,
-            'new_id': new_id,
-            'rs': cards,
-        }
-        return render(request, 'cards/card-list-card-partial.html', context)
-    except TypeError:
-        message = 'TypeError'
-        status_code = 500
-        explanation = 'The server encountered an error. Please try again later'
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error: %s' % e
-        explanation = 'The server encountered an error. Please try again later'
-    return JsonResponse({'message': message, 'explanation': explanation}, status=status_code)
+            obj = CardSet.objects.get(slug=type_slug)
+            cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
+                'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
+            title = str(obj.year) + ' ' + obj.card_set_name
+    else:
+        cards = Card.last_50.all()
+        title = 'Last 50 Cards'
+    context = {
+        'title': title,
+        'new_id': new_id,
+        'rs': cards,
+    }
+    return render(request, 'cards/card-list-card-partial.html', context)
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_form_refresh(request):
     context = {'card_title': 'Add New Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/card-form.html', context)
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_image(request, pk: int):
-    try:
-        obj = Card.objects.get(pk=pk)
-        card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
-        context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
-        return render(request, 'cards/card-image.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    obj = Card.objects.get(pk=pk)
+    card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
+    context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
+    return render(request, 'cards/card-image.html', context)
 
 
 def card_search_rs(search: str) -> list:
@@ -340,30 +326,21 @@ def card_search_rs(search: str) -> list:
 
 
 @login_required(login_url='/users/')
+@error_handling
 def card_search(request):
-    try:
-        cards = []
-        search = ''
-        if request.method == 'POST':
-            search = request.POST['search']
-            cards = card_search_rs(search)
-            request.session['rs'] = card_list_dict(cards)
-        context = {
-            'title': f'Search "{search}"',
-            'form': CardCreateForm,
-            'search': search,
-            'card_title': 'Add New Card'
-        }
-        return render(request, 'cards/card-list.html', dict(context, **card_list_context(request, cards)))
-    except ValueError as e:
-        status_code = 500
-        message = 'Value Error: %s' % e
-        explanation = 'The Server has encountered an error'
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error: %s' % e
-        explanation = 'The server encountered an error. Please try again later'
-    return JsonResponse({'message': message, 'explanation': explanation}, status=status_code)
+    cards = []
+    search = ''
+    if request.method == 'POST':
+        search = request.POST['search']
+        cards = card_search_rs(search)
+        request.session['rs'] = card_list_dict(cards)
+    context = {
+        'title': f'Search "{search}"',
+        'form': CardCreateForm,
+        'search': search,
+        'card_title': 'Add New Card'
+    }
+    return render(request, 'cards/card-list.html', dict(context, **card_list_context(request, cards)))
 
 
 class ExportScriptsExcel:
@@ -433,6 +410,7 @@ def card_list_export(rs: list[dict]) -> str:
 
 @login_required(login_url='/users/')
 @csrf_exempt
+@error_handling
 def card_list_export_vw(request):
     try:
         rs = card_list_export(request.session['rs']) if 'rs' in request.session else ''

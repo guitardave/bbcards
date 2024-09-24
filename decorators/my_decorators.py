@@ -1,11 +1,14 @@
+from django.http import JsonResponse
+
+
 def error_handling(func):
     def wrapper(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except TypeError as e:
-            m = 'TypeError: %s' % e
+            return JsonResponse('TypeError: %s' % e)
         except ValueError as e:
-            m = 'ValueError: %s' % e
+            JsonResponse('ValueError: %s' % e)
         except Exception as e:
-            m = 'Error: %s' % e
+            JsonResponse('Error: %s' % e)
     return wrapper

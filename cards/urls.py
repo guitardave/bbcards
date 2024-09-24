@@ -8,6 +8,7 @@ urlpatterns = [
     path('cards/', views.CardsViewAll.as_view(), name='card-list-all'),
     path('cards/by-set/<slug:slug>/', views.CardsViewSet.as_view(), name='card-list-set'),
     path('cards/by-player/<slug:slug>/', views.CardsViewPlayer.as_view(), name='card-list-player'),
+    path('cards/list/async/<int:c_type>/<int:data>/', views.load_cards_async, name='card-list-async'),
     path('cards/new/async/', views.card_create_async, name='card-new-async'),
     path('cards/new/async/<str:card_type>/<str:type_slug>/', views.card_create_async, name='card-new-async'),
     path('cards/<int:pk>/images/', views.card_image, name='card-image'),
