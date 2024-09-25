@@ -12,13 +12,13 @@
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
             <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
-                <div id="player-card" class="fade-in">
+                <div id="card-div" class="fade-in">
                     {% include 'players/player_list_card_partial.html' %}
                 </div>
             </div>
             {% if user.is_authenticated %}
                 <div class="col-sm-4">
-                    <div id="player-form-div">
+                    <div id="form-div">
                         {% include 'players/player_form.html'%}
                     </div>
                 </div>

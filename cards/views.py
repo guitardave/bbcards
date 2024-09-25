@@ -21,6 +21,15 @@ from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
 
 
+class ErrorHandlerMixin:
+    def test_func(self):
+        try:
+            # stuff
+            pass
+        except Exception as e:
+            return JsonResponse({'Error': str(e)})
+
+
 def get_card_set_list():
     return CardSet.objects.all().order_by('year', 'card_set_name')
 
@@ -28,36 +37,29 @@ def get_card_set_list():
 @login_required(login_url='/users/')
 @error_handling
 def card_set_create_async(request):
-    try:
-        c_message = ''
-        if request.method == 'POST':
-            set_year = request.POST['year']
-            set_name = request.POST['card_set_name']
-            full_set_name = f'{set_year} {set_name}'
-            check = CardSet.objects.filter(card_set_name=set_name, year=set_year)
-            if not check.exists():
-                form = CardSetForm(request.POST)
-                if form.is_valid():
-                    form.save()
-                    c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
-            else:
-                c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
-        cards = get_card_set_list()
-        new_id = Card.objects.last().id
-        return render(request, 'cards/cardset-list-card-partial.html',
-                      {
-                          'rs': cards,
-                          'new_id': new_id,
-                          'title': 'Card Sets',
-                          'c_message': c_message
-                      }
-                      )
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
-
+    c_message = ''
+    if request.method == 'POST':
+        set_year = request.POST['year']
+        set_name = request.POST['card_set_name']
+        full_set_name = f'{set_year} {set_name}'
+        check = CardSet.objects.filter(card_set_name=set_name, year=set_year)
+        if not check.exists():
+            form = CardSetForm(request.POST)
+            if form.is_valid():
+                form.save()
+                c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
+        else:
+            c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
+    cards = get_card_set_list()
+    new_id = Card.objects.last().id
+    return render(request, 'cards/cardset-list-card-partial.html',
+                  {
+                      'rs': cards,
+                      'new_id': new_id,
+                      'title': 'Card Sets',
+                      'c_message': c_message
+                  }
+                  )
 
 @error_handling
 def card_set_list(request):
@@ -170,7 +172,7 @@ class CardsViewSet(CardsListView):
         data['title'] = f'{self.get_card_set()}'
         data['card_set'] = card_set
         data['form'] = CardCreateForm(**{'set': card_set.slug})
-        data['card_title'] = 'Add Card - by Card Set'
+        data['card_title'] = 'Add Card - Card Set'
         d_2 = card_list_context(self.request, self.get_queryset())
         return dict(data, **d_2)
 
@@ -242,7 +244,6 @@ def card_update_async(request, pk: int):
 @csrf_exempt
 @error_handling
 def card_delete_async(request, pk: int):
-
     c_message, cards, player = None, None, None
     obj = Card.objects.filter(pk=pk)
     if obj.exists():
@@ -261,33 +262,49 @@ def card_delete_async(request, pk: int):
 @login_required(login_url='/users/')
 @error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
-
     new_id = None
     if request.method == 'POST':
         form = CardCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             new_id = Card.objects.last().id
+        if card_type and type_slug:
+            if card_type == 'player':
+                obj = Player.objects.get(slug=type_slug)
+                cards = Card.objects.filter(player_id__slug=type_slug).order_by(
+                    'card_set_id__year', 'card_set_id__card_set_name')
+                title = obj.player_fname + ' ' + obj.player_lname
+            else:
+                obj = CardSet.objects.get(slug=type_slug)
+                cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
+                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
+                title = str(obj.year) + ' ' + obj.card_set_name
+        else:
+            cards = Card.last_50.all()
+            title = 'Last 50 Cards'
+        context = {
+            'title': title,
+            'new_id': new_id,
+            'rs': cards,
+        }
+        return render(request, 'cards/card-list-card-partial.html', context)
+
+
+@login_required(login_url='/users/')
+@error_handling
+def card_create_form_async(request, card_type: str = None, type_slug: str = None):
+    form = CardCreateForm()
+    context = {'card_title': 'Add Card'}
     if card_type and type_slug:
         if card_type == 'player':
-            obj = Player.objects.get(slug=type_slug)
-            cards = Card.objects.filter(player_id__slug=type_slug).order_by(
-                'card_set_id__year', 'card_set_id__card_set_name')
-            title = obj.player_fname + ' ' + obj.player_lname
+            kwargs = {'player': type_slug}
+            context['card_title'] = 'Add Card - Player'
         else:
-            obj = CardSet.objects.get(slug=type_slug)
-            cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
-                'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
-            title = str(obj.year) + ' ' + obj.card_set_name
-    else:
-        cards = Card.last_50.all()
-        title = 'Last 50 Cards'
-    context = {
-        'title': title,
-        'new_id': new_id,
-        'rs': cards,
-    }
-    return render(request, 'cards/card-list-card-partial.html', context)
+            kwargs = {'set': type_slug}
+            context['card_title'] = 'Add Card - Set'
+        form = CardCreateForm(**kwargs)
+    context['form'] = form
+    return render(request, 'cards/card-form.html', context)
 
 
 @login_required(login_url='/users/')
@@ -412,18 +429,11 @@ def card_list_export(rs: list[dict]) -> str:
 @csrf_exempt
 @error_handling
 def card_list_export_vw(request):
-    try:
-        rs = card_list_export(request.session['rs']) if 'rs' in request.session else ''
-        if len(rs) > 0:
-            export_list_save(request, rs)
-            # request.session['rs'] = None
-        context = {
-            'xport_result': rs,
-            'xport_url': f'https://jojodave.s3.amazonaws.com/static/bbcards/export_data/{rs}'
-        }
-        return render(request, 'cards/card-list-export-msg-partial.html', context)
-    except Exception as e:
-        status_code = 500
-        message = 'There has been an error'
-        explanation = 'The server encountered an error. Please try again later'
-        return JsonResponse({'message': message, 'explanation': explanation, 'e': e.__cause__}, status=status_code)
+    rs = card_list_export(request.session['rs']) if 'rs' in request.session else ''
+    if len(rs) > 0:
+        export_list_save(request, rs)
+    context = {
+        'xport_result': rs,
+        'xport_url': f'https://jojodave.s3.amazonaws.com/static/bbcards/export_data/{rs}'
+    }
+    return render(request, 'cards/card-list-export-msg-partial.html', context)

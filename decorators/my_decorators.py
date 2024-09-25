@@ -6,9 +6,9 @@ def error_handling(func):
         try:
             return func(*args, **kwargs)
         except TypeError as e:
-            return JsonResponse('TypeError: %s' % e)
+            return JsonResponse('TypeError: %s' % e, safe=False)
         except ValueError as e:
-            JsonResponse('ValueError: %s' % e)
+            return JsonResponse('ValueError: %s' % e, safe=False)
         except Exception as e:
-            JsonResponse('Error: %s' % e)
+            return JsonResponse('Error: %s' % e, safe=False)
     return wrapper

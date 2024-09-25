@@ -11,14 +11,14 @@
         <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
         <div class="row">
             <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
-                <div id="cardset-card" class="fade-in">
+                <div id="card-div" class="fade-in">
                     {% include 'cards/cardset-list-card-partial.html' %}
                 </div>
                 <div class="row"><div class="col-sm-12">&nbsp;</div></div>
             </div>
             {% if user.is_authenticated %}
                 <div class="col-sm-4">
-                    <div id="cardset-form">
+                    <div id="form-div">
                         {% include 'cards/cardset-form.html' %}
                     </div>
                 </div>
