@@ -21,15 +21,6 @@ from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
 
 
-class ErrorHandlerMixin:
-    def test_func(self):
-        try:
-            # stuff
-            pass
-        except Exception as e:
-            return JsonResponse({'Error': str(e)})
-
-
 def get_card_set_list():
     return CardSet.objects.all().order_by('year', 'card_set_name')
 
@@ -60,6 +51,7 @@ def card_set_create_async(request):
                       'c_message': c_message
                   }
                   )
+
 
 @error_handling
 def card_set_list(request):
@@ -162,9 +154,7 @@ class CardsViewSet(CardsListView):
     def get_queryset(self):
         return Card.objects.filter(
             card_set_id__slug=self.kwargs.get('slug')
-        ).annotate(
-            card_num_field=Cast('card_num', IntegerField())
-        ).order_by('card_num_field')
+        ).order_by('card_num')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         card_set = self.get_object()
