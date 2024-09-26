@@ -13,3 +13,16 @@
         <span class="m-1" id="filterResults"></span>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $("#my-input").on("keyup", function () {
+            let value = $(this).val().toLowerCase();
+            $("#my-table tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+            let v = $('tr:visible').length-1;
+            let ttl = $('tr').length-1
+            $('#n-results').html('<span class="row-count">' + v.toString() + ' of ' + ttl + ' rows</span>')
+        });
+    });
+</script>

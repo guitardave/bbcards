@@ -81,7 +81,15 @@ def card_set_update_async(request, pk: int):
             t_message = '<i class="fa fa-check"></i>'
         else:
             t_message = '<i class="fa fa-remove"></i> Error'
-        context = {'card': obj, 'success': True, 't_message': t_message}
+        context = {
+            'card':
+                {
+                    'card': obj,
+                    'count': Card.objects.filter(card_set_id=obj.id).count()
+                },
+            'success': True,
+            't_message': t_message
+        }
         return render(request, 'cards/cardset-list-tr-partial.html', context)
     context = {
         'form': CardSetForm(instance=obj),

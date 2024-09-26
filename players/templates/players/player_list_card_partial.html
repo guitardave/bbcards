@@ -23,12 +23,13 @@
                     <tr>
                         <th>First Name</th>
                         <th>Last Name</th>
+                        <th>Count</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="my-table">
                     {% for p in rs %}
-                        <tr id="tr-p{{ p.id }}" class="player-row">
+                        <tr id="tr-p{{ p.player.id }}" class="player-row">
                             {% include 'players/player_list_tr_partial.html' %}
                         </tr>
                     {% endfor %}
