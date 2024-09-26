@@ -3,12 +3,14 @@
         <tr>
             <th>Year</th>
             <th>Card Set</th>
+            <th>Sport</th>
+            <th>Count</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody id="my-table">
     {% for card in rs %}
-        <tr id="tr-s{{ card.id }}">
+        <tr id="tr-s{{ card.card.id }}">
             {% include 'cards/cardset-list-tr-partial.html' %}
         </tr>
     {% endfor %}

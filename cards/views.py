@@ -9,7 +9,6 @@ from openpyxl.workbook import Workbook
 import boto3
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, QuerySet, IntegerField
-from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
@@ -19,10 +18,6 @@ from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm
 from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
-
-
-def get_card_set_list():
-    return CardSet.objects.all().order_by('year', 'card_set_name')
 
 
 @login_required(login_url='/users/')
@@ -41,16 +36,18 @@ def card_set_create_async(request):
                 c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
             c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
-    cards = get_card_set_list()
+    cards = CardSet.all_sets.all()
     new_id = Card.objects.last().id
-    return render(request, 'cards/cardset-list-card-partial.html',
-                  {
-                      'rs': cards,
-                      'new_id': new_id,
-                      'title': 'Card Sets',
-                      'c_message': c_message
-                  }
-                  )
+    return render(
+        request,
+        'cards/cardset-list-card-partial.html',
+        {
+            'rs': cards,
+            'new_id': new_id,
+            'title': 'Card Sets',
+            'c_message': c_message
+        }
+    )
 
 
 @error_handling
@@ -62,13 +59,13 @@ def card_set_list(request):
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
     form = CardSetForm
-    cards = get_card_set_list()
+    cards = card_list_count(CardSet.all_sets.all())
     context = {
         'rs': cards,
         'form': form,
         'title': 'Card Sets',
         'card_title': 'Add Card Set',
-        'loaded': datetime.datetime.now()
+        'loaded': timezone.now()
     }
     return render(request, 'cards/cardset-list.html', context)
 
@@ -100,6 +97,12 @@ def card_set_update_async(request, pk: int):
 def card_set_form_refresh(request):
     context = {'card_title': 'Add Card Set', 'form': CardSetForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/cardset-form.html', context)
+
+
+def card_list_count(card_list: list) -> list[dict]:
+    return [
+        dict(card=card, count=Card.objects.filter(card_set_id=card.id).count()) for card in card_list
+    ]
 
 
 def card_list_context(request, queryset: QuerySet) -> dict[str, str]:

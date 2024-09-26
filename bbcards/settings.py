@@ -125,10 +125,11 @@ LOGIN_URL = 'users:login'
 
 # Databases
 
-if os.getenv("DATABASE_URL", None) is None:
-    raise Exception("DATABASE_URL environment variable not defined")
+# if os.getenv("DATABASE_URL", None) is None:
+#     raise Exception("DATABASE_URL environment variable not defined")
 DATABASES = {
-    "default": dj_database_url.parse(os.getenv('DATABASE_URL')),
+    # "default": dj_database_url.parse(os.getenv('DATABASE_URL')),
+    'default': dj_database_url.parse('postgresql://bbusr:y90k494n5qwoskb3@dave-pg-do-user-9288761-0.b.db.ondigitalocean.com:25060/bbcards?sslmode=require')
 }
 
 REDIS_HOST = os.environ.get('REDIS_HOST')

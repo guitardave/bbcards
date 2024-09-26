@@ -8,14 +8,23 @@ from players.models import Player
 from users.models import CardUser
 
 
+class CardSetAll(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().all().order_by('year', 'card_set_name')
+
+
 class CardSet(models.Model):
     year = models.IntegerField(default=datetime.now().year)
     card_set_name = models.CharField(max_length=45, default=None)
     date_entered = models.DateTimeField(auto_now_add=True)
+    sport = models.CharField(max_length=50, null=True, default='Baseball')
     slug = models.SlugField(unique=True)
+
+    objects = models.Manager()
+    all_sets = CardSetAll()
     
     def __str__(self):
-        return '%s %s' % (str(self.year), self.card_set_name)
+        return '%s %s %s' % (str(self.year), self.card_set_name, self.sport)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.__str__())

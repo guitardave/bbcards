@@ -6,6 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from .models import *
 
 
+SPORTS = [('Baseball', 'Baseball'), ('Football', 'Football'), ('Basketball', 'Basketball')]
+
+
 def validate_int(value):
     if not int(value):
         raise ValidationError(
@@ -82,10 +85,14 @@ class CardSetForm(forms.ModelForm):
         label='Card Set Name',
         required=True
     )
+    sport = forms.CharField(
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=SPORTS),
+        label='Sport',
+    )
 
     class Meta:
         model = CardSet
-        fields = ('year', 'card_set_name',)
+        fields = ('year', 'card_set_name', 'sport',)
 
 
 class SearchForm(forms.Form):

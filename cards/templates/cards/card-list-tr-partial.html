@@ -1,8 +1,8 @@
 <td class="one"><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
-<td class="text-end">{{ card.card_set_id.year }}</td>
+<td class="me-auto text-end">{{ card.card_set_id.year }}</td>
 <td><a href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a></td>
 <td class="one">{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
-<td style="text-align: right">{{ card.card_num }}</td>
+<td class="me-auto text-end">{{ card.card_num }}</td>
 {% if user.is_authenticated %}
     <td colspan="2">
         <div class="row">
