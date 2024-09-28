@@ -6,6 +6,9 @@
     {% if user.is_authenticated %}
         <a class="m-1" href="#add" hx-get="{% url 'cards:card-new-form-async' 'player' p.player.slug %}" hx-target="#form-div" hx-swap="innerHMTL" title="Add card for {{ p.player.player_fname }} {{ p.player.player_lname }}"><i class="fa fa-plus"></i></a>
         <a class="m-1" href="#update" hx-get="{% url 'players:players-upd-async' p.player.id %}" hx-target="#form-div" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
+        {% if user.is_superuser and p.count == 0 %}
+            <a class="m-1" href="#delete" hx-post="{% url 'players:players-delete-async' p.player.id %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa fa-remove"></i></a>
+        {% endif %}
     {% endif %}
     <span class="fade-out m-1">
         {% if t_message %}

@@ -1,11 +1,10 @@
 import datetime
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
-from django.views.generic import ListView
+from django.views.decorators.csrf import csrf_exempt
 
 from cards.models import Card
 from decorators.my_decorators import error_handling
@@ -99,3 +98,21 @@ def player_update_async(request, pk: int):
 def player_form_refresh(request):
     context = {'card_title': 'Add Player', 'loaded': datetime.datetime.now(), 'form': PlayerForm}
     return render(request, 'players/player_form.html', context)
+
+
+@login_required(login_url='/users/')
+@csrf_exempt
+@error_handling
+def player_delete_async(request, player_id: int):
+    message = ''
+    obj = Player.objects.filter(id=player_id)
+    if obj.exists():
+        obj.delete()
+        message = 'Player deleted successfully'
+    players = Player.list_all.all()
+    context = {
+        'title': 'Player List',
+        'rs': [{'player': p, 'count': Card.objects.filter(player_id_id=p.id).count()} for p in players],
+        'message': message
+    }
+    return render(request, 'players/player_list_card_partial.html', context)
