@@ -25,10 +25,9 @@ from decorators.my_decorators import error_handling
 def card_set_create_async(request):
     c_message = ''
     if request.method == 'POST':
-        set_year = request.POST['year']
-        set_name = request.POST['card_set_name']
-        full_set_name = f'{set_year} {set_name}'
-        check = CardSet.objects.filter(card_set_name=set_name, year=set_year)
+        set_year, set_name, sport = request.POST['year'], request.POST['card_set_name'], request.POST['sport']
+        full_set_name = f'{set_year} {set_name} {sport}'
+        check = CardSet.objects.filter(card_set_name=set_name, year=set_year, sport=sport)
         if not check.exists():
             form = CardSetForm(request.POST)
             if form.is_valid():
@@ -36,18 +35,13 @@ def card_set_create_async(request):
                 c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
             c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
-    cards = CardSet.all_sets.all()
-    new_id = Card.objects.last().id
-    return render(
-        request,
-        'cards/cardset-list-card-partial.html',
-        {
-            'rs': cards,
-            'new_id': new_id,
-            'title': 'Card Sets',
-            'c_message': c_message
-        }
-    )
+    context = {
+        'rs': card_list_count(CardSet.all_sets.all()),
+        'new_id': Card.objects.last().id,
+        'title': 'Card Sets',
+        'c_message': c_message
+    }
+    return render(request, 'cards/cardset-list-card-partial.html', context)
 
 
 @error_handling
