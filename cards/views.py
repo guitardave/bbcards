@@ -258,31 +258,30 @@ def card_delete_async(request, pk: int):
 @error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
     new_id = None
-    if request.method == 'POST':
-        form = CardCreateForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            new_id = Card.objects.last().id
-        if card_type and type_slug:
-            if card_type == 'player':
-                obj = Player.objects.get(slug=type_slug)
-                cards = Card.objects.filter(player_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name')
-                title = obj.player_fname + ' ' + obj.player_lname
-            else:
-                obj = CardSet.objects.get(slug=type_slug)
-                cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
-                    'card_set_id__year', 'card_set_id__card_set_name', 'card_set_id__card__card_num')
-                title = str(obj.year) + ' ' + obj.card_set_name
+    form = CardCreateForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        new_id = Card.objects.last().id
+    if card_type and type_slug:
+        if card_type == 'player':
+            obj = Player.objects.get(slug=type_slug)
+            cards = Card.objects.filter(player_id__slug=type_slug).order_by(
+                'card_set_id__year', 'card_set_id__card_set_name')
+            title = obj.player_fname + ' ' + obj.player_lname
         else:
-            cards = Card.last_50.all()
-            title = 'Last 50 Cards'
-        context = {
-            'title': title,
-            'new_id': new_id,
-            'rs': cards,
-        }
-        return render(request, 'cards/card-list-card-partial.html', context)
+            obj = CardSet.objects.get(slug=type_slug)
+            cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
+                'card_set_id__year', 'card_set_id__card_set_name')
+            title = str(obj.year) + ' ' + obj.card_set_name
+    else:
+        cards = Card.last_50.all()
+        title = 'Last 50 Cards'
+    context = {
+        'title': title,
+        'new_id': new_id,
+        'rs': cards,
+    }
+    return render(request, 'cards/card-list-card-partial.html', context)
 
 
 @login_required(login_url='/users/')
