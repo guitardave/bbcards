@@ -45,6 +45,11 @@ def card_set_create_async(request):
 
 
 @error_handling
+def card_set_load_more(request):
+    pass
+
+
+@error_handling
 def card_set_list(request):
     if request.method == 'POST':
         form = CardSetForm(request.POST)

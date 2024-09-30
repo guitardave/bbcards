@@ -11,6 +11,16 @@ from players.models import Player
 from .serializers import CardSerializer, CardSetSerializer, PlayerSerializer
 
 
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def card_search(request):
+    search = request.POST['search']
+    cards = []
+    serializer = CardSerializer(cards, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])

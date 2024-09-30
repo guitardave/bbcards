@@ -1,8 +1,8 @@
-<td class="me-auto text-end">{{ card.card.year }}</td>
-<td><a href="{% url 'cards:card-list-set' card.card.slug %}">{{ card.card.card_set_name }}</a></td>
-<td>{{ card.card.sport }}</td>
-<td>{{ card.count }}</td>
-<td>
+<td class="col-sm-1 me-auto text-end">{{ card.card.year }}</td>
+<td class="col-sm-6"><a href="{% url 'cards:card-list-set' card.card.slug %}">{{ card.card.card_set_name }}</a></td>
+<td class="col-sm-2">{{ card.card.sport }}</td>
+<td class="col-sm-1">{{ card.count }}</td>
+<td class="col-sm-2">
     <a class="m-2" href="{% url 'cards:card-list-set' card.card.slug %}" title="View Cards List"><i class="fa fa-list-alt"></i></a>
     {% if user.is_authenticated %}
         <a class="m-2" href="#add" hx-get="{% url 'cards:card-new-form-async' 'set' card.card.slug %}" hx-target="#form-div" hx-swap="innerHTML" title="Add player to {{ card.card.year }} {{ card.card.card_set }}"><i class="fa fa-plus"></i></a>

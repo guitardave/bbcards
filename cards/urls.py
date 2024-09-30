@@ -18,6 +18,7 @@ urlpatterns = [
     path('cards/<int:pk>/delete/async/', views.card_delete_async, name='card-delete-async'),
     path('cards/form/refresh/async/', views.card_form_refresh, name='card-form-refresh'),
     path('sets/', views.card_set_list, name='cardsets'),
+    path('sets/<int:page_num>/', views.card_set_load_more, name='cardsets-load-more'),
     path('sets/new/async/', views.card_set_create_async, name='cardsets-new-async'),
     path('sets/<int:pk>/update/async/', views.card_set_update_async, name='cardsets-upd-async'),
     path('sets/form/refresh/async/', views.card_set_form_refresh, name='cardsets-form-refresh'),

@@ -39,11 +39,28 @@
 	{% else %}
 		<title>BBCards</title>
 	{% endif %}
+
+{#    <style>#}
+{#        #cover {#}
+{#            background: url("/static/images/Loading_2.gif") no-repeat scroll center center #fff;#}
+{#            position: absolute;#}
+{#            height: 100%;#}
+{#            width: 100%;#}
+{#        }#}
+{#    </style>#}
+{##}
+{#    <script>#}
+{#        $(window).on('load', function(){#}
+{#            $('#cover').fadeOut(1000);#}
+{#        })#}
+{#    </script>#}
 </head>
 
 <body>
+
 	{% include 'header.html' %}
 	<main role="main" class="container">
+{#        <div id="cover"></div>#}
         <p>&nbsp;</p>
         {% block breadcrumbs %}
             {% clear_breadcrumbs %}
@@ -65,7 +82,6 @@
             {% endblock %}
         </div>
       </div>
-
     </main>
     <div class="container">
         <hr>
@@ -76,7 +92,7 @@
         </footer>
     </div>
     <script>
-        
+        // TOGGLE DARK/LIGHT MODES W AJAX CALL TO DJANGO VIEW WHICH CREATES AND RETURNS COOKIE
         $('#toggle-link').on('click', function () {
             let html_tag = $('html');
             let mode = html_tag.attr('data-bs-theme');
@@ -113,6 +129,11 @@
                     .removeClass('btn-dark');
             }
         });
+        
+        $(".new-row").on('load', function() {
+            $(this).fadeOut(500);
+        });
+        
     </script>
 </body>
 </html>

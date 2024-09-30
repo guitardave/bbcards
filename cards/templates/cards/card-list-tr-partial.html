@@ -1,17 +1,17 @@
-<td class="one"><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
-<td class="me-auto text-end">{{ card.card_set_id.year }}</td>
-<td><a href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }} {{ card.card_set_id.sport }}</a></td>
-<td class="one">{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
-<td class="me-auto text-end">{{ card.card_num }}</td>
+<td class="one col-sm-3"><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
+<td class="me-auto text-end col-sm-1">{{ card.card_set_id.year }}</td>
+<td class="col-sm-3"><a href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }} {{ card.card_set_id.sport }}</a></td>
+<td class="one col-sm-3">{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
+<td class="col-sm-1 me-auto text-end">{{ card.card_num }}</td>
 {% if user.is_authenticated %}
-    <td colspan="2">
+    <td class="col-sm-1">
         {% if card.card_image %}
-            <a class="m-2" href="{% url 'cards:card-image' card.id %}"><i class="fa fa-image"></i></a>
+            <a class="me-1" href="{% url 'cards:card-image' card.id %}"><i class="fa fa-image"></i></a>
         {% endif %}
         {% if request.user.is_superuser %}
-            <a class="m-2" href="#delete" hx-post="{% url 'cards:card-delete-async' card.id %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa fa-remove"></i></a>
+            <a class="m-1" href="#delete" hx-post="{% url 'cards:card-delete-async' card.id %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa fa-remove"></i></a>
         {% endif %}
-        <a class="m-2" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#form-div" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
+        <a class="m-1" href="#update" hx-get="{% url 'cards:card-upd-async' card.id %}" hx-target="#form-div" hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
         <span class="fade-out">
             {% if t_message %}
                 <small class="text-muted">{{t_message|safe}}</small>
