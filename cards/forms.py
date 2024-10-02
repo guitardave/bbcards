@@ -2,11 +2,11 @@ from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
 
 from .models import *
 
-
-SPORTS = [('Baseball', 'Baseball'), ('Football', 'Football'), ('Basketball', 'Basketball')]
+YN = Choices(('False', _('No')), ('True', _('Yes')))
 
 
 def validate_int(value):
@@ -50,10 +50,18 @@ class CardForm(forms.ModelForm):
         label='Card number',
         widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'})
     )
+    graded = forms.CharField(
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=YN),
+        label='Graded?',
+    )
+    condition = forms.CharField(
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=Card.Condition.choices),
+        label='Card condition (estimate if raw)',
+    )
 
     class Meta:
         model = Card
-        fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image',)
+        fields = ('player_id', 'card_set_id', 'card_subset', 'card_num', 'card_image', 'graded', 'condition')
 
 
 class CardCreateForm(CardForm):
@@ -86,7 +94,7 @@ class CardSetForm(forms.ModelForm):
         required=True
     )
     sport = forms.CharField(
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=SPORTS),
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=CardSet.Sports.choices),
         label='Sport',
     )
 

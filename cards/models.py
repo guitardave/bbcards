@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from players.models import Player
 from users.models import CardUser
@@ -14,10 +15,15 @@ class CardSetAll(models.Manager):
 
 
 class CardSet(models.Model):
+    class Sports(models.TextChoices):
+        BASEBALL = 'Baseball', _('Baseball')
+        FOOTBALL = 'Football', _('Football')
+        BASKETBALL = 'Basketball', _('Basketball')
+
     year = models.IntegerField(default=datetime.now().year)
     card_set_name = models.CharField(max_length=45, default=None)
     date_entered = models.DateTimeField(auto_now_add=True)
-    sport = models.CharField(max_length=50, null=True, default='Baseball')
+    sport = models.CharField(max_length=50, null=True, default=Sports.BASEBALL, choices=Sports.choices)
     slug = models.SlugField(unique=True)
 
     objects = models.Manager()
@@ -49,12 +55,22 @@ class CardsAllMgr(models.Manager):
 
 
 class Card(models.Model):
+    class Condition(models.TextChoices):
+        MT = 'Mint', _('Mint')
+        NM = 'Near Mint', _('Near Mint')
+        EX = 'Excellent', _('Excellent')
+        VG = 'Very Good', _('Very Good')
+        G = 'Good', _('Good')
+        F = 'Fair', _('Fair')
+
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     card_num = models.CharField(max_length=50, default=None)
     card_set_id = models.ForeignKey(CardSet, on_delete=models.CASCADE)
     card_subset = models.CharField(max_length=100, default=None, null=True, blank=True)
     card_image = models.FileField(upload_to='upload/', default=None, null=True, blank=True)
     date_entered = models.DateTimeField(auto_now_add=True)
+    condition = models.CharField(max_length=100, default=None, null=True, blank=True, choices=Condition.choices)
+    graded = models.BooleanField(default=False, null=True)
 
     objects = models.Manager()
     last_50 = CardLast50Mgr()
