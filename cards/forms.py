@@ -2,11 +2,10 @@ from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from model_utils import Choices
 
 from .models import *
 
-YN = Choices(('False', _('No')), ('True', _('Yes')))
+YN = [('False', _('No')), ('True', _('Yes'))]
 
 
 def validate_int(value):
