@@ -48,3 +48,9 @@ a {
     opacity: 0;
   }
 }
+
+.fa {
+    /*color: #777;*/
+    font-size:14px;
+    padding: 2px;
+}
