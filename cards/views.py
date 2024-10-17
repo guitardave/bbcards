@@ -1,6 +1,7 @@
 import datetime
+from xhtml2pdf import pisa
 import os
-from typing import Any
+from typing import Any, List, Dict
 
 import openpyxl
 from django.db.models.functions import Cast
@@ -8,6 +9,7 @@ from django.utils import timezone
 from openpyxl.workbook import Workbook
 import boto3
 from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import SearchVector, SearchQuery
 from django.db.models import Q, QuerySet, IntegerField
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +17,7 @@ from django.views.generic import ListView
 from django.contrib import messages
 
 from players.models import Player
-from .forms import CardSetForm, CardUpdateForm, CardCreateForm
+from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
 from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
 
@@ -133,7 +135,7 @@ class CardsListView(ListView):
 
     def get_context_data(self, **kwargs):
         data = super(CardsListView, self).get_context_data()
-        data['title'] = 'Last 50 Cards'
+        data['title'] = f'Last {len(self.get_queryset())} Cards'
         data['form'] = CardCreateForm()
         data['card_title'] = 'Add New Card'
         d_2 = card_list_context(self.request, self.get_queryset())
@@ -203,13 +205,19 @@ class CardsViewPlayer(CardsListView):
 
 @login_required(login_url='/users/')
 @error_handling
-def load_cards_async(request, c_type: int, data: int):
-    if c_type == 3:  # by player
-        rs = Card.objects.filter(player_id_id=data).order_by('card_set_id__slug')
-    elif c_type == 2:  # by card set
-        rs = Card.objects.filter(card_set_id_id=data).order_by('card_set_id__slug')
-    else:  # last 50
-        rs = Card.list_all.all().order_by('-id')[:50]
+def load_cards_async(request, c_type: str, t_slug: str, page: int = None):
+    if not page:
+        page = 1
+    if request.method == 'POST':
+        search = request.POST['search']
+        rs = Card.objects.filter(Q(player_id_id=search) | Q(card_set_id=search))
+    else:
+        if c_type == 3:  # by player
+            rs = Card.objects.filter(player_id__slug=t_slug).order_by('card_set_id__slug')
+        elif c_type == 2:  # by card set
+            rs = Card.objects.filter(card_set_id__slug=t_slug).order_by('card_set_id__slug')
+        else:  # last n
+            rs = Card.list_all.all().order_by('-id')[:25][page]
     context = {'rs': rs, 'loaded': timezone.now()}
     return render(request, 'cards/card-list-table-partial.html', context)
 
@@ -254,7 +262,7 @@ def card_delete_async(request, pk: int):
     context = {
         'rs': cards if cards else Card.last_50.all(),
         'c_message': c_message,
-        'title': 'Last 50 Cards' if not player else f'{player.player_fname} {player.player_lname}'
+        'title': f'Last {len(cards)} Cards' if not player else f'{player.player_fname} {player.player_lname}'
     }
     return render(request, 'cards/card-list-card-partial.html', context)
 
@@ -280,7 +288,7 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
             title = str(obj.year) + ' ' + obj.card_set_name
     else:
         cards = Card.last_50.all()
-        title = 'Last 50 Cards'
+        title = f'Last {len(cards)} Cards'
     context = {
         'title': title,
         'new_id': new_id,
@@ -322,23 +330,41 @@ def card_image(request, pk: int):
     return render(request, 'cards/card-image.html', context)
 
 
-def card_search_rs(search: str) -> list:
-    searches = search.split(' ')
-    rs = []
-    for search in searches:
-        rs = Card.objects.filter(
-            Q(card_set_id__card_set_name__icontains=search) |
-            Q(card_subset__icontains=search) |
-            Q(player_id__player_lname__icontains=search) |
-            Q(player_id__player_fname__icontains=search) |
-            (Q(player_id__player_fname__icontains=search) & Q(player_id__player_lname__icontains=search)) |
-            (Q(card_set_id__year__icontains=search) & (Q(card_set_id__card_set_name__icontains=search)))
-        ).order_by(
+def card_search_full_text(query: str) -> QuerySet:
+    s_query = SearchQuery(query)
+    queryset = Card.objects.annotate(
+        search=SearchVector(
             'card_set_id__year',
             'card_set_id__card_set_name',
+            'player_id__player_fname',
             'player_id__player_lname'
         )
-    return rs
+    ).filter(
+        search=s_query
+    ).order_by(
+        'card_set_id__year',
+        'card_set_id__card_set_name',
+        'player_id__player_lname'
+    )
+
+    return queryset
+
+
+def card_search_rs(searches: Any) -> list:
+    return [Card.objects.filter(
+        Q(card_set_id__card_set_name__icontains=search) |
+        Q(card_subset__icontains=search) |
+        Q(player_id__player_lname__icontains=search) |
+        Q(player_id__player_fname__icontains=search) |
+        (Q(player_id__player_fname__icontains=search) & Q(player_id__player_lname__icontains=search)) |
+        (Q(card_set_id__year__icontains=search) & (Q(card_set_id__card_set_name__icontains=search)))
+    ).order_by(
+        'card_set_id__year',
+        'card_set_id__card_set_name',
+        'player_id__player_lname'
+    )
+        for search in searches
+    ]
 
 
 @login_required(login_url='/users/')
@@ -348,7 +374,7 @@ def card_search(request):
     search = ''
     if request.method == 'POST':
         search = request.POST['search']
-        cards = card_search_rs(search)
+        cards = card_search_full_text(search)
         request.session['rs'] = card_list_dict(cards)
     context = {
         'title': f'Search "{search}"',
@@ -402,7 +428,7 @@ def export_list_save(request, file_name: str):
     export.save()
 
 
-def card_list_dict(cards) -> list[dict]:
+def card_list_dict(cards) -> list[dict[str, Any]]:
     return [
         {
             'player_name': c.player_id.player_fname + ' ' + c.player_id.player_lname,
@@ -422,6 +448,55 @@ def card_list_export(rs: list[dict]) -> str:
         xl = ExportScriptsExcel(rs, file_name)
         xl.upload_excel()
     return file_name
+
+
+def card_list_export_pdf(text: str = None) -> str:
+    rs = Card.objects.filter(player_id__player_lname__icontains='Jackson').order_by('card_set_id__slug')
+    html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+    html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+    html += '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">'
+
+    html += '</head><body><div class="container"><h1>Test</h1><table>'
+    for r in rs:
+        html += '<tr>'
+        html += f'<td>{r.player_id.player_fname} {r.player_id.player_lname}</td>'
+        html += f'<td>{r.card_set_id.year}</td>'
+        html += f'<td>{r.card_set_id.card_set_name}</td>'
+        html += f'<td>{r.card_subset}</td>'
+        html += f'<td>{r.card_num}</td>'
+        html += '</tr>'
+    html += f'</table><p>{len(rs)} records</p>'
+    html += '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>'
+    html += '</div></body></html>'
+    return html
+
+
+def html_to_pdf():
+    pdf_path = 'test.pdf'
+    html_content = card_list_export_pdf(None)
+    with open(pdf_path, "wb") as pdf_file:
+        pisa_status = pisa.CreatePDF(html_content, dest=pdf_file)
+    return not pisa_status.err
+
+
+@login_required(login_url='/users/')
+@csrf_exempt
+# @error_handling
+def card_list_export_vw_pdf(request):
+    if request.method == 'POST':
+        form = SearchForm(request.POST or None)
+        if form.is_valid():
+            search = form.cleaned_data['search']
+        else:
+            search = '<h1>Invalid input</h1>'
+        rs = card_search_rs(search)
+    else:
+        rs = card_search_rs('Bo Jackson')
+    return render(
+        request,
+        'cards/card-list-pdf-preview.html',
+        {'output': card_list_export_pdf(rs), 'pdf': html_to_pdf()}
+    )
 
 
 @login_required(login_url='/users/')

@@ -1,22 +1,22 @@
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
                 <h1>{{ title }}</h1>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <small class="text-muted fade-out">{{ c_message }}</small>
             </div>
 {#            {% if rs_dict %}#}
-                <div class="col-sm-2 me-auto text-end">
+                <div class="col-sm-3 me-auto text-end">
                     {% if user.is_authenticated %}
                         {% if rs|length > 0 %}
-                            <a href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
+                            <a class="m-1" href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
+                            <a class="m-1" href="{% url 'cards:cards-export-pdf' %}" title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>
                         {% else %}
                             <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
                         {% endif %}
-                        <br>
-                        <span id="export-msg" class="text-muted">
+                        <span id="export-msg" class="text-muted m-1">
                             {% include 'cards/card-list-export-msg-partial.html' %}
                         </span>
                     {% endif %}

@@ -42,7 +42,7 @@ class CardSet(models.Model):
 
 class CardLast50Mgr(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().all().order_by('-id')[:50]
+        return super().get_queryset().all().order_by('-id')[:25]
 
 
 class CardsAllMgr(models.Manager):
