@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.get_cards_all, name='cards'),
+    path('search/', views.search_cards, name='search'),
     path('<int:card_id>/', views.get_card, name='card'),
     path('set/<int:card_set_id>/', views.get_cards_by_set, name='cards_by_set'),
     path('sets/', views.get_card_sets, name='sets'),

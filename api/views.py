@@ -13,21 +13,11 @@ from players.models import Player
 from .serializers import CardSerializer, CardSetSerializer, PlayerSerializer
 
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def card_search(request):
-    search = request.POST['search']
-    cards = []
-    serializer = CardSerializer(cards, many=True)
-    return Response(serializer.data, status.HTTP_200_OK)
-
-
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_card_sets(request):
-    card_sets = CardSet.objects.all()
+    card_sets = CardSet.objects.all().order_by('year', 'card_set_name')
     serializer = CardSetSerializer(card_sets, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -59,7 +49,7 @@ def update_card_set(request, pk: int):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_players(request):
-    players = Player.objects.all()
+    players = Player.objects.all().order_by('player_lname', 'player_fname')
     serializer = PlayerSerializer(players, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -91,7 +81,7 @@ def update_player(request, player_id: int):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_cards_all(request):
-    cards = Card.objects.all()
+    cards = Card.objects.all().order_by('-id')[:50]
     serializer = CardSerializer(cards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -100,7 +90,13 @@ def get_cards_all(request):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_cards_by_player(request, player_id: int):
-    cards = Card.objects.filter(player_id_id=player_id)
+    cards = Card.objects.filter(
+        player_id_id=player_id
+    ).order_by(
+        'card_set_id__year',
+        'card_set_id__card_set_name',
+        'card_num'
+    )
     serializer = CardSerializer(cards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -109,7 +105,7 @@ def get_cards_by_player(request, player_id: int):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_cards_by_set(request, set_id: int):
-    cards = Card.objects.filter(card_set_id_id=set_id)
+    cards = Card.objects.filter(card_set_id_id=set_id).order_by('card_num')
     serializer = CardSerializer(cards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -118,9 +114,11 @@ def get_cards_by_set(request, set_id: int):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_card(request, card_id: int):
-    card = Card.objects.get(pk=card_id)
-    serializer = CardSerializer(card)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    card = Card.objects.filter(pk=card_id)
+    if card.exists():
+        serializer = CardSerializer(card)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
@@ -134,13 +132,12 @@ def create_card(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def search_cards(request):
-    search = request.POST['search'] if 'search' in request.POST else ''
+    search = request.GET['q'] if 'q' in request.GET else ''
     cards = card_search_full_text(search)
-    if cards.__len__() == 0:
-        return Response({}, status.HTTP_200_OK)
-    serializer = CardSerializer(data=cards)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    serializer = CardSerializer(cards, many=True)
+    data = {'search_term': search, 'results': serializer.data}
+    return Response(data, status=status.HTTP_200_OK)
