@@ -1,6 +1,10 @@
 from datetime import datetime
 
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField, SearchVector, SearchQuery
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -40,6 +44,22 @@ class CardSet(models.Model):
         return reverse('cards:cardsets')
 
 
+class CardSearchMgr(models.Manager):
+    def search_query(self, raw_query: str):
+        search_vector = SearchVector(
+            'card_set_id__year',
+            'card_set_id__card_set_name',
+            'card_subset',
+            'card_num',
+            'player_id__player_fname',
+            'player_id__player_lname',
+            'card_set_id__sport'
+        )
+        search_query = SearchQuery(raw_query)
+        return self.annotate(search=search_vector).filter(search=search_query)
+        # return self.filter(search_vector=search_query)
+
+
 class CardLast50Mgr(models.Manager):
     def get_queryset(self):
         return super().get_queryset().all().order_by('-id')[:25]
@@ -71,16 +91,41 @@ class Card(models.Model):
     date_entered = models.DateTimeField(auto_now_add=True)
     condition = models.CharField(max_length=100, default=None, null=True, blank=True, choices=Condition.choices)
     graded = models.BooleanField(default=False, null=True)
+    search_vector = SearchVectorField(null=True)
 
-    objects = models.Manager()
+    objects = CardSearchMgr()
+    # objects = models.Manager()
     last_50 = CardLast50Mgr()
     list_all = CardsAllMgr()
 
+    class Meta:
+        indexes = (GinIndex(fields=['search_vector']),)
+
     def __str__(self):
-        return self.card_num
+        return f''' 
+            {self.player_id.player_fname} {self.player_id.player_fname} 
+            {self.card_set_id.year} 
+            {self.card_set_id.card_set_name}
+            {self.card_num}
+        '''
         
     def get_absolute_url(self):
         return reverse('cards:card-det', kwargs={'pk': self.id})
+
+
+# @receiver(post_save, sender=Card)
+# def update_search_vector(instance, sender, **kwargs):
+#     inst = Card.objects.filter(id=instance.id).update(
+#         search_vector=SearchVector(
+#             'card_set_id__year',
+#             'card_set_id__card_set_name',
+#             'card_subset',
+#             'card_num',
+#             'player_id__player_fname',
+#             'player_id__player_lname',
+#             'card_set_id__sport'
+#         )
+#     )
 
 
 class CardListExport(models.Model):

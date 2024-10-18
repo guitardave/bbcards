@@ -25,4 +25,5 @@ urlpatterns = [
     path('search/', views.card_search, name='search'),
     path('xport/async/', views.card_list_export_vw, name='cards-export'),
     path('xport/pdf/', views.card_list_export_vw_pdf, name='cards-export-pdf'),
+    path('xport/pdf/<str:q>/', views.card_list_export_vw_pdf, name='cards-export-pdf'),
 ]

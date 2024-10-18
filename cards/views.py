@@ -331,40 +331,11 @@ def card_image(request, pk: int):
 
 
 def card_search_full_text(query: str) -> QuerySet:
-    s_query = SearchQuery(query)
-    queryset = Card.objects.annotate(
-        search=SearchVector(
-            'card_set_id__year',
-            'card_set_id__card_set_name',
-            'player_id__player_fname',
-            'player_id__player_lname'
-        )
-    ).filter(
-        search=s_query
-    ).order_by(
+    return Card.objects.search_query(query).order_by(
         'card_set_id__year',
         'card_set_id__card_set_name',
         'player_id__player_lname'
     )
-
-    return queryset
-
-
-def card_search_rs(searches: Any) -> list:
-    return [Card.objects.filter(
-        Q(card_set_id__card_set_name__icontains=search) |
-        Q(card_subset__icontains=search) |
-        Q(player_id__player_lname__icontains=search) |
-        Q(player_id__player_fname__icontains=search) |
-        (Q(player_id__player_fname__icontains=search) & Q(player_id__player_lname__icontains=search)) |
-        (Q(card_set_id__year__icontains=search) & (Q(card_set_id__card_set_name__icontains=search)))
-    ).order_by(
-        'card_set_id__year',
-        'card_set_id__card_set_name',
-        'player_id__player_lname'
-    )
-        for search in searches
-    ]
 
 
 @login_required(login_url='/users/')
@@ -382,7 +353,11 @@ def card_search(request):
         'search': search,
         'card_title': 'Add New Card'
     }
-    return render(request, 'cards/card-list.html', dict(context, **card_list_context(request, cards)))
+    return render(
+        request,
+        'cards/card-list-card-partial.html',
+        dict(context, **card_list_context(request, cards))
+    )
 
 
 class ExportScriptsExcel:
@@ -440,18 +415,17 @@ def card_list_dict(cards) -> list[dict[str, Any]]:
     ]
 
 
-def card_list_export(rs: list[dict]) -> str:
-    file_name = ''
+def card_list_export(rs: list[dict] | QuerySet) -> str:
+    f_date = datetime.datetime.strftime(timezone.now(), '%m_%d_%Y__%H_%M_%S')
+    file_name = f"bbcards_card_list_export_{str(f_date)}.xlsx"
     if len(rs) > 0:
-        f_date = datetime.datetime.strftime(datetime.datetime.today(), '%m_%d_%Y__%H_%M_%S')
-        file_name = f"bbcards_card_list_export_{str(f_date)}.xlsx"
         xl = ExportScriptsExcel(rs, file_name)
         xl.upload_excel()
     return file_name
 
 
 def card_list_export_pdf(text: str = None) -> str:
-    rs = Card.objects.filter(player_id__player_lname__icontains='Jackson').order_by('card_set_id__slug')
+    rs = card_search_full_text(text)
     html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
     html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
     html += '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">'
@@ -482,20 +456,19 @@ def html_to_pdf():
 @login_required(login_url='/users/')
 @csrf_exempt
 # @error_handling
-def card_list_export_vw_pdf(request):
+def card_list_export_vw_pdf(request, q: str = None):
     if request.method == 'POST':
         form = SearchForm(request.POST or None)
         if form.is_valid():
             search = form.cleaned_data['search']
         else:
             search = '<h1>Invalid input</h1>'
-        rs = card_search_rs(search)
     else:
-        rs = card_search_rs('Bo Jackson')
+        search = 'Bo Jackson'
     return render(
         request,
         'cards/card-list-pdf-preview.html',
-        {'output': card_list_export_pdf(rs), 'pdf': html_to_pdf()}
+        {'output': card_list_export_pdf(search), 'pdf': html_to_pdf()}
     )
 
 

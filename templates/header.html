@@ -27,7 +27,12 @@
                         <div class="input-group">
                             <label for="search"></label>
                             <input id="search" name="search" type="text" class="form-control form-control-lg rounded-start" placeholder="Player name, card set" required>
-                            <button id="search-btn" class="btn {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}btn-dark btn-outline-secondary{% else %}btn-primary btn-outline-light{% endif %} btn-lg "><i class="fa fa-search"></i></button>
+                            <button 
+                                id="search-btn" 
+                                class="btn {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}btn-dark btn-outline-secondary{% else %}btn-primary btn-outline-light{% endif %} btn-lg "
+                                hx-post="{% url 'cards:search' %}"
+                                hx-target="#card-div"
+                                hx-swap="innerHTML swap:1s"><i class="fa fa-search"></i></button>
                         </div>
                     </form>
                 </li>

@@ -1,35 +1,30 @@
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-9">
                 <h1>{{ title }}</h1>
+                <span class="text-muted fade-out small">{{ c_message }}</span>
             </div>
-            <div class="col-sm-3">
-                <small class="text-muted fade-out">{{ c_message }}</small>
-            </div>
-{#            {% if rs_dict %}#}
-                <div class="col-sm-3 me-auto text-end">
-                    {% if user.is_authenticated %}
-                        {% if rs|length > 0 %}
-                            <a class="m-1" href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
-                            <a class="m-1" href="{% url 'cards:cards-export-pdf' %}" title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>
-                        {% else %}
-                            <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
-                        {% endif %}
-                        <span id="export-msg" class="text-muted m-1">
-                            {% include 'cards/card-list-export-msg-partial.html' %}
-                        </span>
+            <div class="col-sm-3 me-auto text-end">
+                {% if user.is_authenticated %}
+                    {% if rs|length > 0 %}
+                        <a class="m-1" href="#export" hx-post="{% url 'cards:cards-export' %}" hx-target="#export-msg" hx-swap="innerHTML" title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
+                        <a class="m-1" href="{% url 'cards:cards-export-pdf' %}" title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>
+                    {% else %}
+                        <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
                     {% endif %}
-                </div>
-{#            {% endif %}#}
+                    <span id="export-msg" class="text-muted m-1">
+                        {% include 'cards/card-list-export-msg-partial.html' %}
+                    </span>
+                {% endif %}
+            </div>
         </div>
-
     </div>
     <div class="card-body filter-bar">
         {% include '_search_filter.html' %}
     </div>
     <div class="card-body scroll">
-        <div id="cards-table">
+        <div id="cards-table" class="fade-in">
             {% include 'cards/card-list-table-partial.html' %}
         </div>
     </div>
