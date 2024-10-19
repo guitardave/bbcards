@@ -1,6 +1,8 @@
-# bbcards
-baseball cards collection
+<h1>Sports card collection</h1>
 
-Add Sets, cards, images of your cards. Organize your collection. Django/PostgreSQL based simple responsive app.
-
-Simple search utility. Organize cards by year, set, player, etc. Upload images to AWS.
+<p>Add Sets, cards, images of cards</p>
+<p>Organize cards by year, set, player, etc.</p>
+<p>Django/PostgreSQL based simple responsive app featuring <code>django-bootstrap5</code> and <code>django-htmx</code>.</p>
+<p>Full text search using <code>SearchVector</code> and <code>SearchQuery</code> classes</p>
+<p>Upload images to AWS using <code>boto3</code></p>
+<p>Export lists using <code>openpyxl</code> and <code>xhtml2pdf</code> packages</p>
