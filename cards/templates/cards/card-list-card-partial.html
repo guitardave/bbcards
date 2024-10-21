@@ -28,7 +28,21 @@
             {% include 'cards/card-list-table-partial.html' %}
         </div>
     </div>
-    <div class="card-footer">
-        <small class="text-muted">{{ rs|length }}</small>
+    <div class="card-footer text-center">
+{#        <small class="text-muted">{{ rs|length }}</small>#}
+        <small class="text-muted">
+
+            <a class="me-2" href="?page=1"><i class="fa fa-chevron-left tiny"></i><i class="fa fa-chevron-left tiny"></i></a>
+            {% if rs.has_previous %}
+                <a class="m-2" href="?page={{ rs.previous_page_number }}"><i class="fa fa-chevron-left"></i></a>
+                <a class="m-2" href="?page={{ rs.previous_page_number }}">{{rs.previous_page_number}}</a>
+            {% endif %}
+            <a class="m-2" href="?page={{ rs.number }}"><u>{{ rs.number }}</u></a>
+            {%if rs.has_next %}
+                <a class="m-2" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
+                <a class="m-2" href="?page={{ rs.next_page_number }}"><i class="fa fa-chevron-right"></i></a>
+            {% endif %}
+            <a class="ms-2" href="?page={{ n_pages }}"><i class="fa fa-chevron-right tiny"></i><i class="fa fa-chevron-right tiny"></i></a>
+        </small>
     </div>
 </div>
