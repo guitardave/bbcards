@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody id="my-table">
-    {% for card in rs %}
+    {% for card in rs.object_list %}
         <tr id="tr-s{{ card.card.id }}">
             {% include 'cards/cardset-list-tr-partial.html' %}
         </tr>

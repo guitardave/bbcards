@@ -63,12 +63,17 @@ def card_set_list(request):
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
     form = CardSetForm
-    cards = card_list_count(CardSet.all_sets.all())
+    card_sets = card_list_count(CardSet.all_sets.all())
+
+    set_count, rs, n_pages = card_list_pagination(request, card_sets)
+
     context = {
-        'rs': cards,
+        'rs': rs,
         'form': form,
         'title': 'Card Sets',
         'card_title': 'Add Card Set',
+        'set_count': set_count,
+        'n_pages': n_pages,
         'loaded': timezone.now()
     }
     return render(request, 'cards/cardset-list.html', context)
@@ -138,9 +143,12 @@ class CardListData:
 
 
 def card_list_count(card_list: list) -> list[dict]:
-    return [
-        dict(card=card, count=Card.objects.filter(card_set_id=card.id).count()) for card in card_list
-    ]
+    c_list = []
+    for card in card_list:
+        c_count = Card.objects.filter(card_set_id=card.id).count()
+        if c_count > 0:
+            c_list.append(dict(card=card, count=c_count))
+    return c_list
 
 
 class CardsListView(ListView):
@@ -239,21 +247,29 @@ def card_list_pagination(request, cards: QuerySet):
         rs = p.page(1)
     except EmptyPage:
         rs = p.page(p.num_pages)
-    return cards.count(), rs, p.num_pages
+    return len(cards), rs, p.num_pages
 
 
-@login_required(login_url='/users/')
+# @login_required(login_url='/users/')
+@error_handling
 def card_list_last_n(request):
     cards = Card.last_50.all()
     card_count, rs, n_pages = card_list_pagination(request, cards)
     return render(
         request,
         'cards/card-list.html',
-        {'title': 'All Cards List', 'rs': rs, 'n_pages': n_pages, 'card_count': card_count}
+        {
+            'title': f'Last {len(cards)} Cards',
+            'rs': rs,
+            'n_pages': n_pages,
+            'card_count': card_count,
+            'form': CardCreateForm,
+            'card_title': 'Add Card'
+        }
     )
 
 
-@login_required(login_url='/users/')
+# @login_required(login_url='/users/')
 @error_handling
 def card_list_by_player(request, slug: str):
     obj = Player.objects.get(slug=slug)
@@ -269,12 +285,14 @@ def card_list_by_player(request, slug: str):
             'rs': rs,
             'n_pages': n_pages,
             'card_count': card_count,
-            'player': obj
+            'player': obj,
+            'form': CardCreateForm(**{'player': obj.slug}),
+            'card_title': 'Add Card - Player'
         }
     )
 
 
-@login_required(login_url='/users/')
+# @login_required(login_url='/users/')
 @error_handling
 def card_list_by_set(request, slug: str):
     obj = CardSet.objects.get(slug=slug)
@@ -290,20 +308,29 @@ def card_list_by_set(request, slug: str):
             'rs': rs,
             'n_pages': n_pages,
             'card_count': card_count,
-            'card_set': obj
+            'card_set': obj,
+            'form': CardCreateForm(**{'set': obj.slug}),
+            'card_title': 'Add Card - Cat Set'
         }
     )
 
 
-@login_required(login_url='/users/')
+# @login_required(login_url='/users/')
 @error_handling
 def card_list_all(request):
-    cards = Card.objects.all()
+    cards = Card.objects.all().order_by('card_set_id__year', 'card_set_id__card_set_name', 'card_num')
     card_count, rs, n_pages = card_list_pagination(request, cards)
     return render(
         request,
         'cards/card-list.html',
-        {'title': 'All Cards List', 'rs': rs, 'n_pages': n_pages, 'card_count': card_count}
+        {
+            'title': 'All Cards List',
+            'rs': rs,
+            'n_pages': n_pages,
+            'card_count': card_count,
+            'form': CardCreateForm,
+            'card_title': 'Add Card'
+        }
     )
 
 
