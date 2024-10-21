@@ -4,10 +4,10 @@ from . import views
 app_name = 'cards'
 
 urlpatterns = [
-    path('', views.CardsListView.as_view(), name='card-list-50'),
+    path('', views.card_list_last_n, name='card-list-50'),
     path('cards/', views.card_list_all, name='card-list-all'),
-    path('cards/by-set/<slug:slug>/', views.CardsViewSet.as_view(), name='card-list-set'),
-    path('cards/by-player/<slug:slug>/', views.CardsViewPlayer.as_view(), name='card-list-player'),
+    path('cards/by-set/<slug:slug>/', views.card_list_by_set, name='card-list-set'),
+    path('cards/by-player/<slug:slug>/', views.card_list_by_player, name='card-list-player'),
     path('cards/list/async/', views.load_cards_async, name='card-list-async'),
     path('cards/new/async/', views.card_create_async, name='card-new-async'),
     path('cards/new/async/<str:card_type>/<str:type_slug>/', views.card_create_async, name='card-new-async'),

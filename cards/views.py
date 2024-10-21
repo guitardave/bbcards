@@ -230,8 +230,7 @@ class CardsViewPlayer(CardsListView):
 
 
 @error_handling
-def card_list_pagination(request):
-    cards = Card.objects.all()
+def card_list_pagination(request, cards: QuerySet):
     p = Paginator(cards, 100)
     page_number = request.GET['page'] if 'page' in request.GET else 1
     try:
@@ -244,9 +243,63 @@ def card_list_pagination(request):
 
 
 @login_required(login_url='/users/')
+def card_list_last_n(request):
+    cards = Card.last_50.all()
+    card_count, rs, n_pages = card_list_pagination(request, cards)
+    return render(
+        request,
+        'cards/card-list.html',
+        {'title': 'All Cards List', 'rs': rs, 'n_pages': n_pages, 'card_count': card_count}
+    )
+
+
+@login_required(login_url='/users/')
+@error_handling
+def card_list_by_player(request, slug: str):
+    obj = Player.objects.get(slug=slug)
+    cards = Card.objects.filter(
+        player_id__slug=slug
+    ).order_by('card_set_id__year', 'card_set_id__slug')
+    card_count, rs, n_pages = card_list_pagination(request, cards)
+    return render(
+        request,
+        'cards/card-list.html',
+        {
+            'title': f'{obj.player_fname} {obj.player_lname}',
+            'rs': rs,
+            'n_pages': n_pages,
+            'card_count': card_count,
+            'player': obj
+        }
+    )
+
+
+@login_required(login_url='/users/')
+@error_handling
+def card_list_by_set(request, slug: str):
+    obj = CardSet.objects.get(slug=slug)
+    cards = Card.objects.filter(
+        card_set_id__slug=slug
+    ).order_by('card_num')
+    card_count, rs, n_pages = card_list_pagination(request, cards)
+    return render(
+        request,
+        'cards/card-list.html',
+        {
+            'title': f'{obj.year} {obj.card_set_name}',
+            'rs': rs,
+            'n_pages': n_pages,
+            'card_count': card_count,
+            'card_set': obj
+        }
+    )
+
+
+@login_required(login_url='/users/')
 @error_handling
 def card_list_all(request):
-    card_count, rs, n_pages = card_list_pagination(request)
+    cards = Card.objects.all()
+    card_count, rs, n_pages = card_list_pagination(request, cards)
     return render(
         request,
         'cards/card-list.html',
