@@ -309,7 +309,7 @@ def card_list_by_set(request, slug: str):
         request,
         'cards/card-list.html',
         {
-            'title': f'{obj.year} {obj.card_set_name}',
+            'title': f'{obj.__str__()}',
             'rs': rs,
             'n_pages': n_pages,
             'card_count': card_count,

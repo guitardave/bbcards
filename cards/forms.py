@@ -96,7 +96,7 @@ class CardCreateForm(CardForm):
         player = kwargs.pop('player') if 'player' in kwargs else None
         super(CardForm, self).__init__(*args, **kwargs)
         if card_set:
-            x = CardSet.objects.get(slug=card_set).id
+            x = CardSet.objects.get(slug=card_set)
             self.fields['card_set_id'].initial = (x.id, x.__str__())
         if player:
             x = Player.objects.get(slug=player)
