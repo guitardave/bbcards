@@ -13,15 +13,23 @@ from .forms import PlayerForm
 
 
 def player_list_count(p_list: list) -> list[dict]:
-    return [
-        dict(player=player, count=Card.objects.filter(player_id_id=player.id).count()) for player in p_list
-    ]
+    players = []
+    for player in p_list:
+        p_count = Card.objects.filter(player_id_id=player.id).count()
+        if p_count > 0:
+            players.append(dict(player=player, count=p_count))
+    return players
 
 
 # @cache_page(60*5)
 @error_handling
-def player_list(request):
-    players = Player.list_all.all()
+def player_list(request, n_list: int = 0):
+    if n_list == 0:
+        players = Player.list_no_ignore.all()
+    elif n_list == 99:
+        players = Player.list_ignore.all()
+    else:
+        players = Player.objects.all().order_by('-id')[:n_list]
     context = {
         'title': 'Player List',
         'rs': player_list_count(players),

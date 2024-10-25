@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 
 from cards.models import CardSet, Card
-from cards.views import card_search_full_text
+from cards.views import CardSearch
 from players.models import Player
 from .serializers import CardSerializer, CardSetSerializer, PlayerSerializer
 
@@ -137,7 +137,8 @@ def create_card(request):
 @permission_classes([IsAuthenticated])
 def search_cards(request):
     search = request.GET['q'] if 'q' in request.GET else ''
-    cards = card_search_full_text(search)
+    s = CardSearch(search)
+    cards = s.search_query()
     serializer = CardSerializer(cards, many=True)
     data = {'search_term': search, 'results': serializer.data}
     return Response(data, status=status.HTTP_200_OK)

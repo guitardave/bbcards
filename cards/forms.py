@@ -29,16 +29,40 @@ class CardCreateSetForm(forms.ModelForm):
         self.fields['card_set_id'].queryset = CardSet.objects.filter(slug=qs)
 
 
+class DefaultChoice:
+    @staticmethod
+    def choices():
+        return [(0, 'Select One')]
+
+
 class CardForm(forms.ModelForm):
-    player_id = forms.ModelChoiceField(
+    class PlayerList:
+        @staticmethod
+        def choices():
+            default_choice = DefaultChoice.choices()
+            return default_choice + [
+                (x.id, f'{x.__str__()}') for x in Player.objects.all().order_by('player_lname')
+            ]
+
+    class CardSetsList:
+        @staticmethod
+        def choices():
+            default_choice = DefaultChoice.choices()
+            return default_choice + [
+                (x.id, f'{x.__str__()}') for x in CardSet.objects.all().order_by('year', 'card_set_name')
+            ]
+
+    player_id = forms.ChoiceField(
         label='Player',
-        queryset=Player.objects.all().order_by('player_lname'),
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'})
+        choices=PlayerList.choices(),
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}),
+        required=True
     )
-    card_set_id = forms.ModelChoiceField(
+    card_set_id = forms.ChoiceField(
         label='Card Set',
-        queryset=CardSet.objects.all().order_by('year', 'card_set_name'),
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'})
+        choices=CardSetsList.choices(),
+        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}),
+        required=True
     )
     card_subset = forms.CharField(
         label='Card Subset/Info',
@@ -47,15 +71,18 @@ class CardForm(forms.ModelForm):
     )
     card_num = forms.CharField(
         label='Card number',
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'})
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        required=True
     )
     graded = forms.CharField(
         widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=YN),
         label='Graded?',
+        required=True
     )
     condition = forms.CharField(
         widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=Card.Condition.choices),
         label='Card condition (estimate if raw)',
+        required=True
     )
 
     class Meta:
@@ -69,9 +96,11 @@ class CardCreateForm(CardForm):
         player = kwargs.pop('player') if 'player' in kwargs else None
         super(CardForm, self).__init__(*args, **kwargs)
         if card_set:
-            self.fields['card_set_id'].initial = CardSet.objects.get(slug=card_set)
+            x = CardSet.objects.get(slug=card_set).id
+            self.fields['card_set_id'].initial = (x.id, x.__str__())
         if player:
-            self.fields['player_id'].initial = Player.objects.get(slug=player)
+            x = Player.objects.get(slug=player)
+            self.fields['player_id'].initial = (x.id, x.__str__())
 
 
 class CardUpdateForm(CardForm):

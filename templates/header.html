@@ -9,13 +9,33 @@
       <div class="collapse navbar-collapse" id="navbarToggle">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link m-2" href="{% url 'players:players-home' %}">Players</a>
+                <div class="btn-group">
+                    <a class="nav-link dropdown-toggle" href="#players" id="players" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Players</a>
+                    <div class="dropdown-menu" aria-labelledby="Players">
+                        <a class="dropdown-item" href="{% url 'players:players-home' n %}">Last {{ n }} Players</a>
+                        <a class="dropdown-item" href="{% url 'players:players-home' 0 %}">All Players</a>
+                    </div>
+                </div>
+                
             </li>
             <li class="nav-item">
-                <a class="nav-link m-2" href="{% url 'cards:cardsets' %}">Card Sets</a>
+                <div class="btn-group">
+                    <a class="nav-link dropdown-toggle" href="#cardsets" id="cardsets" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Card Sets</a>
+                    <div class="dropdown-menu" aria-labelledby="cardsets">
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' 50 %}">Last 50 Card Sets</a>
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' %}">Card Sets (all)</a>
+                    </div>
+                </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link m-2" href="{% url 'cards:card-list-all' %}">All Cards</a>
+                <div class="btn-group">
+                    <a class="nav-link dropdown-toggle" href="#card" id="cards" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">All Cards</a>
+                    <div class="dropdown-menu" aria-labelledby="cards">
+                        <a class="dropdown-item" href="{% url 'cards:card-list-50' %}">Last {{ n }} Cards</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 0 %}">List by Player</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}">List by Card Set</a>
+                    </div>
+                </div>
             </li>
         </ul>
         <!-- Navbar Right Side -->
@@ -36,7 +56,6 @@
                         </div>
                     </form>
                 </li>
-                <li class="nav-divider">&nbsp;</li>
             {% endif %}
             
             <li class="nav-item">

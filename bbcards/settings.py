@@ -109,8 +109,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cards.custom_context_processor.copyright_year_ctx',
+                'cards.custom_context_processor.cards_count_ctx',
                 'users.custom_context_processor.toggle_mode_ctx',
                 'users.custom_context_processor.user_full_name_ctx',
+
             ],
         },
     },

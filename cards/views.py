@@ -1,4 +1,7 @@
 import datetime
+
+from django.http import HttpResponse
+from django.views import View
 from xhtml2pdf import pisa
 import os
 from typing import Any, List, Dict
@@ -38,24 +41,22 @@ def card_set_create_async(request):
                 c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
             c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
+    cards = card_list_count(CardSet.all_sets.all().order_by('-id')[:50], True)
+    set_count, rs, n_pages = card_list_pagination(request, cards, 50)
+    last_id = CardSet.objects.last().id
     context = {
-        'rs': card_list_count(CardSet.all_sets.all()),
-        'new_id': Card.objects.last().id,
+        'rs': rs,
+        'new_id': last_id,
         'title': 'Card Sets',
+        'set_count': set_count,
+        'n_pages': n_pages,
         'c_message': c_message
     }
     return render(request, 'cards/cardset-list-card-partial.html', context)
 
 
 @error_handling
-def card_set_load_more(request, page=None):
-    if not page:
-        page = 1
-    out = CardSet.objects.filter()
-
-
-@error_handling
-def card_set_list(request):
+def card_set_list(request, n_count: int = 0):
     if request.method == 'POST':
         form = CardSetForm(request.POST)
         if form.is_valid():
@@ -63,9 +64,9 @@ def card_set_list(request):
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
     form = CardSetForm
-    card_sets = card_list_count(CardSet.all_sets.all())
-
-    set_count, rs, n_pages = card_list_pagination(request, card_sets)
+    cards = CardSet.all_sets.all() if n_count == 0 else CardSet.all_sets.all().order_by('-date_entered')[:n_count]
+    card_sets = card_list_count(cards)
+    set_count, rs, n_pages = card_list_pagination(request, card_sets, 50)
 
     context = {
         'rs': rs,
@@ -142,12 +143,12 @@ class CardListData:
         ]
 
 
-def card_list_count(card_list: list) -> list[dict]:
+def card_list_count(card_list: list, inc_zero: bool = False) -> list[dict]:
     c_list = []
-    for card in card_list:
-        c_count = Card.objects.filter(card_set_id=card.id).count()
-        if c_count > 0:
-            c_list.append(dict(card=card, count=c_count))
+    for card_set in card_list:
+        c_count = Card.objects.filter(card_set_id_id=card_set.id).count()
+        if c_count > 0 or inc_zero:
+            c_list.append(dict(card=card_set, count=c_count))
     return c_list
 
 
@@ -238,8 +239,8 @@ class CardsViewPlayer(CardsListView):
 
 
 @error_handling
-def card_list_pagination(request, cards: QuerySet):
-    p = Paginator(cards, 100)
+def card_list_pagination(request, cards: QuerySet | list[dict], n_count: int = None):
+    p = Paginator(cards, n_count if n_count else 100)
     page_number = request.GET['page'] if 'page' in request.GET else 1
     try:
         rs = p.get_page(page_number)
@@ -298,7 +299,9 @@ def card_list_by_set(request, slug: str):
     obj = CardSet.objects.get(slug=slug)
     cards = Card.objects.filter(
         card_set_id__slug=slug
-    ).order_by('card_num')
+    ).order_by(
+        'card_num'
+    )
     card_count, rs, n_pages = card_list_pagination(request, cards)
     return render(
         request,
@@ -317,9 +320,22 @@ def card_list_by_set(request, slug: str):
 
 # @login_required(login_url='/users/')
 @error_handling
-def card_list_all(request):
-    cards = Card.objects.all().order_by('card_set_id__year', 'card_set_id__card_set_name', 'card_num')
-    card_count, rs, n_pages = card_list_pagination(request, cards)
+def card_list_all(request, sort_by: int = None):
+    if not sort_by:
+        sort_by = 0
+    if sort_by == 1:
+        cards = Card.objects.all().order_by(
+            'card_set_id__year',
+            'card_set_id__card_set_name',
+            'card_num'
+        )
+    else:
+        cards = Card.objects.all().order_by(
+            'player_id__player_lname',
+            'card_set_id__year',
+            'card_set_id__card_set_name'
+        )
+    card_count, rs, n_pages = card_list_pagination(request, cards, 200)
     return render(
         request,
         'cards/card-list.html',
@@ -386,33 +402,63 @@ def card_delete_async(request, pk: int):
     return render(request, 'cards/card-list-card-partial.html', context)
 
 
+class TypeSlugs:
+    PLAYER = 'player'
+    CARD_SET = 'card_set'
+
+
 @login_required(login_url='/users/')
 @error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
-    new_id = None
-    form = CardCreateForm(request.POST, request.FILES)
-    if form.is_valid():
-        player_id = form.cleaned_data['player_id']
-        form.save()
-        new_id = Card.objects.last().id
+    # form = CardCreateForm(request.POST, request.FILES)
+    # if form.is_valid():
+    #     player_id = form.cleaned_data['player_id']
+    #     form.save()
+    player_id = request.POST['player_id']
+    card_set_id = request.POST['card_set_id']
+    subset = request.POST['card_subset']
+    card_num = request.POST['card_num']
+    graded = request.POST['graded']
+    condition = request.POST['condition']
+
+    if player_id == '0' or card_set_id == '0':
+        return HttpResponse('invalid data')
+
+    card = Card(
+        player_id_id=player_id,
+        card_set_id_id=card_set_id,
+        card_subset=subset,
+        card_num=card_num,
+        graded=graded,
+        condition=condition
+    )
+    card.save()
+    new_id = card.id
+
     if card_type and type_slug:
-        if card_type == 'player':
+        if card_type == TypeSlugs.PLAYER:
             obj = Player.objects.get(slug=type_slug)
-            cards = Card.objects.filter(player_id__slug=type_slug).order_by(
-                'card_set_id__year', 'card_set_id__card_set_name')
-            title = obj.player_fname + ' ' + obj.player_lname
+            cards = Card.objects.filter(player_id__slug=type_slug).order_by('-id')
+            title = f'{obj.player_fname} {obj.player_lname}'
         else:
             obj = CardSet.objects.get(slug=type_slug)
-            cards = Card.objects.filter(card_set_id__slug=type_slug).order_by(
-                'card_set_id__year', 'card_set_id__card_set_name')
-            title = str(obj.year) + ' ' + obj.card_set_name
+            cards = Card.objects.filter(card_set_id__slug=type_slug).order_by('-id')
+            title = f'{str(obj.year)} {obj.card_set_name}'
+    elif player_id:
+        obj = Player.objects.get(id=player_id)
+        cards = Card.objects.filter(player_id_id=player_id).order_by('-id')
+
+        title = f'{obj.player_fname} {obj.player_lname}'
     else:
         cards = Card.last_50.all()
         title = f'Last {len(cards)} Cards'
+    card_count, rs, n_pages = card_list_pagination(request, cards, 150)
     context = {
         'title': title,
         'new_id': new_id,
-        'rs': cards,
+        'card_count': card_count,
+        'rs': rs,
+        'n_pages': n_pages
     }
     return render(request, 'cards/card-list-card-partial.html', context)
 
@@ -450,34 +496,71 @@ def card_image(request, pk: int):
     return render(request, 'cards/card-image.html', context)
 
 
-def card_search_full_text(query: str) -> QuerySet:
-    return Card.objects.search_query(query).order_by(
-        'card_set_id__year',
-        'card_set_id__card_set_name',
-        'player_id__player_lname'
-    )
+class CardSearch(View):
+    template_name = 'cards/card-list-card-partial.html'
+    model = Card
+    redirect_to = 'cards:card-list-50'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-@login_required(login_url='/users/')
-@error_handling
-def card_search(request):
-    cards = []
-    search = ''
-    if request.method == 'POST':
-        search = request.POST['search']
-        cards = card_search_full_text(search)
+    def search_query(self, qs: str) -> QuerySet:
+        return self.model.objects.search_query(qs).order_by(
+            'card_set_id__year',
+            'card_set_id__card_set_name',
+            'player_id__player_lname'
+        )
+
+    def post(self, request, *args, **kwargs):
+        search = request.POST['search'] if 'search' in request.POST else self.get(request, *args, **kwargs)
+
+        cards = self.search_query(search)
         request.session['rs'] = CardListData(cards).card_list_dict()
-    context = {
-        'title': f'Search "{search}"',
-        'form': CardCreateForm,
-        'search': search,
-        'card_title': 'Add New Card'
-    }
-    return render(
-        request,
-        'cards/card-list-card-partial.html',
-        dict(context, **CardListData(cards).card_list_context(request))
-    )
+
+        card_list_ctx = CardListData(cards).card_list_context(request)
+        card_count, rs, n_pages = card_list_pagination(request, cards, 200)
+        context = {
+            'title': f'Search "{search}"',
+            'form': CardCreateForm,
+            'search': search,
+            'card_title': 'Add New Card',
+            'card_count': card_count,
+            'rs': rs,
+            'n_pages': n_pages,
+            'loaded': card_list_ctx['loaded'],
+            'rs_dict': card_list_ctx['rs_dict']
+        }
+        return render(request, self.template_name, context)
+
+    def get(self, request, *args, **kwargs):
+        return redirect(self.redirect_to)
+
+
+# @login_required(login_url='/users/')
+# @error_handling
+# def card_search(request):
+#     cards = []
+#     search = ''
+#     if request.method == 'POST':
+#         search = request.POST['search']
+#         s = CardSearch(qs=search)
+#         cards = s.search_query()
+#         request.session['rs'] = CardListData(cards).card_list_dict()
+#
+#     card_list_ctx = CardListData(cards).card_list_context(request)
+#     card_count, rs, n_pages = card_list_pagination(request, cards)
+#     context = {
+#         'title': f'Search "{search}"',
+#         'form': CardCreateForm,
+#         'search': search,
+#         'card_title': 'Add New Card',
+#         'card_count': card_count,
+#         'rs': rs,
+#         'n_pages': n_pages,
+#         'loaded': card_list_ctx['loaded'],
+#         'rs_dict': card_list_ctx['rs_dict']
+#     }
+#     return render(request, 'cards/card-list-card-partial.html', context)
 
 
 class ExportScriptsExcel:
@@ -533,7 +616,8 @@ def card_list_export(rs: list[dict] | QuerySet) -> str:
 
 
 def card_list_export_pdf(text: str = None) -> str:
-    rs = card_search_full_text(text)
+    s = CardSearch()
+    rs = s.search_query(text)
     html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
     html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
     html += '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">'
