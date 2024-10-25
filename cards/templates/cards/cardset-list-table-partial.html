@@ -10,7 +10,7 @@
     </thead>
     <tbody id="my-table">
     {% for card in rs.object_list %}
-        <tr id="tr-s{{ card.card.id }}">
+        <tr id="tr-s{{ card.card.id }}" title="{{ card.card.date_entered }}">
             {% include 'cards/cardset-list-tr-partial.html' %}
         </tr>
     {% endfor %}

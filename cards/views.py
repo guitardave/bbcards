@@ -41,7 +41,9 @@ def card_set_create_async(request):
                 c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
         else:
             c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
-    cards = card_list_count(CardSet.all_sets.all().order_by('-id')[:50], True)
+    cards = CardSet.all_sets.all().order_by('-id')[:50]
+    c_data = CardListData(cards)
+    cards = c_data.card_list_count(True)
     set_count, rs, n_pages = card_list_pagination(request, cards, 50)
     last_id = CardSet.objects.last().id
     context = {
@@ -65,7 +67,8 @@ def card_set_list(request, n_count: int = 0):
         return redirect('cards:cardsets')
     form = CardSetForm
     cards = CardSet.all_sets.all() if n_count == 0 else CardSet.all_sets.all().order_by('-date_entered')[:n_count]
-    card_sets = card_list_count(cards)
+    c_data = CardListData(cards)
+    card_sets = c_data.card_list_count(False)
     set_count, rs, n_pages = card_list_pagination(request, card_sets, 50)
 
     context = {
@@ -142,14 +145,13 @@ class CardListData:
             } for c in self.qs
         ]
 
-
-def card_list_count(card_list: list, inc_zero: bool = False) -> list[dict]:
-    c_list = []
-    for card_set in card_list:
-        c_count = Card.objects.filter(card_set_id_id=card_set.id).count()
-        if c_count > 0 or inc_zero:
-            c_list.append(dict(card=card_set, count=c_count))
-    return c_list
+    def card_list_count(self, inc_zero: bool = False) -> list[dict]:
+        c_list = []
+        for card_set in self.qs:
+            c_count = Card.objects.filter(card_set_id_id=card_set.id).count()
+            if c_count > 0 or inc_zero:
+                c_list.append(dict(card=card_set, count=c_count))
+        return c_list
 
 
 class CardsListView(ListView):
