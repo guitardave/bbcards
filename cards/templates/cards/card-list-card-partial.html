@@ -8,18 +8,20 @@
             <div class="col-sm-3 me-auto text-end">
                 {% if user.is_authenticated %}
                     {% if rs|length > 0 %}
+
                         <a class="m-1"
                             href="#export"
                             hx-post="{% url 'cards:cards-export' %}"
                             hx-target="#export-msg"
                             hx-swap="innerHTML"
                             title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
-                        <a class="m-1"
-                            href="#pdf"
-                            hx-post="{% if q_search %}{% url 'cards:cards-export-pdf' q_search %}{% else %}{% url 'cards:cards-export-pdf' %}{% endif %}"
-                            hx-target="#export-msg"
-                            hx-swap="innerHTML"
-                            title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>
+
+{#                        <a class="m-1"#}
+{#                            href="#pdf"#}
+{#                            hx-post="{% if q_search %}{% url 'cards:cards-export-pdf' q_search %}{% else %}{% url 'cards:cards-export-pdf' %}{% endif %}"#}
+{#                            hx-target="#export-msg"#}
+{#                            hx-swap="innerHTML"#}
+{#                            title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>#}
                     {% else %}
                         <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
                     {% endif %}

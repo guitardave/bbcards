@@ -624,13 +624,13 @@ def card_list_export_vw_pdf(request, q: str = None):
         if form.is_valid():
             search = form.cleaned_data['search']
         else:
-            search = '<h1>Invalid input</h1>'
+            search = '<span class="fade-out">Invalid input</span>'
     else:
         search = 'Bo Jackson'
     return render(
         request,
-        'cards/card-list-pdf-preview.html',
-        {'output': card_list_export_pdf(search), 'pdf': html_to_pdf()}
+        'cards/card-list-export-msg-partial.html',
+        {'xport_result': card_list_export_pdf(search), 'pdf': html_to_pdf()}
     )
 
 
