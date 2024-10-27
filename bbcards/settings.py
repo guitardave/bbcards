@@ -220,4 +220,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# General
+
+DEFAULT_LIMIT = 50
+
 django_heroku.settings(locals())

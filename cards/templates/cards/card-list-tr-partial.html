@@ -6,24 +6,28 @@
 {% if user.is_authenticated %}
     <td class="col-sm-2">
         {% if card.card_image %}
-            <a class="me-1" href="{% url 'cards:card-image' card.slug %}"><i class="fa fa-image"></i></a>
+            <a class="me-1"
+                href="{% url 'cards:card-image' card.slug %}"
+                title="View card image"><i class="fa fa-image"></i></a>
         {% else %}
             <span class="me-1" title="No image available right now"><i class="fa fa-image"></i></span>
         {% endif %}
 
-        <a class=""
-            href="#update"
-            hx-get="{% url 'cards:card-upd-async' card.slug %}"
-            hx-target="#form-div"
-            hx-swap="innerHTML"><i class="fa fa-edit"></i></a>
-
         {% if request.user.is_superuser %}
-            <a class=""
+            <a class="m-1"
                 href="#delete"
                 hx-post="{% url 'cards:card-delete-async' card.slug %}"
                 hx-target="#card-div"
-                hx-swap="innerHTML"><i class="fa fa-trash"></i></a>
+                hx-swap="innerHTML"
+                title="Delete card from database"><i class="fa fa-trash"></i></a>
         {% endif %}
+
+        <a class="m-1"
+            href="#update"
+            hx-get="{% url 'cards:card-upd-async' card.slug %}"
+            hx-target="#form-div"
+            hx-swap="innerHTML"
+            title="Update Card info"><i class="fa fa-edit"></i></a>
 
         <span class="fade-out">
             {% if t_message %}

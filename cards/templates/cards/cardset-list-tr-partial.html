@@ -13,13 +13,6 @@
             hx-swap="innerHTML"
             title="Add card to {{ card.card.year }} {{ card.card.card_set_name }}"><i class="fa fa-plus"></i></a>
 
-        <a class=""
-            href="#update"
-            hx-get="{% url 'cards:cardsets-upd-async' card.card.slug %}"
-            hx-target="#form-div"
-            hx-swap="innerHTML"
-            title="Update"><i class="fa fa-edit"></i></a>
-
         {% if card.count == 0 and request.user.is_superuser %}
             <a class=""
                 href="#del"
@@ -27,10 +20,19 @@
                 hx-target="#cardset-div"
                 hx-swap=""><i class="fa fa-trash"></i></a>
         {% else %}
-            <i class="fa fa-trash" title="Unable to delete (has child records)"></i>
+            <span class="" title="Unable to delete (has child records)">
+                <i class="fa fa-trash"></i>
+            </span>
         {% endif %}
 
-        <span class="fade-out m-1">
+        <a class=""
+            href="#update"
+            hx-get="{% url 'cards:cardsets-upd-async' card.card.slug %}"
+            hx-target="#form-div"
+            hx-swap="innerHTML"
+            title="Update"><i class="fa fa-edit"></i></a>
+
+        <span class="fade-out ms-1">
             {% if t_message %}
                 <small class="text-muted">{{t_message|safe}}</small>
             {% endif %}

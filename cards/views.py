@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
 from xhtml2pdf import pisa
@@ -27,10 +28,14 @@ from decorators.my_decorators import error_handling
 
 
 def card_set_list_fn(request, n_count: int):
-    cards = CardSet.all_sets.all() if n_count == 0 else CardSet.all_sets.all().order_by('-date_entered')[:n_count]
+    if n_count > 0:
+        cards = CardSet.all_sets.all().order_by('-date_entered')[:n_count]
+    else:
+        cards = CardSet.all_sets.all().order_by('year', 'card_set_name')
+
     c_data = CardListData(cards)
     card_sets = c_data.card_list_count(True)
-    set_count, rs, n_pages = card_list_pagination(request, card_sets, 50)
+    set_count, rs, n_pages = card_list_pagination(request, card_sets, settings.DEFAULT_LIMIT)
 
     return {
         'rs': rs,
@@ -48,20 +53,24 @@ def card_set_list_fn(request, n_count: int):
 def card_set_create_async(request):
     c_message = ''
     if request.method == 'POST':
-        set_year, set_name, sport = request.POST['year'], request.POST['card_set_name'], request.POST['sport']
-        full_set_name = f'{set_year} {set_name} {sport}'
-        check = CardSet.objects.filter(card_set_name=set_name, year=set_year, sport=sport)
-        if not check.exists():
-            form = CardSetForm(request.POST)
-            if form.is_valid():
+        form = CardSetForm(request.POST)
+        if form.is_valid():
+            set_year = form.cleaned_data['year']
+            set_name = form.cleaned_data['card_set_name']
+            sport = form.cleaned_data['sport']
+            full_set_name = f'{set_year} {set_name} {sport}'
+            check = CardSet.objects.filter(card_set_name=set_name, year=set_year, sport=sport)
+            if not check.exists():
                 form.save()
                 c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
+            else:
+                c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
         else:
-            c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
-    cards = CardSet.all_sets.all().order_by('-id')[:50]
+            c_message = f'<i class="fa fa-remove">{form.errors}</i>'
+    cards = CardSet.all_sets.all().order_by('-id')[:CardSet.LIMIT]
     c_data = CardListData(cards)
     cards = c_data.card_list_count(True)
-    set_count, rs, n_pages = card_list_pagination(request, cards, 50)
+    set_count, rs, n_pages = card_list_pagination(request, cards, CardSet.LIMIT)
     last_id = CardSet.objects.last().id
     context = {
         'rs': rs,
@@ -81,7 +90,7 @@ def card_set_list(request, n_count: int = 0, inc_zero: bool = False):
         if form.is_valid():
             form.save()
             messages.success(request, 'Card set has been created')
-        return redirect('cards:cardsets')
+        return redirect('cards:cardsets', n_count=n_count if n_count > 0 else CardSet.LIMIT)
     context = card_set_list_fn(request, n_count)
     return render(request, 'cards/cardset-list.html', context)
 
@@ -111,7 +120,7 @@ def card_set_update_async(request, slug: str):
         'form': CardSetForm(instance=obj),
         'obj': obj,
         'card_title': 'Update Card Set',
-        'loaded': datetime.datetime.now()
+        'loaded': timezone.now()
     }
     return render(request, 'cards/cardset-form.html', context)
 
@@ -129,7 +138,7 @@ def card_set_delete_async(request, slug: str):
             t_message = 'Set Deleted'
         else:
             t_message = 'Set not empty'
-    context = {'t_message': t_message, **card_set_list_fn(request, 50)}
+    context = {'t_message': t_message, **card_set_list_fn(request, CardSet.LIMIT)}
     return render(request, 'cards/cardset-list-card-partial.html', context)
 
 
@@ -172,92 +181,6 @@ class CardListData:
             if c_count > 0 or inc_zero:
                 c_list.append(dict(card=card_set, count=c_count))
         return c_list
-
-
-class CardsListView(ListView):
-    model = Card
-    template_name = 'cards/card-list.html'
-    context_object_name = 'cards'
-    ordering = 'card_set_id__slug'
-    paginate_by = 250
-
-    def get_queryset(self):
-        return Card.last_50.all()
-
-    def get_context_data(self, **kwargs):
-        data = super(CardsListView, self).get_context_data()
-        data['title'] = f'Last {len(self.get_queryset())} Cards'
-        data['form'] = CardCreateForm()
-        data['card_title'] = 'Add New Card'
-        c_data = CardListData(self.get_queryset())
-        d_2 = c_data.card_list_context(self.request)
-        return dict(data, **d_2)
-
-
-class CardsViewAll(CardsListView):
-    paginate_by = 250
-
-    def get_queryset(self):
-        return Card.list_all.all()
-
-    def get_context_data(self, **kwargs):
-        data = super(CardsViewAll, self).get_context_data()
-        data['title'] = 'All Cards'
-        data['form'] = CardCreateForm()
-        data['card_title'] = 'Add New Card'
-        c_list = CardListData(self.get_queryset())
-        d_2 = c_list.card_list_context(self.request)
-        return dict(data, **d_2)
-
-
-class CardsViewSet(CardsListView):
-    def get_object(self):
-        return CardSet.objects.get(slug=self.kwargs.get('slug'))
-
-    def get_card_set(self):
-        card_set = self.get_object()
-        return f'{card_set.year} {card_set.card_set_name}'
-
-    def get_queryset(self):
-        return Card.objects.filter(
-            card_set_id__slug=self.kwargs.get('slug')
-        ).order_by('card_num')
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        card_set = self.get_object()
-        data = super(CardsViewSet, self).get_context_data(**kwargs)
-        data['title'] = f'{self.get_card_set()}'
-        data['card_set'] = card_set
-        data['form'] = CardCreateForm(**{'set': card_set.slug})
-        data['card_title'] = 'Add Card - Card Set'
-        c_list = CardListData(self.get_queryset())
-        d_2 = c_list.card_list_context(self.request)
-        return dict(data, **d_2)
-
-
-class CardsViewPlayer(CardsListView):
-    def get_queryset(self):
-        return Card.objects.filter(
-            player_id__slug=self.kwargs.get('slug')
-        ).order_by('card_set_id__year', 'card_set_id__slug')
-
-    def get_object(self):
-        return Player.objects.get(slug=self.kwargs.get('slug'))
-
-    def get_player_name(self):
-        player = self.get_object()
-        return f'{player.player_fname} {player.player_lname}'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        player = self.get_object()
-        data = super(CardsViewPlayer, self).get_context_data(**kwargs)
-        data['title'] = f'{self.get_player_name()}'
-        data['player'] = player
-        data['form'] = CardCreateForm(**{'player': player.slug})
-        data['card_title'] = 'Add Card - Player'
-        c_list = CardListData(self.get_queryset())
-        d_2 = c_list.card_list_context(self.request)
-        return dict(data, **d_2)
 
 
 @error_handling
@@ -666,9 +589,9 @@ def card_list_export_pdf(text: str = None) -> str:
     rs = s.search_query(text)
     html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
     html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-    html += '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">'
+    html += '<style>body, h1, p, th, td {font-family: "Lato", "Calibri", Arial, sans-serif;}</style>'
 
-    html += '</head><body><div class="container"><h1>Test</h1><table>'
+    html += f'</head><body><div class="container"><h1>Search: {text}</h1><table>'
     for r in rs:
         html += '<tr>'
         html += f'<td>{r.player_id.player_fname} {r.player_id.player_lname}</td>'
@@ -678,13 +601,13 @@ def card_list_export_pdf(text: str = None) -> str:
         html += f'<td>{r.card_num}</td>'
         html += '</tr>'
     html += f'</table><p>{len(rs)} records</p>'
-    html += '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>'
+    html += f'<hr>Date: {datetime.datetime.strftime(timezone.now(), "%m/%d/%Y %H:%M")}'
     html += '</div></body></html>'
     return html
 
 
 def html_to_pdf():
-    pdf_path = 'test.pdf'
+    pdf_path = f'bbcards_export__{datetime.datetime.strftime(timezone.now(), "%m%d%Y_%H%M")}.pdf'
     html_content = card_list_export_pdf(None)
     with open(pdf_path, "wb") as pdf_file:
         pisa_status = pisa.CreatePDF(html_content, dest=pdf_file)
@@ -693,8 +616,9 @@ def html_to_pdf():
 
 @login_required(login_url='/users/')
 @csrf_exempt
-# @error_handling
+@error_handling
 def card_list_export_vw_pdf(request, q: str = None):
+    search = ''
     if request.method == 'POST':
         form = SearchForm(request.POST or None)
         if form.is_valid():

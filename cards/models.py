@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField, SearchVector, SearchQuery
 from django.db import models
@@ -19,6 +20,8 @@ class CardSetAll(models.Manager):
 
 
 class CardSet(models.Model):
+    LIMIT = settings.DEFAULT_LIMIT
+
     class Sports(models.TextChoices):
         BASEBALL = 'Baseball', _('Baseball')
         FOOTBALL = 'Football', _('Football')
@@ -41,7 +44,7 @@ class CardSet(models.Model):
         super(CardSet, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('cards:cardsets')
+        return reverse('cards:cardsets', kwargs={'n_count': self.LIMIT})
 
 
 class CardSearchMgr(models.Manager):

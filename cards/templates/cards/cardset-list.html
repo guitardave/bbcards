@@ -4,7 +4,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Card Sets" "cards:cardsets" %}
+    {% breadcrumb "Card Sets" "cards:cardsets" n %}
 {% endblock breadcrumbs %}
 {% block content %}
 	<div class="container">

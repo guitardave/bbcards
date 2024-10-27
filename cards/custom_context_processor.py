@@ -1,8 +1,10 @@
 from datetime import datetime
 
+from django.conf import settings
+
 
 def cards_count_ctx(request):
-    return {'n': 25}
+    return {'n': settings.DEFAULT_LIMIT}
 
 
 def copyright_year_ctx(request):

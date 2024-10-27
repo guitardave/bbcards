@@ -3,7 +3,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Card Sets" "cards:cardsets" %}
+    {% breadcrumb "Card Sets" "cards:cardsets" n %}
     {% breadcrumb object.player_id 'cards:card-list-player' object.player_id.slug %}
     {% breadcrumb card_string '' %}
 {% endblock breadcrumbs %}
