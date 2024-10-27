@@ -52,35 +52,49 @@ class CardForm(forms.ModelForm):
                 (x.id, f'{x.__str__()}') for x in CardSet.objects.all().order_by('year', 'card_set_name')
             ]
 
-    player_id = forms.ChoiceField(
+    # player_id = forms.CharField(
+    #     label='Player',
+    #     widget=forms.Select(
+    #         attrs={'class': 'form-control form-control-lg'},
+    #         choices=PlayerList.choices()
+    #     ),
+    #     required=True
+    # )
+    # card_set_id = forms.CharField(
+    #     label='Card Set',
+    #     widget=forms.Select(
+    #         attrs={'class': 'form-control form-control-lg'},
+    #         choices=CardSetsList.choices()
+    #     ),
+    #     required=True
+    # )
+    player_id = forms.ModelChoiceField(
+        queryset=Player.objects.all().order_by('player_lname'),
         label='Player',
-        choices=PlayerList.choices(),
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}),
-        required=True
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
-    card_set_id = forms.ChoiceField(
+    card_set_id = forms.ModelChoiceField(
+        queryset=CardSet.objects.all().order_by('year', 'card_set_name'),
         label='Card Set',
-        choices=CardSetsList.choices(),
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}),
-        required=True
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
     card_subset = forms.CharField(
         label='Card Subset/Info',
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'})
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     card_num = forms.CharField(
         label='Card number',
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
         required=True
     )
     graded = forms.CharField(
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=YN),
+        widget=forms.Select(attrs={'class': 'form-control'}, choices=YN),
         label='Graded?',
         required=True
     )
     condition = forms.CharField(
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=Card.Condition.choices),
+        widget=forms.Select(attrs={'class': 'form-control'}, choices=Card.Condition.choices),
         label='Card condition (estimate if raw)',
         required=True
     )
@@ -97,10 +111,12 @@ class CardCreateForm(CardForm):
         super(CardForm, self).__init__(*args, **kwargs)
         if card_set:
             x = CardSet.objects.get(slug=card_set)
-            self.fields['card_set_id'].initial = (x.id, x.__str__())
+            # self.fields['card_set_id'].initial = (x.id, x.__str__())
+            self.fields['card_set_id'].initial = x
         if player:
             x = Player.objects.get(slug=player)
-            self.fields['player_id'].initial = (x.id, x.__str__())
+            # self.fields['player_id'].initial = (x.id, x.__str__())
+            self.fields['player_id'].initial = x
 
 
 class CardUpdateForm(CardForm):
@@ -111,18 +127,21 @@ class CardUpdateForm(CardForm):
 
 class CardSetForm(forms.ModelForm):
     year = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
         label='Set Year',
         validators=[validate_int],
         required=True
     )
     card_set_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
         label='Card Set Name',
         required=True
     )
     sport = forms.CharField(
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg'}, choices=CardSet.Sports.choices),
+        widget=forms.Select(
+            attrs={'class': 'form-control'},
+            choices=CardSet.Sports.choices
+        ),
         label='Sport',
     )
 

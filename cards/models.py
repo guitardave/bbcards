@@ -83,6 +83,7 @@ class Card(models.Model):
         G = 'Good', _('Good')
         F = 'Fair', _('Fair')
 
+    slug = models.SlugField(null=True, max_length=250, unique=True)
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     card_num = models.CharField(max_length=50, default=None)
     card_set_id = models.ForeignKey(CardSet, on_delete=models.CASCADE)
@@ -108,6 +109,12 @@ class Card(models.Model):
             {self.card_set_id.card_set_name}
             {self.card_num}
         '''
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(
+            f'{self.player_id.__str__()} {self.card_set_id.__str__()} {self.card_subset} {self.card_num}'
+        )
+        super().save(*args, **kwargs)
         
     def get_absolute_url(self):
         return reverse('cards:card-det', kwargs={'pk': self.id})

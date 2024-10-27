@@ -26,6 +26,23 @@ from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
 
 
+def card_set_list_fn(request, n_count: int):
+    cards = CardSet.all_sets.all() if n_count == 0 else CardSet.all_sets.all().order_by('-date_entered')[:n_count]
+    c_data = CardListData(cards)
+    card_sets = c_data.card_list_count(True)
+    set_count, rs, n_pages = card_list_pagination(request, card_sets, 50)
+
+    return {
+        'rs': rs,
+        'title': 'Card Sets',
+        'form': CardSetForm,
+        'card_title': 'Add Card Set',
+        'set_count': set_count,
+        'n_pages': n_pages,
+        'loaded': timezone.now()
+    }
+
+
 @login_required(login_url='/users/')
 @error_handling
 def card_set_create_async(request):
@@ -58,35 +75,21 @@ def card_set_create_async(request):
 
 
 @error_handling
-def card_set_list(request, n_count: int = 0):
+def card_set_list(request, n_count: int = 0, inc_zero: bool = False):
     if request.method == 'POST':
         form = CardSetForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Card set has been created')
         return redirect('cards:cardsets')
-    form = CardSetForm
-    cards = CardSet.all_sets.all() if n_count == 0 else CardSet.all_sets.all().order_by('-date_entered')[:n_count]
-    c_data = CardListData(cards)
-    card_sets = c_data.card_list_count(False)
-    set_count, rs, n_pages = card_list_pagination(request, card_sets, 50)
-
-    context = {
-        'rs': rs,
-        'form': form,
-        'title': 'Card Sets',
-        'card_title': 'Add Card Set',
-        'set_count': set_count,
-        'n_pages': n_pages,
-        'loaded': timezone.now()
-    }
+    context = card_set_list_fn(request, n_count)
     return render(request, 'cards/cardset-list.html', context)
 
 
 @login_required(login_url="/users/")
 @error_handling
-def card_set_update_async(request, pk: int):
-    obj = CardSet.objects.get(pk=pk)
+def card_set_update_async(request, slug: str):
+    obj = CardSet.objects.get(slug=slug)
     if request.method == 'POST':
         form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
@@ -111,6 +114,23 @@ def card_set_update_async(request, pk: int):
         'loaded': datetime.datetime.now()
     }
     return render(request, 'cards/cardset-form.html', context)
+
+
+@login_required(login_url='/users/')
+@csrf_exempt
+@error_handling
+def card_set_delete_async(request, slug: str):
+    obj = CardSet.objects.filter(slug=slug)
+    t_message = ''
+    if obj.exists():
+        obj = obj[0]
+        if not Card.objects.filter(card_set_id=obj).exists():
+            obj.delete()
+            t_message = 'Set Deleted'
+        else:
+            t_message = 'Set not empty'
+    context = {'t_message': t_message, **card_set_list_fn(request, 50)}
+    return render(request, 'cards/cardset-list-card-partial.html', context)
 
 
 @login_required(login_url='/users/')
@@ -361,10 +381,26 @@ def load_cards_async(request):
 
 @login_required(login_url="/users/")
 @error_handling
-def card_update_async(request, pk: int):
-    obj = Card.objects.get(pk=pk)
+def card_update_async(request, slug: str):
+    obj = Card.objects.get(slug=slug)
     if request.method == 'POST':
         success = False
+        # player_id = request.POST['player_id']
+        # card_set_id = request.POST['card_set_id']
+        # subset = request.POST['card_subset']
+        # card_num = request.POST['card_num']
+        # graded = request.POST['graded']
+        # condition = request.POST['condition']
+        # Card.objects.filter(
+        #     slug=slug).update(
+        #     player_id_id=player_id,
+        #     card_set_id_id=card_set_id,
+        #     card_subset=subset,
+        #     card_num=card_num,
+        #     graded=graded,
+        #     condition=condition
+        # )
+
         form = CardUpdateForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
@@ -375,12 +411,12 @@ def card_update_async(request, pk: int):
         return render(
             request,
             'cards/card-list-tr-partial.html',
-            {'card': Card.objects.get(pk=pk), 'success': success, 't_message': t_message}
+            {'card': Card.objects.get(slug=slug), 'success': success, 't_message': t_message}
         )
     context = {
         'form': CardUpdateForm(instance=obj), 'obj': obj,
         'card_title': 'Update Card',
-        'loaded': datetime.datetime.now()
+        'loaded': timezone.now()
     }
     return render(request, 'cards/card-form.html', context)
 
@@ -388,9 +424,9 @@ def card_update_async(request, pk: int):
 @login_required(login_url='/users/')
 @csrf_exempt
 @error_handling
-def card_delete_async(request, pk: int):
+def card_delete_async(request, slug: str):
     c_message, cards, player = None, None, None
-    obj = Card.objects.filter(pk=pk)
+    obj = Card.objects.filter(slug=slug)
     if obj.exists():
         cards = Card.objects.filter(player_id_id=obj[0].player_id_id)
         player = Player.objects.get(id=obj[0].player_id_id)
@@ -412,30 +448,34 @@ class TypeSlugs:
 @login_required(login_url='/users/')
 @error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
-    # form = CardCreateForm(request.POST, request.FILES)
-    # if form.is_valid():
-    #     player_id = form.cleaned_data['player_id']
-    #     form.save()
-    player_id = request.POST['player_id']
-    card_set_id = request.POST['card_set_id']
-    subset = request.POST['card_subset']
-    card_num = request.POST['card_num']
-    graded = request.POST['graded']
-    condition = request.POST['condition']
+    player_id, new_id = None, {'id': None}
 
-    if player_id == '0' or card_set_id == '0':
-        return HttpResponse('invalid data')
+    # player_id = request.POST['player_id']
+    # card_set_id = request.POST['card_set_id']
+    # subset = request.POST['card_subset']
+    # card_num = request.POST['card_num']
+    # graded = request.POST['graded']
+    # condition = request.POST['condition']
 
-    card = Card(
-        player_id_id=player_id,
-        card_set_id_id=card_set_id,
-        card_subset=subset,
-        card_num=card_num,
-        graded=graded,
-        condition=condition
-    )
-    card.save()
-    new_id = card.id
+    # if player_id == '0' or card_set_id == '0':
+    #     return HttpResponse('invalid data')
+    #
+    # card = Card(
+    #     player_id_id=player_id,
+    #     card_set_id_id=card_set_id,
+    #     card_subset=subset,
+    #     card_num=card_num,
+    #     graded=graded,
+    #     condition=condition
+    # )
+    # card.save()
+    # new_id = card.id
+
+    form = CardCreateForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        new_id = Card.objects.last()
+        player_id = Player.objects.get(id=new_id.player_id_id)
 
     if card_type and type_slug:
         if card_type == TypeSlugs.PLAYER:
@@ -447,8 +487,8 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
             cards = Card.objects.filter(card_set_id__slug=type_slug).order_by('-id')
             title = f'{str(obj.year)} {obj.card_set_name}'
     elif player_id:
-        obj = Player.objects.get(id=player_id)
-        cards = Card.objects.filter(player_id_id=player_id).order_by('-id')
+        obj = Player.objects.get(id=player_id.id)
+        cards = Card.objects.filter(player_id_id=player_id.id).order_by('-id')
 
         title = f'{obj.player_fname} {obj.player_lname}'
     else:
@@ -457,7 +497,7 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
     card_count, rs, n_pages = card_list_pagination(request, cards, 150)
     context = {
         'title': title,
-        'new_id': new_id,
+        'new_id': new_id.id,
         'card_count': card_count,
         'rs': rs,
         'n_pages': n_pages
@@ -491,11 +531,15 @@ def card_form_refresh(request):
 
 @login_required(login_url='/users/')
 @error_handling
-def card_image(request, pk: int):
-    obj = Card.objects.get(pk=pk)
+def card_image(request, slug: str):
+    obj = Card.objects.get(slug=slug)
     card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
     context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
     return render(request, 'cards/card-image.html', context)
+
+
+def card_search_pagination(request, search: str):
+    pass
 
 
 class CardSearch(View):
