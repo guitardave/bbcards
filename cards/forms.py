@@ -52,40 +52,40 @@ class CardForm(forms.ModelForm):
                 (x.id, f'{x.__str__()}') for x in CardSet.objects.all().order_by('year', 'card_set_name')
             ]
 
-    # player_id = forms.CharField(
-    #     label='Player',
-    #     widget=forms.Select(
-    #         attrs={'class': 'form-control form-control-lg'},
-    #         choices=PlayerList.choices()
-    #     ),
-    #     required=True
-    # )
-    # card_set_id = forms.CharField(
-    #     label='Card Set',
-    #     widget=forms.Select(
-    #         attrs={'class': 'form-control form-control-lg'},
-    #         choices=CardSetsList.choices()
-    #     ),
-    #     required=True
-    # )
     player_id = forms.ModelChoiceField(
         queryset=Player.objects.all().order_by('player_lname'),
-        label='Player',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='',
+        empty_label='Player',
+        widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Player'})
     )
+    # player_id = forms.CharField(
+    #     widget=forms.TextInput(
+    #         attrs={'class': 'form-control', 'placeholder': 'Player'}
+    #     ),
+    #     label=''
+    # )
+
     card_set_id = forms.ModelChoiceField(
         queryset=CardSet.objects.all().order_by('year', 'card_set_name'),
-        label='Card Set',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='',
+        empty_label='Card Set',
+        widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Card Set'})
     )
+    # card_set_id = forms.CharField(
+    #     widget=forms.TextInput(
+    #         attrs={'class': 'form-control', 'placeholder': 'Card Set'}
+    #     ),
+    #     label=''
+    # )
+
     card_subset = forms.CharField(
-        label='Card Subset/Info',
+        label='',
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subset/Info'})
     )
     card_num = forms.CharField(
-        label='Card number',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Card #'}),
         required=True
     )
     graded = forms.CharField(
@@ -127,22 +127,22 @@ class CardUpdateForm(CardForm):
 
 class CardSetForm(forms.ModelForm):
     year = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        label='Set Year',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Year'}),
+        label='',
         validators=[validate_int],
         required=True
     )
     card_set_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        label='Card Set Name',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Set Name'}),
+        label='',
         required=True
     )
     sport = forms.CharField(
         widget=forms.Select(
-            attrs={'class': 'form-control'},
+            attrs={'class': 'form-control', 'placeholder': 'Sport'},
             choices=CardSet.Sports.choices
         ),
-        label='Sport',
+        label='',
     )
 
     class Meta:

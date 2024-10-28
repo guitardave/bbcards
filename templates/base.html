@@ -111,27 +111,31 @@
             if (this_mode === 'dark') {
                 $('#my-navbar')
                     .addClass('bg-dark')
-                    .removeClass('bg-primary');
+                    .removeClass('text-secondary')
+                    .addClass('text-light')
+                    .removeClass('bg-info');
                 $('#search-btn')
-                    .addClass('btn-dark')
+                    .addClass('btn-dark-subtle')
                     .addClass('btn-outline-secondary')
                     .removeClass('btn-outline-light')
-                    .removeClass('btn-primary');
+                    .removeClass('btn-info');
             }
             else {
                 $('#my-navbar')
-                    .addClass('bg-primary')
+                    .addClass('text-secondary')
+                    .removeClass('text-light')
+                    .addClass('bg-info')
                     .removeClass('bg-dark');
                 $('#search-btn')
-                    .addClass('btn-primary')
+                    .addClass('btn-info')
                     .addClass('btn-outline-light')
                     .removeClass('btn-outline-secondary')
-                    .removeClass('btn-dark');
+                    .removeClass('btn-dark-subtle');
             }
         });
         
         $(".new-row").on('load', function() {
-            $(this).fadeOut(500);
+            $(this).fadeIn(500);
         });
         
     </script>

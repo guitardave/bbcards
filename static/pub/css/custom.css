@@ -69,3 +69,13 @@ a { text-decoration: none; }
     padding: 2px;
 }
 .tiny { font-size: 10px; }
+
+.teeny { font-size: 8px; }
+
+.text-999 { color: #999; }
+
+.text-111 { color: #111; }
+
+.pag-ref {
+    color:#222;
+}

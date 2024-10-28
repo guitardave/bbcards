@@ -1,6 +1,6 @@
 {% load static %}
 <header class="site-header">
-  <nav id="my-navbar" class="navbar navbar-expand-md navbar-dark {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}bg-dark{% else %}bg-primary{% endif %} fixed-top">
+  <nav id="my-navbar" class="navbar navbar-expand-md navbar-dark {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}bg-dark {% else %}bg-info {% endif %} fixed-top">
     <div class="container">
         <a class="navbar-brand mr-4" href="{% url 'cards:card-list-50' %}"><img class="rounded" src="{% static 'pub/img/baseball_logo_black_background.jpg' %}" alt="logo"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,8 +12,8 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#players" id="players" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Players</a>
                     <div class="dropdown-menu" aria-labelledby="Players">
-                        <a class="dropdown-item" href="{% url 'players:players-home' n %}">Last {{ n }} Players</a>
-                        <a class="dropdown-item" href="{% url 'players:players-home' 0 %}">All Players</a>
+                        <a class="dropdown-item" href="{% url 'players:players-home' n %}">Players Recently Added</a>
+                        <a class="dropdown-item" href="{% url 'players:players-home' 0 %}">Players (all)</a>
                     </div>
                 </div>
                 
@@ -22,7 +22,7 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#cardsets" id="cardsets" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Card Sets</a>
                     <div class="dropdown-menu" aria-labelledby="cardsets">
-                        <a class="dropdown-item" href="{% url 'cards:cardsets' 50 %}">Last 50 Card Sets</a>
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' 50 %}">Card Sets Recently Added</a>
                         <a class="dropdown-item" href="{% url 'cards:cardsets' %}">Card Sets (all)</a>
                     </div>
                 </div>
@@ -31,9 +31,9 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#card" id="cards" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">All Cards</a>
                     <div class="dropdown-menu" aria-labelledby="cards">
-                        <a class="dropdown-item" href="{% url 'cards:card-list-50' %}">Last {{ n }} Cards</a>
-                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 0 %}">List by Player</a>
-                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}">List by Card Set</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-50' %}">Cards Recently Added</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 0 %}">List by Player (all)</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}">List by Card Set (all)</a>
                     </div>
                 </div>
             </li>
@@ -49,7 +49,7 @@
                             <input id="search" name="search" type="text" class="form-control form-control-lg rounded-start" placeholder="Player name, card set" required>
                             <button 
                                 id="search-btn" 
-                                class="btn {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}btn-dark btn-outline-secondary{% else %}btn-primary btn-outline-light{% endif %} btn-lg "
+                                class="btn {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}btn-outline-secondary{% else %}btn-info-subtle{% endif %} btn-lg "
                                 hx-post="{% url 'cards:search' %}"
                                 hx-target="#card-div"
                                 hx-swap="innerHTML swap:1s"><i class="fa fa-search"></i></button>

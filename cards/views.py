@@ -308,21 +308,6 @@ def card_update_async(request, slug: str):
     obj = Card.objects.get(slug=slug)
     if request.method == 'POST':
         success = False
-        # player_id = request.POST['player_id']
-        # card_set_id = request.POST['card_set_id']
-        # subset = request.POST['card_subset']
-        # card_num = request.POST['card_num']
-        # graded = request.POST['graded']
-        # condition = request.POST['condition']
-        # Card.objects.filter(
-        #     slug=slug).update(
-        #     player_id_id=player_id,
-        #     card_set_id_id=card_set_id,
-        #     card_subset=subset,
-        #     card_num=card_num,
-        #     graded=graded,
-        #     condition=condition
-        # )
 
         form = CardUpdateForm(request.POST, instance=obj)
         if form.is_valid():
@@ -334,10 +319,11 @@ def card_update_async(request, slug: str):
         return render(
             request,
             'cards/card-list-tr-partial.html',
-            {'card': Card.objects.get(slug=slug), 'success': success, 't_message': t_message}
+            {'card': Card.objects.get(id=obj.id), 'success': success, 't_message': t_message}
         )
     context = {
-        'form': CardUpdateForm(instance=obj), 'obj': obj,
+        'form': CardUpdateForm(instance=obj),
+        'obj': obj,
         'card_title': 'Update Card',
         'loaded': timezone.now()
     }
@@ -373,27 +359,6 @@ class TypeSlugs:
 def card_create_async(request, card_type: str = None, type_slug: str = None):
     player_id, new_id = None, {'id': None}
 
-    # player_id = request.POST['player_id']
-    # card_set_id = request.POST['card_set_id']
-    # subset = request.POST['card_subset']
-    # card_num = request.POST['card_num']
-    # graded = request.POST['graded']
-    # condition = request.POST['condition']
-
-    # if player_id == '0' or card_set_id == '0':
-    #     return HttpResponse('invalid data')
-    #
-    # card = Card(
-    #     player_id_id=player_id,
-    #     card_set_id_id=card_set_id,
-    #     card_subset=subset,
-    #     card_num=card_num,
-    #     graded=graded,
-    #     condition=condition
-    # )
-    # card.save()
-    # new_id = card.id
-
     form = CardCreateForm(request.POST, request.FILES)
     if form.is_valid():
         form.save()
@@ -412,7 +377,6 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
     elif player_id:
         obj = Player.objects.get(id=player_id.id)
         cards = Card.objects.filter(player_id_id=player_id.id).order_by('-id')
-
         title = f'{obj.player_fname} {obj.player_lname}'
     else:
         cards = Card.last_50.all()
@@ -431,7 +395,7 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
 @login_required(login_url='/users/')
 @error_handling
 def card_create_form_async(request, card_type: str = None, type_slug: str = None):
-    form = CardCreateForm()
+    form = CardCreateForm
     context = {'card_title': 'Add Card'}
     if card_type and type_slug:
         if card_type == 'player':
