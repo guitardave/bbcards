@@ -15,84 +15,82 @@
     </div>
     <div class="card-body">
         <div id="card-form">
-            <article class="media content-section">
-                  <div class="media-body">
-                    <form method="POST" enctype="multipart/form-data" autocomplete="off">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-sm-12">
+            <div class="card card-body">
+                <form method="POST" enctype="multipart/form-data" autocomplete="off">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-sm-12">
 {#                                {{ form|crispy }}#}
 {#                                <label for="player"></label>#}
 {#                                <input type="text" id="player" name="player" class="form-control" placeholder="Player" required>#}
 {#                                <input type="hidden" name="player_id" id="player_id" value="">#}
-                                {{ form.player_id|as_crispy_field }}
-                            </div>
+                            {{ form.player_id|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
 {#                                <label for="card_set"></label>#}
 {#                                <input type="text" id="card_set" name="card_set" class="form-control" placeholder="Card Set" required>#}
 {#                                <input type="hidden" name="card_set_id" id="card_set_id" value="">#}
-                                {{ form.card_set_id|as_crispy_field }}
-                            </div>
+                            {{ form.card_set_id|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {{ form.card_subset|as_crispy_field }}
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form.card_subset|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {{ form.card_num|as_crispy_field }}
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form.card_num|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {{ form.graded|as_crispy_field }}
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form.graded|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {{ form.condition|as_crispy_field }}
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form.condition|as_crispy_field }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">&nbsp;</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 me-auto text-end">
-                                {% if obj %}
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">&nbsp;</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 me-auto text-end">
+                            {% if obj %}
+                                <button
+                                    class="btn btn-lg btn-outline-secondary"
+                                    hx-post="{% url 'cards:card-upd-async' obj.slug %}"
+                                    hx-target="#tr-c{{ obj.id }}"
+                                    hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                            {% else %}
+                                {% if player %}
                                     <button
                                         class="btn btn-lg btn-outline-secondary"
-                                        hx-post="{% url 'cards:card-upd-async' obj.slug %}"
-                                        hx-target="#tr-c{{ obj.id }}"
+                                        hx-post="{% url 'cards:card-new-async' 'player' player.slug %}"
+                                        hx-target="#card-div"
+                                        hx-swap="innerHTML"><i class="fa fa-save"></i></button>
+                                {% elif card_set %}
+                                    <button
+                                        class="btn btn-lg btn-outline-secondary"
+                                        hx-post="{% url 'cards:card-new-async' 'card_set' card_set.slug %}"
+                                        hx-target="#card-div"
                                         hx-swap="innerHTML"><i class="fa fa-save"></i></button>
                                 {% else %}
-                                    {% if player %}
-                                        <button
-                                            class="btn btn-lg btn-outline-secondary"
-                                            hx-post="{% url 'cards:card-new-async' 'player' player.slug %}"
-                                            hx-target="#card-div"
-                                            hx-swap="innerHTML"><i class="fa fa-save"></i></button>
-                                    {% elif card_set %}
-                                        <button
-                                            class="btn btn-lg btn-outline-secondary"
-                                            hx-post="{% url 'cards:card-new-async' 'card_set' card_set.slug %}"
-                                            hx-target="#card-div"
-                                            hx-swap="innerHTML"><i class="fa fa-save"></i></button>
-                                    {% else %}
-                                        <button
-                                            class="btn btn-lg btn-outline-secondary"
-                                            hx-post="{% url 'cards:card-new-async' %}"
-                                            hx-target="#card-div"
-                                            hx-swap="innerHTML"><i class="fa fa-save"></i></button>
-                                    {% endif %}
+                                    <button
+                                        class="btn btn-lg btn-outline-secondary"
+                                        hx-post="{% url 'cards:card-new-async' %}"
+                                        hx-target="#card-div"
+                                        hx-swap="innerHTML"><i class="fa fa-save"></i></button>
                                 {% endif %}
-                            </div>
+                            {% endif %}
                         </div>
-                    </form>
-                  </div>
-            </article>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="card-footer bg-info-subtle">

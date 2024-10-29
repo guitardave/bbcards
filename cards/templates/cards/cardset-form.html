@@ -11,27 +11,26 @@
         </div>
     </div>
     <div class="card-body">
-            <article class="media content-section">
-                  <div class="media-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-sm-12">
+        <div class="card card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-sm-12">
 {#                                {{ form|crispy }}#}
 {#                                <label for="year"></label>#}
 {#                                <input type="text" id="year" name="year" class="form-control" placeholder="Year">#}
-                                {{ form.year|as_crispy_field }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
+                        {{ form.year|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
 {#                                <label for="card_set_name"></label>#}
 {#                                <input type="text" id="card_set_name" name="card_set_name" class="form-control" placeholder="Card set name">#}
-                                {{ form.card_set_name|as_crispy_field }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
+                        {{ form.card_set_name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
 {#                                <label for="sport"></label>#}
 {#                                <select name="sport" id="sport" class="form-control">#}
 {#                                    <option value="0" disabled selected>Sport</option>#}
@@ -39,34 +38,33 @@
 {#                                    <option value="Football">Football</option>#}
 {#                                    <option value="Basketball">Basketball</option>#}
 {#                                </select>#}
-                                {{ form.sport|as_crispy_field }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">&nbsp;</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 me-auto text-end">
-                                {% if obj %}
-                                    <button
-                                        class="btn btn-lg btn-outline-secondary"
-                                        hx-post="{% url 'cards:cardsets-upd-async' obj.slug %}"
-                                        hx-target="#tr-s{{ obj.id }}"
-                                        hx-swap="innerHTML"><i class="fa fa-save"></i>
-                                    </button>
-                                {% else %}
-                                    <button
-                                        class="btn btn-lg btn-outline-secondary"
-                                        hx-post="{% url 'cards:cardsets-new-async' %}"
-                                        hx-target="#card-div"
-                                        hx-swap="innerHTML"><i class="fa fa-save"></i>
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </form>
-                  </div>
-            </article>
+                        {{ form.sport|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 me-auto text-end">
+                        {% if obj %}
+                            <button
+                                class="btn btn-lg btn-outline-secondary"
+                                hx-post="{% url 'cards:cardsets-upd-async' obj.slug %}"
+                                hx-target="#tr-s{{ obj.id }}"
+                                hx-swap="innerHTML"><i class="fa fa-save"></i>
+                            </button>
+                        {% else %}
+                            <button
+                                class="btn btn-lg btn-outline-secondary"
+                                hx-post="{% url 'cards:cardsets-new-async' %}"
+                                hx-target="#card-div"
+                                hx-swap="innerHTML"><i class="fa fa-save"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
     <div class="card-footer bg-info-subtle">
         <small class="text-muted">

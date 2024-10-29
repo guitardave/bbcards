@@ -10,26 +10,26 @@
                         <h1>{{ title }}</h1>
                     </div>
                     <div class="card-body">
-                        <article class="media content-section">
-                              <div class="media-body">
-                                <form method="post">
-                                    {% csrf_token %}
-        {#                            {{ form|crispy }}#}
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            {{ form.username|as_crispy_field }}
-                                        </div>
-                                        <div class="col-sm-4">
-                                            {{ form.password|as_crispy_field }}
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <br>
-                                            <button class="btn btn-lg btn-outline-secondary"><i class="fa fa-sign-in"></i></button>
-                                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+{#                            {{ form|crispy }}#}
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+    {#                                    {{ form.username|as_crispy_field }}#}
+                                        <label for="username"></label>
+                                        <input type="text" id="username" name="username" class="rounded-start-2 form-control form-control-lg" placeholder="username">
+
+    {#                                    {{ form.password|as_crispy_field }}#}
+                                        <label for="password"></label>
+                                        <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="password">
+
+                                        <button class="btn btn-lg btn-outline-secondary"><i class="fa fa-sign-in"></i></button>
                                     </div>
-                                </form>
-                              </div>
-                        </article>
+                                </div>
+                            </div>
+                        </form>
+
                     </div>
                     <div class="card-footer bg-info-subtle">
                         <small class="text-muted">&nbsp;</small>

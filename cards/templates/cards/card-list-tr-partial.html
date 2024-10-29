@@ -19,6 +19,7 @@
                 hx-post="{% url 'cards:card-delete-async' card.slug %}"
                 hx-target="#card-div"
                 hx-swap="innerHTML"
+                hx-confirm="Are you sure you want to proceed? This action cannot be undone"
                 title="Delete card from database"><i class="fa fa-trash"></i></a>
         {% endif %}
 

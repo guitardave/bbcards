@@ -18,7 +18,8 @@
                 href="#del"
                 hx-post="{% url 'cards:cardsets-delete-async' card.card.slug %}"
                 hx-target="#cardset-div"
-                hx-swap=""><i class="fa fa-trash"></i></a>
+                hx-swap=""
+                hx-confirm="Are you sure you want to proceed? This action cannot be undone"><i class="fa fa-trash"></i></a>
         {% else %}
             <span class="" title="Unable to delete (has child records)">
                 <i class="fa fa-trash"></i>

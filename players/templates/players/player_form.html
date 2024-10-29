@@ -12,8 +12,7 @@
     </div>
     <div class="card-body">
         <div id="player-form" class="fade-in">
-            <article class="media content-section">
-              <div class="media-body">
+            <div class="card card-body">
                 <form method="POST">
                     {% csrf_token %}
                     <div class="row">
@@ -45,7 +44,7 @@
                     </div>
                 </form>
               </div>
-        </article>
+            </div>
         </div>
     </div>
     <div class="card-footer bg-info-subtle">
@@ -53,4 +52,3 @@
             <i class="fa fa-refresh"></i> {{ loaded|date:'m/d/Y h:i:s A' }}
         </small>
     </div>
-</div>
