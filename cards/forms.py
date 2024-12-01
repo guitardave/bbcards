@@ -151,4 +151,8 @@ class CardSetForm(forms.ModelForm):
 
 
 class SearchForm(forms.Form):
-    search = forms.CharField(max_length=50, help_text='Search by card set or description')
+    search = forms.CharField(
+        widget=forms.TextInput,
+        max_length=50,
+        help_text='Search by card set or description'
+    )

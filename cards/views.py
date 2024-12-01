@@ -445,8 +445,12 @@ class CardSearch(View):
         )
 
     def post(self, request, *args, **kwargs):
-        search = request.POST['search'] if 'search' in request.POST else self.get(request, *args, **kwargs)
-
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            search = form.cleaned_data['search'] if 'search' in form.cleaned_data else self.get(request, *args, **kwargs)
+        else:
+            search = ''
+            messages.warning(request, f'{form.errors}')
         cards = self.search_query(search)
         request.session['rs'] = CardListData(cards).card_list_dict()
 
@@ -467,33 +471,6 @@ class CardSearch(View):
 
     def get(self, request, *args, **kwargs):
         return redirect(self.redirect_to)
-
-
-# @login_required(login_url='/users/')
-# @error_handling
-# def card_search(request):
-#     cards = []
-#     search = ''
-#     if request.method == 'POST':
-#         search = request.POST['search']
-#         s = CardSearch(qs=search)
-#         cards = s.search_query()
-#         request.session['rs'] = CardListData(cards).card_list_dict()
-#
-#     card_list_ctx = CardListData(cards).card_list_context(request)
-#     card_count, rs, n_pages = card_list_pagination(request, cards)
-#     context = {
-#         'title': f'Search "{search}"',
-#         'form': CardCreateForm,
-#         'search': search,
-#         'card_title': 'Add New Card',
-#         'card_count': card_count,
-#         'rs': rs,
-#         'n_pages': n_pages,
-#         'loaded': card_list_ctx['loaded'],
-#         'rs_dict': card_list_ctx['rs_dict']
-#     }
-#     return render(request, 'cards/card-list-card-partial.html', context)
 
 
 class ExportScriptsExcel:

@@ -45,7 +45,7 @@ h1 { font-size: 24px; }
 
 h2 { font-size: 20px; }
 
-a { text-decoration: none; }
+a { text-decoration: none; color: darkcyan; }
 
 .nav-item .nav-link {
     font-family: OldSport02Athletic, serif;
@@ -66,10 +66,11 @@ a { text-decoration: none; }
 }
 
 .fa {
-    color: #666;
+    /*color: #666;*/
     font-size:14px;
     padding: 2px;
 }
+
 .tiny { font-size: 10px; }
 
 .teeny { font-size: 8px; }
