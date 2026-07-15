@@ -125,6 +125,7 @@ def get_card(request, card_id: int):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def create_card(request):
+    """Create a card record API"""
     serializer = CardSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -136,6 +137,7 @@ def create_card(request):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def search_cards(request):
+    """Search cards API"""
     search = request.GET['q'] if 'q' in request.GET else ''
     s = CardSearch(search)
     cards = s.search_query()
