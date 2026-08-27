@@ -8,9 +8,9 @@
         {% if card.card_image %}
             <a class="me-1"
                 href="{% url 'cards:card-image' card.slug %}"
-                title="View card image"><i class="fa fa-image"></i></a>
+                title="View card image"><i class="fa-solid fa-image"></i></a>
         {% else %}
-            <span class="me-1" title="No image available right now"><i class="fa fa-image"></i></span>
+            <span class="me-1" title="No image available right now"><i class="fa-solid fa-image"></i></span>
         {% endif %}
 
         {% if request.user.is_superuser %}
@@ -20,7 +20,7 @@
                 hx-target="#card-div"
                 hx-swap="innerHTML"
                 hx-confirm="Are you sure you want to proceed? This action cannot be undone"
-                title="Delete card from database"><i class="fa fa-trash"></i></a>
+                title="Delete card from database"><i class="fa-solid fa-trash"></i></a>
         {% endif %}
 
         <a class="m-1"
@@ -28,7 +28,7 @@
             hx-get="{% url 'cards:card-upd-async' card.slug %}"
             hx-target="#form-div"
             hx-swap="innerHTML"
-            title="Update Card info"><i class="fa fa-edit"></i></a>
+            title="Update Card info"><i class="fa-solid fa-edit"></i></a>
 
         <span class="fade-out">
             {% if t_message %}
@@ -36,7 +36,7 @@
             {% endif %}
             {% if new_id and new_id == card.id %}
                 <small class="text-muted">
-                    <i class="fa fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
                 </small>
             {% endif %}
         </span>

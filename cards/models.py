@@ -60,13 +60,17 @@ class CardSearchMgr(models.Manager):
             'card_set_id__sport'
         )
         search_query = SearchQuery(raw_query)
-        return self.annotate(search=search_vector).filter(search=search_query)
+        return self.annotate(
+            search=search_vector).filter(
+            search=search_query).order_by(
+            'card_set_id__year', 'card_set_id__card_set_name', 'card_num'
+        )
         # return self.filter(search_vector=search_query)
 
 
 class CardLast50Mgr(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().all().order_by('-id')[:25]
+        return super().get_queryset().all().order_by('-id')[:50]
 
 
 class CardsAllMgr(models.Manager):

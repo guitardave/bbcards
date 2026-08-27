@@ -45,13 +45,13 @@ def logout_view(request):
 def toggle_view_mode(request, mode: str = None):
     if mode is not None:
         if mode == 'dark':
-            response = HttpResponse('<i class="fa fa-sun-o"></i> Switch to Light')
+            response = HttpResponse('<i class="fa-solid fa-sun-o"></i> Switch to Light')
             response.set_cookie('toggle_mode', 'dark')
         else:
-            response = HttpResponse('<i class="fa fa-moon-o"></i> Switch to Dark')
+            response = HttpResponse('<i class="fa-solid fa-moon-o"></i> Switch to Dark')
             response.set_cookie('toggle_mode', None)
     else:
-        response = HttpResponse('<i class="fa fa-moon-o"></i>')
+        response = HttpResponse('<i class="fa-solid fa-moon-o"></i>')
         response.set_cookie('toggle_mode', None)
     return response
 
@@ -110,10 +110,10 @@ def user_management_update(request, pk: int):
         form = UserForm(instance=user, data=request.POST or None)
         if form.is_valid():
             form.save()
-            message = '<i class="fa fa-check"></i>'
+            message = '<i class="fa-solid fa-check"></i>'
             u_success = True
         else:
-            message = '<i class="fa fa-remove"></i>'
+            message = '<i class="fa-solid fa-remove"></i>'
         context['message'] = message
         context['u_success'] = u_success
         return render(request, 'users/user_management_tr_partial.html', context)
@@ -146,9 +146,9 @@ def user_update_async(request, pk):
         form = UserForm(instance=user, data=request.POST or None)
         if form.is_valid():
             form.save()
-            message = '<i class="fa fa-check"></i> Success'
+            message = '<i class="fa-solid fa-check"></i> Success'
         else:
-            message = '<i class="fa fa-remove"></i> Error'
+            message = '<i class="fa-solid fa-remove"></i> Error'
             print(form.errors)
         return render(request, 'users/user_detail_card_partial.html',
                       {'object': user, 'message': message})
@@ -164,9 +164,9 @@ def password_update(request, pk: int):
         form = SetPasswordForm(user, data=request.POST or None)
         if form.is_valid():
             form.save()
-            message = '<i class="fa fa-check"></i> Password Updated'
+            message = '<i class="fa-solid fa-check"></i> Password Updated'
         else:
-            message = '<i class="fa fa-remove"></i> Update failed'
+            message = '<i class="fa-solid fa-remove"></i> Update failed'
         return render(request, 'users/user_detail_card_partial.html',
                       {'object': user, 'message': message})
     form = SetPasswordForm(user)

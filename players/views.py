@@ -55,9 +55,9 @@ def player_add_async(request):
             form = PlayerForm(request.POST)
             if form.is_valid():
                 form.save()
-                message = f'<i class="fa fa-check"></i> {f_name} {l_name} entered successfully'
+                message = f'<i class="fa-solid fa-check"></i> {f_name} {l_name} entered successfully'
         else:
-            message = f'<i class="fa fa-remove"></i> {f_name} {l_name} already exists'
+            message = f'<i class="fa-solid fa-remove"></i> {f_name} {l_name} already exists'
     players = Player.list_all.all()
     new_id = Player.objects.last().id
     context = {
@@ -77,9 +77,9 @@ def player_update_async(request, pk: int):
         form = PlayerForm(request.POST, instance=player)
         if form.is_valid():
             form.save()
-            t_message = '<i class="fa fa-check"></i>'
+            t_message = '<i class="fa-solid fa-check"></i>'
         else:
-            t_message = '<i class="fa fa-remove"></i> Error'
+            t_message = '<i class="fa-solid fa-remove"></i> Error'
         return render(
             request,
             'players/player_list_tr_partial.html',

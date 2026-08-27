@@ -12,8 +12,8 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#players" id="players" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Players</a>
                     <div class="dropdown-menu" aria-labelledby="Players">
-                        <a class="dropdown-item" href="{% url 'players:players-home' n %}">Players Recently Added</a>
-                        <a class="dropdown-item" href="{% url 'players:players-home' 0 %}">Players (all)</a>
+                        <a class="dropdown-item" href="{% url 'players:players-home' n %}"><i class="fa-solid fa-person"></i> Players Recently Added</a>
+                        <a class="dropdown-item" href="{% url 'players:players-home' 0 %}"><i class="fa-solid fa-people"></i> Players (all)</a>
                     </div>
                 </div>
 
@@ -22,8 +22,8 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#cardsets" id="cardsets" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Card Sets</a>
                     <div class="dropdown-menu" aria-labelledby="cardsets">
-                        <a class="dropdown-item" href="{% url 'cards:cardsets' 50 %}">Card Sets Recently Added</a>
-                        <a class="dropdown-item" href="{% url 'cards:cardsets' %}">Card Sets (all)</a>
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' 50 %}"><i class="fa-solid fa-cards-blank"></i> Card Sets Recently Added</a>
+                        <a class="dropdown-item" href="{% url 'cards:cardsets' %}"><i class="fa-solid fa-list-alt"></i> Card Sets (all)</a>
                     </div>
                 </div>
             </li>
@@ -31,9 +31,9 @@
                 <div class="btn-group">
                     <a class="nav-link dropdown-toggle" href="#card" id="cards" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">All Cards</a>
                     <div class="dropdown-menu" aria-labelledby="cards">
-                        <a class="dropdown-item" href="{% url 'cards:card-list-50' %}">Cards Recently Added</a>
-                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 0 %}">List by Player (all)</a>
-                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}">List by Card Set (all)</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-50' %}"><i class="fa-regular fa-cards-blank"></i> Cards Recently Added</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 0 %}"><i class="fa-regular fa-person"></i> List by Player (all)</a>
+                        <a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}"><i class="fa-regular fa-list-alt"></i> List by Card Set (all)</a>
                     </div>
                 </div>
             </li>
@@ -52,7 +52,7 @@
                                 class="btn {% if request.COOKIES.toggle_mode and request.COOKIES.toggle_mode == 'dark' %}btn-outline-secondary{% else %}btn-outline-light{% endif %} btn-lg "
                                 hx-post="{% url 'cards:search' %}"
                                 hx-target="#card-div"
-                                hx-swap="innerHTML swap:1s"><i class="fa fa-search"></i></button>
+                                hx-swap="innerHTML swap:1s"><i class="fa-solid fa-search"></i></button>
                         </div>
                     </form>
                 </li>
@@ -63,15 +63,15 @@
                     <a class="nav-link dropdown-toggle" href="#manage" id="mgdrp" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{% if not user.is_authenticated %}Manage{% else %}{{ request.user.username }}{% endif %}</a>
                     <div class="dropdown-menu" aria-labelledby="mgdrp">
                       {% if user.is_authenticated %}
-                          <a class="dropdown-item" href="{% url 'users:user-profile' user.id %}"><i class="fa fa-user"></i> Profile</a>
+                          <a class="dropdown-item" href="{% url 'users:user-profile' user.id %}"><i class="fa-solid fa-user"></i> Profile</a>
                           {% if request.user.is_superuser %}
-                              <a class="dropdown-item" href="{% url 'users:user-management' %}"><i class="fa fa-users"></i> User Management</a>
+                              <a class="dropdown-item" href="{% url 'users:user-management' %}"><i class="fa-solid fa-users"></i> User Management</a>
                           {% endif %}
 {#                          <a class="dropdown-item" href="#togglemode" id="toggle-link" hx-post="{% url 'users:toggle_mode' mode %}" hx-target="#toggle-mode" hx-swap="innerHTML"><span id="toggle-mode">{% include '_toggle_mode.html' %}</span></a>#}
                           <a class="dropdown-item toggleMode" href="#togglemode" id="toggle-link">{% include '_toggle_mode.html' %}</a>
-                          <a class="dropdown-item" href="{% url 'users:logout' %}"><i class="fa fa-sign-out"></i> Logout</a>
+                          <a class="dropdown-item" href="{% url 'users:logout' %}"><i class="fa-solid fa-sign-out"></i> Logout</a>
                       {% else %}
-                          <a class="dropdown-item" href="{% url 'users:login' %}"><i class="fa fa-sign-in"></i> Login</a>
+                          <a class="dropdown-item" href="{% url 'users:login' %}"><i class="fa-solid fa-sign-in"></i> Login</a>
                       {% endif %}
                     </div>
                 </div>

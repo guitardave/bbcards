@@ -19,7 +19,9 @@
     {% bootstrap_javascript %}
 
     <!-- FontAwesome -->
-    <link rel="stylesheet" type="text/css" href="{% static 'cards/font-awesome.min.css' %}">
+{#    <link rel="stylesheet" type="text/css" href="{% static 'cards/font-awesome.min.css' %}">#}
+    <link href="{% static 'fontawesome-pro/css/all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'fontawesome-pro/css/v4-shims.min.css' %}" rel="stylesheet">
 
     <!-- JQUERY -->
     <script src="{% static 'jquery/jquery.min.js' %}"></script>
@@ -39,21 +41,6 @@
 	{% else %}
 		<title>BBCards</title>
 	{% endif %}
-
-{#    <style>#}
-{#        #cover {#}
-{#            background: url("/static/images/Loading_2.gif") no-repeat scroll center center #fff;#}
-{#            position: absolute;#}
-{#            height: 100%;#}
-{#            width: 100%;#}
-{#        }#}
-{#    </style>#}
-{##}
-{#    <script>#}
-{#        $(window).on('load', function(){#}
-{#            $('#cover').fadeOut(1000);#}
-{#        })#}
-{#    </script>#}
 </head>
 
 <body>

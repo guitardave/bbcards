@@ -62,11 +62,11 @@ def card_set_create_async(request):
             check = CardSet.objects.filter(card_set_name=set_name, year=set_year, sport=sport)
             if not check.exists():
                 form.save()
-                c_message = f'<i class="fa fa-check"></i> {full_set_name} has been added'
+                c_message = f'<i class="fa-solid fa-check"></i> {full_set_name} has been added'
             else:
-                c_message = f'<i class="fa fa-remove"></i> {full_set_name} already exists'
+                c_message = f'<i class="fa-solid fa-remove"></i> {full_set_name} already exists'
         else:
-            c_message = f'<i class="fa fa-remove">{form.errors}</i>'
+            c_message = f'<i class="fa-solid fa-remove">{form.errors}</i>'
     cards = CardSet.all_sets.all().order_by('-id')[:CardSet.LIMIT]
     c_data = CardListData(cards)
     cards = c_data.card_list_count(True)
@@ -103,9 +103,9 @@ def card_set_update_async(request, slug: str):
         form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
-            t_message = '<i class="fa fa-check"></i>'
+            t_message = '<i class="fa-solid fa-check"></i>'
         else:
-            t_message = '<i class="fa fa-remove"></i> Error'
+            t_message = '<i class="fa-solid fa-remove"></i> Error'
         context = {
             'card':
                 {
@@ -154,14 +154,14 @@ class CardListData:
     def __init__(self, qs: QuerySet):
         self.qs = qs
 
-    def card_list_context(self, request) -> dict[str, str]:
+    def card_list_context(self, request) -> dict:
         d_card_list = self.card_list_dict()
         request.session['rs'] = d_card_list
-        return dict(
-            rs=self.qs,
-            loaded=timezone.now(),
-            rs_dict=request.session['rs'] if 'rs' in request.session else []
-        )
+        return {
+            'rs': self.qs,
+            'loaded': timezone.now(),
+            'rs_dict': request.session['rs'] if 'rs' in request.session else []
+        }
 
     def card_list_dict(self) -> list[dict[str, Any]]:
         return [
@@ -313,9 +313,9 @@ def card_update_async(request, slug: str):
         if form.is_valid():
             form.save()
             success = True
-            t_message = '<i class="fa fa-check"></i>'
+            t_message = '<i class="fa-solid fa-check"></i>'
         else:
-            t_message = '<i class="fa fa-remove"></i> Error'
+            t_message = '<i class="fa-solid fa-remove"></i> Error'
         return render(
             request,
             'cards/card-list-tr-partial.html',

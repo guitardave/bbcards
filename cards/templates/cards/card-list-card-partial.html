@@ -14,16 +14,16 @@
                             hx-post="{% url 'cards:cards-export' %}"
                             hx-target="#export-msg"
                             hx-swap="innerHTML"
-                            title="Export list to Excel file"><i class="fa fa-file-excel-o"></i></a>
+                            title="Export list to Excel file"><i class="fa-solid fa-file-excel-o"></i></a>
 
 {#                        <a class="m-1"#}
 {#                            href="#pdf"#}
 {#                            hx-post="{% if q_search %}{% url 'cards:cards-export-pdf' q_search %}{% else %}{% url 'cards:cards-export-pdf' %}{% endif %}"#}
 {#                            hx-target="#export-msg"#}
 {#                            hx-swap="innerHTML"#}
-{#                            title="Export PDF"><i class="fa fa-file-pdf-o"></i></a>#}
+{#                            title="Export PDF"><i class="fa-solid fa-file-pdf-o"></i></a>#}
                     {% else %}
-                        <span class="text-muted" title="Export unavailable"><i class="fa fa-file-excel-o"></i></span>
+                        <span class="text-muted" title="Export unavailable"><i class="fa-solid fa-file-excel-o"></i></span>
                     {% endif %}
                     <span id="export-msg" class="text-muted m-1">
                         {% include 'cards/card-list-export-msg-partial.html' %}
@@ -43,17 +43,17 @@
     <div class="card-footer text-center bg-info-subtle">
 {#        <small class="text-muted">{{ rs|length }}</small>#}
         <small class="text-muted">
-            <a class="me-2 pag-ref" href="?page=1"><i class="fa fa-chevron-left tiny"></i><i class="fa fa-chevron-left tiny"></i></a>
+            <a class="me-2 pag-ref" href="?page=1"><i class="fa-solid fa-chevron-left tiny"></i><i class="fa-solid fa-chevron-left tiny"></i></a>
             {% if rs.has_previous %}
-                <a class="m-2 pag-ref" href="?page={{ rs.previous_page_number }}"><i class="fa fa-chevron-left"></i></a>
+                <a class="m-2 pag-ref" href="?page={{ rs.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
                 <a class="m-2 pag-ref" href="?page={{ rs.previous_page_number }}">{{rs.previous_page_number}}</a>
             {% endif %}
             <a class="m-2" href="?page={{ rs.number }}"><u>{{ rs.number }}</u></a>
             {%if rs.has_next %}
                 <a class="m-2 pag-ref" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
-                <a class="m-2 pag-ref" href="?page={{ rs.next_page_number }}"><i class="fa fa-chevron-right"></i></a>
+                <a class="m-2 pag-ref" href="?page={{ rs.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
             {% endif %}
-            <a class="ms-2 pag-ref" href="?page={{ n_pages }}"><i class="fa fa-chevron-right tiny"></i><i class="fa fa-chevron-right tiny"></i></a>
+            <a class="ms-2 pag-ref" href="?page={{ n_pages }}"><i class="fa-solid fa-chevron-right tiny"></i><i class="fa-solid fa-chevron-right tiny"></i></a>
         </small>
     </div>
 </div>
