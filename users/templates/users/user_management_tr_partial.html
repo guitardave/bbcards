@@ -1,10 +1,9 @@
-<td>{{ u.username }}</td>
+<td class="fw-bold">{{ u.username }}</td>
 <td>{{ u.first_name }} {{ u.last_name }}</td>
-<td>{{ u.email }}</td>
-<td>{{ u.favorite_player.player_fname }} {{ u.favorite_player.player_lname }}</td>
-<td>{{ u.last_login }}</td>
-<td>
-{#    <a class="m-1" href="#passwd" hx-get="{% url 'users:user-update-password' u.id %}" hx-target="#user-form-card" hx-swap="innerHTML" title="Change password"><i class="fa-solid fa-lock"></i></a>#}
-    <a class="m-1" href="#loaduser" hx-get="{% url 'users:user-management-upd' u.id %}" hx-target="#user-form-card" hx-swap="innerHTML" title="Update profile"><i class="fa-solid fa-edit"></i></a>
-    {% if u_success %}<span class="m-1">{{ message|safe }}</span>{% endif %}
+<td class="text-muted">{{ u.email }}</td>
+<td>{% if u.favorite_player %}<span class="badge bg-primary-subtle text-primary-emphasis border">{{ u.favorite_player.player_fname }} {{ u.favorite_player.player_lname }}</span>{% else %}&mdash;{% endif %}</td>
+<td class="small text-muted">{{ u.last_login|default:"Never" }}</td>
+<td class="text-nowrap">
+    <a class="action-btn" href="#loaduser" hx-get="{% url 'users:user-management-upd' u.id %}" hx-target="#user-form-card" hx-swap="innerHTML" title="Update profile"><i class="fa-solid fa-pen-to-square"></i></a>
+    {% if u_success %}<span class="ms-1 text-success">{{ message|safe }}</span>{% endif %}
 </td>

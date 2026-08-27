@@ -1,31 +1,23 @@
 <div class="card">
     <div class="card-header bg-info-subtle">
-        <div class="row">
-            <div class="col-sm-9">
+        <div class="row align-items-center">
+            <div class="col-sm-8">
                 <h1>{{ title }}</h1>
-                <span class="text-muted fade-out small">{{ c_message }}</span>
+                {% if c_message %}<span class="text-warning fade-out small ms-2">{{ c_message }}</span>{% endif %}
             </div>
-            <div class="col-sm-3 me-auto text-end">
+            <div class="col-sm-4 text-end">
                 {% if user.is_authenticated %}
                     {% if rs|length > 0 %}
-
-                        <a class="m-1"
+                        <a class="btn btn-sm btn-outline-light action-pill"
                             href="#export"
                             hx-post="{% url 'cards:cards-export' %}"
                             hx-target="#export-msg"
                             hx-swap="innerHTML"
-                            title="Export list to Excel file"><i class="fa-solid fa-file-excel-o"></i></a>
-
-{#                        <a class="m-1"#}
-{#                            href="#pdf"#}
-{#                            hx-post="{% if q_search %}{% url 'cards:cards-export-pdf' q_search %}{% else %}{% url 'cards:cards-export-pdf' %}{% endif %}"#}
-{#                            hx-target="#export-msg"#}
-{#                            hx-swap="innerHTML"#}
-{#                            title="Export PDF"><i class="fa-solid fa-file-pdf-o"></i></a>#}
+                            title="Export list to Excel file"><i class="fa-solid fa-file-excel text-success me-1"></i> Export</a>
                     {% else %}
-                        <span class="text-muted" title="Export unavailable"><i class="fa-solid fa-file-excel-o"></i></span>
+                        <span class="text-muted small" title="Export unavailable"><i class="fa-solid fa-file-excel text-muted me-1"></i> Export</span>
                     {% endif %}
-                    <span id="export-msg" class="text-muted m-1">
+                    <span id="export-msg" class="text-muted ms-2">
                         {% include 'cards/card-list-export-msg-partial.html' %}
                     </span>
                 {% endif %}
@@ -35,25 +27,24 @@
     <div class="card-body filter-bar">
         {% include '_search_filter.html' %}
     </div>
-    <div class="card-body scroll">
-        <div id="cards-table" class="fade-in">
+    <div class="card-body scroll p-0">
+        <div id="cards-table" class="fade-in table-responsive">
             {% include 'cards/card-list-table-partial.html' %}
         </div>
     </div>
     <div class="card-footer text-center bg-info-subtle">
-{#        <small class="text-muted">{{ rs|length }}</small>#}
-        <small class="text-muted">
-            <a class="me-2 pag-ref" href="?page=1"><i class="fa-solid fa-chevron-left tiny"></i><i class="fa-solid fa-chevron-left tiny"></i></a>
+        <div class="d-flex align-items-center justify-content-center gap-2 pagination-bar">
+            <a class="action-btn" href="?page=1" title="First Page"><i class="fa-solid fa-angles-left tiny"></i></a>
             {% if rs.has_previous %}
-                <a class="m-2 pag-ref" href="?page={{ rs.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
-                <a class="m-2 pag-ref" href="?page={{ rs.previous_page_number }}">{{rs.previous_page_number}}</a>
+                <a class="action-btn" href="?page={{ rs.previous_page_number }}" title="Previous Page"><i class="fa-solid fa-angle-left"></i></a>
+                <a class="badge bg-secondary text-decoration-none px-2 py-1" href="?page={{ rs.previous_page_number }}">{{ rs.previous_page_number }}</a>
             {% endif %}
-            <a class="m-2" href="?page={{ rs.number }}"><u>{{ rs.number }}</u></a>
-            {%if rs.has_next %}
-                <a class="m-2 pag-ref" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
-                <a class="m-2 pag-ref" href="?page={{ rs.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
+            <span class="badge bg-warning text-dark px-3 py-1 font-athletic fs-6">{{ rs.number }}</span>
+            {% if rs.has_next %}
+                <a class="badge bg-secondary text-decoration-none px-2 py-1" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
+                <a class="action-btn" href="?page={{ rs.next_page_number }}" title="Next Page"><i class="fa-solid fa-angle-right"></i></a>
             {% endif %}
-            <a class="ms-2 pag-ref" href="?page={{ n_pages }}"><i class="fa-solid fa-chevron-right tiny"></i><i class="fa-solid fa-chevron-right tiny"></i></a>
-        </small>
+            <a class="action-btn" href="?page={{ n_pages }}" title="Last Page"><i class="fa-solid fa-angles-right tiny"></i></a>
+        </div>
     </div>
 </div>

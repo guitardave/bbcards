@@ -1,12 +1,25 @@
-<td class="col-sm-1 me-auto text-end">{{ card.card.year }}</td>
-<td class="col-sm-6"><a href="{% url 'cards:card-list-set' card.card.slug %}">{{ card.card.card_set_name }}</a></td>
-<td class="col-sm-2">{{ card.card.sport }}</td>
-<td class="col-sm-1">{{ card.count }}</td>
+<td class="col-sm-1 text-end font-athletic fs-6">{{ card.card.year }}</td>
+<td class="col-sm-6">
+    <a class="fw-bold text-decoration-none" href="{% url 'cards:card-list-set' card.card.slug %}">
+        <i class="fa-solid fa-folder-open text-muted me-1 tiny"></i>{{ card.card.card_set_name }}
+    </a>
+</td>
 <td class="col-sm-2">
-    <a class="" href="{% url 'cards:card-list-set' card.card.slug %}" title="View Cards List"><i class="fa-solid fa-list-alt"></i></a>
+    {% if card.card.sport == 'Baseball' %}
+        <span class="sport-badge sport-badge-baseball"><i class="fa-solid fa-baseball"></i> Baseball</span>
+    {% elif card.card.sport == 'Football' %}
+        <span class="sport-badge sport-badge-football"><i class="fa-solid fa-football"></i> Football</span>
+    {% elif card.card.sport == 'Basketball' %}
+        <span class="sport-badge sport-badge-basketball"><i class="fa-solid fa-basketball"></i> Basketball</span>
+    {% elif card.card.sport %}
+        <span class="sport-badge sport-badge-baseball">{{ card.card.sport }}</span>
+    {% endif %}
+</td>
+<td class="col-sm-1"><span class="badge bg-secondary px-2 py-1">{{ card.count }}</span></td>
+<td class="col-sm-2 text-nowrap">
+    <a class="action-btn text-primary" href="{% url 'cards:card-list-set' card.card.slug %}" title="View Cards List"><i class="fa-solid fa-list-ul"></i></a>
     {% if user.is_authenticated %}
-
-        <a class=""
+        <a class="action-btn add-btn"
             href="#add"
             hx-get="{% url 'cards:card-new-form-async' 'set' card.card.slug %}"
             hx-target="#form-div"
@@ -14,33 +27,34 @@
             title="Add card to {{ card.card.year }} {{ card.card.card_set_name }}"><i class="fa-solid fa-plus"></i></a>
 
         {% if card.count == 0 and request.user.is_superuser %}
-            <a class=""
+            <a class="action-btn delete-btn"
                 href="#del"
                 hx-post="{% url 'cards:cardsets-delete-async' card.card.slug %}"
                 hx-target="#cardset-div"
                 hx-swap=""
-                hx-confirm="Are you sure you want to proceed? This action cannot be undone"><i class="fa-solid fa-trash"></i></a>
+                hx-confirm="Are you sure you want to proceed? This action cannot be undone"
+                title="Delete set"><i class="fa-solid fa-trash-can"></i></a>
         {% else %}
-            <span class="" title="Unable to delete (has child records)">
-                <i class="fa-solid fa-trash"></i>
+            <span class="action-btn opacity-25" title="Unable to delete (contains cards)">
+                <i class="fa-solid fa-trash-can"></i>
             </span>
         {% endif %}
 
-        <a class=""
+        <a class="action-btn"
             href="#update"
             hx-get="{% url 'cards:cardsets-upd-async' card.card.slug %}"
             hx-target="#form-div"
             hx-swap="innerHTML"
-            title="Update"><i class="fa-solid fa-edit"></i></a>
+            title="Edit Set"><i class="fa-solid fa-pen-to-square"></i></a>
 
         <span class="fade-out ms-1">
             {% if t_message %}
-                <small class="text-muted">{{t_message|safe}}</small>
+                <small class="text-success fw-bold">{{t_message|safe}}</small>
             {% endif %}
             {% if new_id and new_id == card.card.id %}
-                <small class="text-muted">
+                <span class="star-badge" title="Recently updated">
                     <i class="fa-solid fa-star"></i>
-                </small>
+                </span>
             {% endif %}
         </span>
     {% endif %}

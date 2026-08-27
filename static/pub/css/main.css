@@ -1,64 +1,29 @@
-@import url("/static/cards/font-awesome.min.css");
-
-body {
-  /*background-color: #333333;*/
-  /*color: #eee*/
-}
-
-/*h1 {*/
-/*  font-size: 24px;*/
-/*  font-weight: bold;*/
-/*}*/
-
-/*h2 {*/
-/*  font-size: 20px;*/
-/*  font-weight: bold;*/
-/*}*/
-
-/*table td {font-size: 13px;}*/
-
-.small-header {
-  font-size: 12px;
-}
+/* Modern Sports Presentation Styles */
 
 .content-section {
-  /*background-color: #2f2f2f;*/
-  padding: 10px 20px;
-  border: 1px solid #888888;
-  border-radius: 3px;
+  background-color: var(--card-bg);
+  padding: 1.25rem;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
   margin-bottom: 20px;
-  /*color: #e1e1e1;*/
-}
-
-.article-title {
-  /*color: #e1e1e1;*/
-}
-
-a.article-title:hover {
-  color: #428bca;
-  text-decoration: none;
 }
 
 .article-content {
   white-space: pre-line;
-  font-size:13px;
+  font-size: 14px;
 }
 
 .article-img {
   height: 65px;
   width: 65px;
   margin-right: 16px;
+  border-radius: 8px;
 }
 
 .article-metadata {
-  padding-bottom: 1px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #888
-}
-
-.article-metadata a:hover {
-  color: #333;
-  text-decoration: none;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--card-border);
 }
 
 .article-svg {
@@ -66,21 +31,3 @@ a.article-title:hover {
   height: 25px;
   vertical-align: middle;
 }
-
-
-/*th, td {color: #e1e1e1;}*/
-
-.list-group {
-  background-color: #2b2b2b;
-}
-
-.scroll {
-  max-height: 640px;
-  overflow-y: scroll;
-}
-
-@media only screen and (max-width: 900px) {
-        .one{
-            display: none;
-        }
-    }

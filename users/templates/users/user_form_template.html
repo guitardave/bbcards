@@ -1,31 +1,26 @@
 {% load crispy_forms_tags %}
-<article class="media content-section">
-    <div class="media-body">
-        <form method="POST">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-12">
-                    {{ form|crispy }}
-                </div>
+<div class="user-form-wrapper">
+    <form method="POST" autocomplete="off">
+        {% csrf_token %}
+        <div class="row g-2">
+            <div class="col-sm-12">
+                {{ form|crispy }}
             </div>
-            <div class="row">
-                <div class="col-sm-12">&nbsp;</div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 me-auto text-end">
-                    {% if update_pw %}
-                        <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-update-password' update_pw %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa-solid fa-save"></i></button>
+        </div>
+        <div class="row mt-3">
+            <div class="col-sm-12 text-end">
+                {% if update_pw %}
+                    <button class="btn btn-sport-save" hx-post="{% url 'users:user-update-password' update_pw %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa-solid fa-key me-1"></i> Update Password</button>
+                {% else %}
+                    {% if upd %}
+                        <button class="btn btn-sport-save" hx-post="{% url 'users:user-management-upd' upd %}" hx-target="#tr-u{{ upd }}" hx-swap="innerHTML"><i class="fa-solid fa-floppy-disk me-1"></i> Save Member</button>
+                    {% elif my_id %}
+                        <button class="btn btn-sport-save" hx-post="{% url 'users:user-update-async' my_id %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa-solid fa-floppy-disk me-1"></i> Save Profile</button>
                     {% else %}
-                        {% if upd %}
-                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-upd' upd %}" hx-target="#tr-u{{ upd }}" hx-swap="innerHTML"><i class="fa-solid fa-save"></i></button>
-                        {% elif my_id %}
-                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-update-async' my_id %}" hx-target="#card-div" hx-swap="innerHTML"><i class="fa-solid fa-save"></i></button>
-                        {% else %}
-                            <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'users:user-management-new' %}" hx-target="#user-list-div" hx-swap="innerHTML"><i class="fa-solid fa-save"></i></button>
-                        {% endif %}
+                        <button class="btn btn-sport-save" hx-post="{% url 'users:user-management-new' %}" hx-target="#user-list-div" hx-swap="innerHTML"><i class="fa-solid fa-user-plus me-1"></i> Add Member</button>
                     {% endif %}
-                </div>
+                {% endif %}
             </div>
-        </form>
-    </div>
-</article>
+        </div>
+    </form>
+</div>

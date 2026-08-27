@@ -2,42 +2,36 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8">
-                <div class="card">
-                    <div class="card-header bg-info-subtle">
-                        <h1>{{ title }}</h1>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-info-subtle text-center py-3">
+                        <div class="mb-1"><i class="fa-solid fa-baseball text-warning fa-2x"></i></div>
+                        <h1>Clubhouse Access</h1>
+                        <small class="text-white-50">Sign in to manage your collection</small>
                     </div>
-                    <div class="card-body">
-                        <form method="post">
+                    <div class="card-body p-4">
+                        <form method="post" autocomplete="off">
                             {% csrf_token %}
-{#                            {{ form|crispy }}#}
-                            <div class="row">
-                                <div class="col-sm-8">
-                                    <div class="input-group">
-    {#                                    {{ form.username|as_crispy_field }}#}
-                                        <label for="username"></label>
-                                        <input type="text" id="username" name="username" class="rounded-start-2 form-control form-control-lg" placeholder="username">
-
-    {#                                    {{ form.password|as_crispy_field }}#}
-                                        <label for="password"></label>
-                                        <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="password">
-
-                                        <button class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-sign-in"></i></button>
-                                    </div>
-                                </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-bold small text-uppercase"><i class="fa-solid fa-user me-1 text-muted"></i> Username</label>
+                                <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Enter username" required>
                             </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label fw-bold small text-uppercase"><i class="fa-solid fa-lock me-1 text-muted"></i> Password</label>
+                                <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Enter password" required>
+                            </div>
+                            <button class="btn btn-sport-save w-100 justify-content-center py-2" type="submit">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i> Enter Vault
+                            </button>
                         </form>
-
                     </div>
-                    <div class="card-footer bg-info-subtle">
-                        <small class="text-muted">&nbsp;</small>
+                    <div class="card-footer bg-info-subtle text-center py-2">
+                        <small class="text-muted"><i class="fa-solid fa-shield-halved me-1"></i> Secure Card Collector Portal</small>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">&nbsp;</div>
         </div>
     </div>
-
 {% endblock content %}

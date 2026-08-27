@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-header bg-info-subtle">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-sm-8">
-                <h1>{{ title }}</h1>
+                <h1><i class="fa-solid fa-layer-group text-warning me-2"></i>{{ title }}</h1>
             </div>
-            <div class="col-sm-4 me-auto text-end">
+            <div class="col-sm-4 text-end">
                 <div id="cardset-message">
-                    <small class="text-muted fade-out">
+                    <small class="text-warning fade-out">
                         {{ c_message|safe }}
                     </small>
                 </div>
@@ -16,26 +16,24 @@
     <div class="card-body filter-bar">
         {% include '_search_filter.html' %}
     </div>
-    <div class="card-body scroll">
-        <div id="cardset-div" class="fade-in">
+    <div class="card-body scroll p-0">
+        <div id="cardset-div" class="fade-in table-responsive">
             {% include 'cards/cardset-list-table-partial.html' %}
         </div>
     </div>
     <div class="card-footer text-center bg-info-subtle">
-        <small class="text-muted">
-            <small class="text-muted">
-                <a class="me-2" href="?page=1"><i class="fa-solid fa-chevron-left tiny"></i><i class="fa-solid fa-chevron-left tiny"></i></a>
-                {% if rs.has_previous %}
-                    <a class="m-2" href="?page={{ rs.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
-                    <a class="m-2" href="?page={{ rs.previous_page_number }}">{{rs.previous_page_number}}</a>
-                {% endif %}
-                <a class="m-2" href="?page={{ rs.number }}"><u>{{ rs.number }}</u></a>
-                {%if rs.has_next %}
-                    <a class="m-2" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
-                    <a class="m-2" href="?page={{ rs.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
-                {% endif %}
-                <a class="ms-2" href="?page={{ n_pages }}"><i class="fa-solid fa-chevron-right tiny"></i><i class="fa-solid fa-chevron-right tiny"></i></a>
-            </small>
-        </small>
+        <div class="d-flex align-items-center justify-content-center gap-2 pagination-bar">
+            <a class="action-btn" href="?page=1" title="First Page"><i class="fa-solid fa-angles-left tiny"></i></a>
+            {% if rs.has_previous %}
+                <a class="action-btn" href="?page={{ rs.previous_page_number }}" title="Previous Page"><i class="fa-solid fa-angle-left"></i></a>
+                <a class="badge bg-secondary text-decoration-none px-2 py-1" href="?page={{ rs.previous_page_number }}">{{ rs.previous_page_number }}</a>
+            {% endif %}
+            <span class="badge bg-warning text-dark px-3 py-1 font-athletic fs-6">{{ rs.number }}</span>
+            {% if rs.has_next %}
+                <a class="badge bg-secondary text-decoration-none px-2 py-1" href="?page={{ rs.next_page_number }}">{{ rs.next_page_number }}</a>
+                <a class="action-btn" href="?page={{ rs.next_page_number }}" title="Next Page"><i class="fa-solid fa-angle-right"></i></a>
+            {% endif %}
+            <a class="action-btn" href="?page={{ n_pages }}" title="Last Page"><i class="fa-solid fa-angles-right tiny"></i></a>
+        </div>
     </div>
 </div>

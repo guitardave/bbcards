@@ -1,43 +1,58 @@
-<td class="one col-sm-2"><a href="{% url 'cards:card-list-player' card.player_id.slug %}">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</a></td>
-<td class="me-auto text-end col-sm-1">{{ card.card_set_id.year }}</td>
-<td class="col-sm-3"><a href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }} {{ card.card_set_id.sport }}</a></td>
-<td class="one col-sm-3">{% if card.card_subset %}{{ card.card_subset }}{% endif %}</td>
-<td class="col-sm-1 me-auto text-end">{{ card.card_num }}</td>
+<td class="col-sm-2">
+    <a class="fw-bold text-decoration-none" href="{% url 'cards:card-list-player' card.player_id.slug %}">
+        <i class="fa-solid fa-user-tag text-muted me-1 tiny"></i>{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}
+    </a>
+</td>
+<td class="text-end col-sm-1 font-athletic fs-6">{{ card.card_set_id.year }}</td>
+<td class="col-sm-3">
+    <a class="text-decoration-none" href="{% url 'cards:card-list-set' card.card_set_id.slug %}">{{ card.card_set_id.card_set_name }}</a>
+    {% if card.card_set_id.sport == 'Baseball' %}
+        <span class="sport-badge sport-badge-baseball ms-1"><i class="fa-solid fa-baseball"></i> BB</span>
+    {% elif card.card_set_id.sport == 'Football' %}
+        <span class="sport-badge sport-badge-football ms-1"><i class="fa-solid fa-football"></i> FB</span>
+    {% elif card.card_set_id.sport == 'Basketball' %}
+        <span class="sport-badge sport-badge-basketball ms-1"><i class="fa-solid fa-basketball"></i> BK</span>
+    {% elif card.card_set_id.sport %}
+        <span class="sport-badge sport-badge-baseball ms-1">{{ card.card_set_id.sport }}</span>
+    {% endif %}
+</td>
+<td class="d-none d-md-table-cell col-sm-3 text-muted">{% if card.card_subset %}<span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ card.card_subset }}</span>{% else %}&mdash;{% endif %}</td>
+<td class="col-sm-1 text-end font-athletic fs-6 text-primary">#{{ card.card_num }}</td>
 {% if user.is_authenticated %}
-    <td class="col-sm-2">
+    <td class="col-sm-2 text-nowrap">
         {% if card.card_image %}
-            <a class="me-1"
+            <a class="action-btn text-primary"
                 href="{% url 'cards:card-image' card.slug %}"
-                title="View card image"><i class="fa-solid fa-image"></i></a>
+                title="View Card Image"><i class="fa-solid fa-image"></i></a>
         {% else %}
-            <span class="me-1" title="No image available right now"><i class="fa-solid fa-image"></i></span>
+            <span class="action-btn opacity-25" title="No image available"><i class="fa-solid fa-image"></i></span>
         {% endif %}
 
         {% if request.user.is_superuser %}
-            <a class="m-1"
+            <a class="action-btn delete-btn"
                 href="#delete"
                 hx-post="{% url 'cards:card-delete-async' card.slug %}"
                 hx-target="#card-div"
                 hx-swap="innerHTML"
                 hx-confirm="Are you sure you want to proceed? This action cannot be undone"
-                title="Delete card from database"><i class="fa-solid fa-trash"></i></a>
+                title="Delete card"><i class="fa-solid fa-trash-can"></i></a>
         {% endif %}
 
-        <a class="m-1"
+        <a class="action-btn"
             href="#update"
             hx-get="{% url 'cards:card-upd-async' card.slug %}"
             hx-target="#form-div"
             hx-swap="innerHTML"
-            title="Update Card info"><i class="fa-solid fa-edit"></i></a>
+            title="Edit Card"><i class="fa-solid fa-pen-to-square"></i></a>
 
-        <span class="fade-out">
+        <span class="fade-out ms-1">
             {% if t_message %}
-                <small class="text-muted">{{t_message|safe}}</small>
+                <small class="text-success fw-bold">{{t_message|safe}}</small>
             {% endif %}
             {% if new_id and new_id == card.id %}
-                <small class="text-muted">
+                <span class="star-badge" title="Recently updated">
                     <i class="fa-solid fa-star"></i>
-                </small>
+                </span>
             {% endif %}
         </span>
     </td>

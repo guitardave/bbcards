@@ -9,41 +9,41 @@
 {% endblock breadcrumbs %}
 {% block content %}
 	<div class="container">
-        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <div class="row">
+        <div class="mb-3"><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="row mb-3">
             <div class="col-sm-12">
-                <a id="go-back" href="#back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></a>
+                <a id="go-back" class="btn btn-sport-save btn-sm" href="#back" onclick="history.back()"><i class="fa-solid fa-arrow-left me-1"></i> Back to Collection</a>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                &nbsp;
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="graded-slab">
+                    <div class="graded-slab-header">
+                        <div class="slab-auth"><i class="fa-solid fa-certificate text-warning me-1"></i> BBCards Authentic Vault Slab</div>
+                        <div class="slab-title">{{ object.player_id.player_fname }} {{ object.player_id.player_lname }}</div>
+                        <div class="slab-sub text-white-50">{{ card_string }}</div>
                     </div>
-                    <div class="card-body">
-                        <div class="card-subtitle">
-                            {{ card_string }}
-                        </div>
-                    </div>
-                    <div class="card-body">
+                    <div class="graded-slab-image-wrap">
                         {% if object.card_image %}
-                            <img class="card-img img-responsive" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">
+                            <img class="img-fluid rounded" src="{{ object.card_image.url | default_if_none:'default.png' }}" alt="{{ object.card_num }}">
+                        {% else %}
+                            <div class="py-5 text-muted">
+                                <i class="fa-solid fa-image fa-3x mb-2 opacity-50"></i>
+                                <p>No card image on file</p>
+                            </div>
                         {% endif %}
                     </div>
-                    <div class="card-footer">
-                        <small class="text-muted">
-                            {{ object.card_image }}
-                        </small>
+                    <div class="d-flex justify-content-between align-items-center mt-3 px-2">
+                        <span class="badge bg-warning text-dark font-athletic fs-6">Card #{{ object.card_num }}</span>
+                        {% if object.condition %}
+                            <span class="badge bg-success-subtle text-success-emphasis border px-2 py-1"><i class="fa-solid fa-shield-halved me-1"></i> {{ object.condition }}</span>
+                        {% endif %}
+                        {% if object.graded %}
+                            <span class="badge bg-info-subtle text-info-emphasis border px-2 py-1"><i class="fa-solid fa-award me-1"></i> Graded</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">&nbsp;</div>
         </div>
     </div>
 {% endblock %}

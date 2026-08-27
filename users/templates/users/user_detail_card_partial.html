@@ -1,23 +1,36 @@
 <div class="card">
     <div class="card-header bg-info-subtle">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-sm-8">
-                <h1>{{ object.first_name }} {{ object.last_name }}</h1>
+                <h1><i class="fa-solid fa-id-card text-warning me-2"></i>{{ object.first_name }} {{ object.last_name }}</h1>
             </div>
-            <div class="col-sm-2 me-auto text-end"><small class="text-muted">{{ message|safe }}</small></div>
-            <div class="col-sm-2 me-auto text-end">
-                <a class="m-1" href="#passwd" hx-get="{% url 'users:user-update-password' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Set password"><i class="fa-solid fa-lock"></i></a>
-                <a class="m-1" href="#update" hx-get="{% url 'users:user-update-async' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Update profile"><i class="fa-solid fa-edit"></i></a>
+            <div class="col-sm-4 text-end">
+                <span class="text-success small fw-bold me-2">{{ message|safe }}</span>
+                <a class="action-btn" href="#passwd" hx-get="{% url 'users:user-update-password' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Set password"><i class="fa-solid fa-key"></i></a>
+                <a class="action-btn" href="#update" hx-get="{% url 'users:user-update-async' object.id %}" hx-target="#user-update-div" hx-swap="innerHTML" title="Update profile"><i class="fa-solid fa-user-pen"></i></a>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <b>Username: </b>{{ object.username }}<br>
-        <b>Favorite Player:</b> {{ object.favorite_player }}
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <div class="p-3 bg-body-tertiary rounded-3 border">
+                    <div class="text-muted small text-uppercase fw-bold"><i class="fa-solid fa-user text-primary me-1"></i> Username</div>
+                    <div class="fs-5 fw-bold">{{ object.username }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="p-3 bg-body-tertiary rounded-3 border">
+                    <div class="text-muted small text-uppercase fw-bold"><i class="fa-solid fa-star text-warning me-1"></i> Favorite Player</div>
+                    <div class="fs-5 fw-bold text-primary">{{ object.favorite_player|default:"Not specified" }}</div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card-footer bg-info-subtle">
-        <small class="text-muted">
-            <b>Last login: </b>{{ object.last_login }}
+        <small class="text-muted d-flex align-items-center justify-content-between">
+            <span><i class="fa-solid fa-clock-rotate-left me-1"></i> Last Login:</span>
+            <span>{{ object.last_login|default:"Never" }}</span>
         </small>
     </div>
 </div>

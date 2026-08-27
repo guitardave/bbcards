@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <h1>The requested page is not available</h1>
+    <div class="card my-5 shadow text-center py-5">
+        <div class="card-body">
+            <div class="mb-3 text-warning">
+                <i class="fa-solid fa-baseball-bat-ball fa-4x"></i>
+            </div>
+            <h1 class="display-5 fw-bold mb-3">Strike Three! Out of Bounds</h1>
+            <p class="text-muted fs-5 mb-4">The card or page you are looking for is not in the deck.</p>
+            <a href="{% url 'cards:card-list-50' %}" class="btn btn-sport-save">
+                <i class="fa-solid fa-home me-2"></i> Return to Clubhouse
+            </a>
+        </div>
+    </div>
 {% endblock %}

@@ -12,14 +12,18 @@
 	<!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" >
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 
     <!-- FontAwesome -->
-{#    <link rel="stylesheet" type="text/css" href="{% static 'cards/font-awesome.min.css' %}">#}
     <link href="{% static 'fontawesome-pro/css/all.min.css' %}" rel="stylesheet">
     <link href="{% static 'fontawesome-pro/css/v4-shims.min.css' %}" rel="stylesheet">
 
@@ -39,16 +43,14 @@
     {% if title %}
 		<title>BBCards: {{ title }}</title>
 	{% else %}
-		<title>BBCards</title>
+		<title>BBCards | Baseball & Sports Card Vault</title>
 	{% endif %}
 </head>
 
 <body>
 
 	{% include 'header.html' %}
-	<main role="main" class="container">
-{#        <div id="cover"></div>#}
-        <p>&nbsp;</p>
+	<main role="main" class="container py-4">
         {% block breadcrumbs %}
             {% clear_breadcrumbs %}
             {% breadcrumb "Home" "/" %}
@@ -56,11 +58,12 @@
 
       <div class="row">
         <div class="col-md-12">
-            <p class="p_short">&nbsp;</p>
-            <p class="p_short">&nbsp;</p>
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissable">{{ message }}</div>
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm mb-4" role="alert">
+                        <i class="fa-solid fa-circle-info me-2"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 {% endfor %}
             {% endif %}
 
@@ -70,12 +73,18 @@
         </div>
       </div>
     </main>
-    <div class="container">
-        <hr>
+    <div class="container my-4">
         <footer class="site-footer">
-            <p>
-                <small class="text-muted">BBCARDS, JOJODAVE &copy; DC 2021-{{ copyright_year }}</small>
-            </p>
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between pt-3 border-top">
+                <div class="footer-badge mb-2 mb-md-0">
+                    <i class="fa-solid fa-baseball text-danger"></i>
+                    <strong>BBCARDS</strong>
+                    <span class="text-muted">| Vintage & Modern Collector Vault</span>
+                </div>
+                <div>
+                    <small class="text-muted">JOJODAVE &copy; DC 2021-{{ copyright_year }} &bull; All Rights Reserved</small>
+                </div>
+            </div>
         </footer>
     </div>
     <script>
@@ -83,48 +92,24 @@
         $('#toggle-link').on('click', function () {
             let html_tag = $('html');
             let mode = html_tag.attr('data-bs-theme');
-            let this_mode = mode ? null : 'dark';
-            html_tag.attr('data-bs-theme', this_mode);
+            let this_mode = (mode === 'dark') ? null : 'dark';
+            if (this_mode) {
+                html_tag.attr('data-bs-theme', this_mode);
+            } else {
+                html_tag.removeAttr('data-bs-theme');
+            }
             $.ajax({
-                url: '/users/toggle_mode/'+this_mode+'/',
+                url: '/users/toggle_mode/'+(this_mode ? this_mode : 'light')+'/',
                 type: 'GET',
                 success: function(res) {
                     $('#toggle-link').html(res);
                 }
             });
-            
-            console.log(this_mode);
-            
-            if (this_mode === 'dark') {
-                $('#my-navbar')
-                    .addClass('bg-info-subtle')
-                    .removeClass('text-secondary')
-                    .addClass('text-light')
-                    .removeClass('bg-info');
-                $('#search-btn')
-                    .addClass('btn-info-subtle')
-                    .addClass('btn-outline-secondary')
-                    .removeClass('btn-outline-light')
-                    .removeClass('btn-info');
-            }
-            else {
-                $('#my-navbar')
-                    .addClass('text-secondary')
-                    .removeClass('text-light')
-                    .addClass('bg-info')
-                    .removeClass('bg-info-subtle');
-                $('#search-btn')
-                    .addClass('btn-info')
-                    .addClass('btn-outline-light')
-                    .removeClass('btn-outline-secondary')
-                    .removeClass('btn-info-subtle');
-            }
         });
         
         $(".new-row").on('load', function() {
             $(this).fadeIn(500);
         });
-        
     </script>
 </body>
 </html>

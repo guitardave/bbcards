@@ -1,16 +1,17 @@
-<div class="row">
-    <div class="col-sm-8">
-        <br>
-        <div id="n-results" class="align-middle">
-            <span class="row-count">
-                {{ rs|length }} of {{ rs|length }} rows
+<div class="row align-items-center g-2">
+    <div class="col-sm-7 col-md-8">
+        <div id="n-results" class="d-flex align-items-center">
+            <span class="scoreboard-badge">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span class="row-count">{{ rs|length }} of {{ rs|length }} Records</span>
             </span>
         </div>
     </div>
-    <div class="col-sm-4 me-auto text-end">
-        <label for="my-input"></label>
-        <input type="text" id="my-input" class="form-control form-control-lg" placeholder="Filter results...">
-        <span class="m-1" id="filterResults"></span>
+    <div class="col-sm-5 col-md-4 text-sm-end">
+        <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-filter"></i></span>
+            <input type="text" id="my-input" class="form-control border-start-0 ps-0" placeholder="Filter current list...">
+        </div>
     </div>
 </div>
 <script>
@@ -20,9 +21,9 @@
             $("#my-table tr").filter(function () {
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
             });
-            let v = $('tr:visible').length-1;
-            let ttl = $('tr').length-1
-            $('#n-results').html('<span class="row-count">' + v.toString() + ' of ' + ttl + ' rows</span>')
+            let v = $('#my-table tr:visible').length;
+            let ttl = $('#my-table tr').length;
+            $('#n-results').html('<span class="scoreboard-badge"><i class="fa-solid fa-baseball-bat-ball"></i><span class="row-count">' + v.toString() + ' of ' + ttl + ' Records</span></span>');
         });
     });
 </script>

@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-header bg-info-subtle">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-sm-8">
-                <h1>{{ title }}</h1>
+                <h1><i class="fa-solid fa-baseball text-warning me-2"></i>{{ title }}</h1>
             </div>
-            <div class="col-sm-4 me-auto text-end">
+            <div class="col-sm-4 text-end">
                 <div id="message-div">
-                    <small class="text-muted fade-out">
+                    <small class="text-warning fade-out">
                         {{ message|safe }}
                     </small>
                 </div>
@@ -16,14 +16,14 @@
     <div class="card-body filter-bar">
         {% include '_search_filter.html' %}
     </div>
-    <div class="card-body scroll">
-        <div id="player-div">
+    <div class="card-body scroll p-0">
+        <div id="player-div" class="table-responsive">
             <table class="table table-hover" id="filter-table">
                 <thead>
                     <tr>
                         <th>First Name</th>
                         <th>Last Name</th>
-                        <th>Count</th>
+                        <th>Cards Count</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -37,7 +37,7 @@
             </table>
         </div>
     </div>
-    <div class="card-footer bg-info-subtle">
-        <small class="text-muted">{{ rs|length }}</small>
+    <div class="card-footer bg-info-subtle text-center">
+        <span class="badge bg-secondary-subtle text-secondary-emphasis border px-3 py-1 font-athletic fs-6">Total Roster: {{ rs|length }} Players</span>
     </div>
 </div>

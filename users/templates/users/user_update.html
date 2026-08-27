@@ -12,20 +12,18 @@
 {% endblock breadcrumbs %}
 {% block content %}
 	<div class="container">
-        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <div class="row">
-            <div class="col-sm-8">
+        <div class="mb-3"><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="row g-4">
+            <div class="col-lg-8">
                 <div id="card-div">
                     {% include 'users/user_detail_card_partial.html' %}
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-lg-4">
                 <div id="user-update-div">
                     {% include 'users/user_management_form_partial.html' %}
                 </div>
             </div>
-            <div class="col-sm-4">&nbsp;</div>
         </div>
     </div>
-
 {% endblock content %}

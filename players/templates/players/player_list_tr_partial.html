@@ -1,37 +1,42 @@
-<td class="col-sm-4">{{ p.player.player_fname }}</td>
-<td class="col-sm-5">{{ p.player.player_lname }}</td>
-<td class="col-sm-1">{{ p.count }}</td>
-<td class="col-sm-2">
-    <a class="" href="{% url 'cards:card-list-player' p.player.slug %}"><i class="fa-solid fa-list-alt"></i></a>
+<td class="col-sm-4 font-bold">{{ p.player.player_fname }}</td>
+<td class="col-sm-5">
+    <a class="fw-bold text-decoration-none" href="{% url 'cards:card-list-player' p.player.slug %}">
+        {{ p.player.player_lname }}
+    </a>
+</td>
+<td class="col-sm-1"><span class="badge bg-secondary px-2 py-1">{{ p.count }}</span></td>
+<td class="col-sm-2 text-nowrap">
+    <a class="action-btn text-primary" href="{% url 'cards:card-list-player' p.player.slug %}" title="View Player's Cards"><i class="fa-solid fa-list-ul"></i></a>
     {% if user.is_authenticated %}
-        <a class=""
+        <a class="action-btn add-btn"
             href="#add"
             hx-get="{% url 'cards:card-new-form-async' 'player' p.player.slug %}"
             hx-target="#form-div"
-            hx-swap="innerHMTL"
+            hx-swap="innerHTML"
             title="Add card for {{ p.player.player_fname }} {{ p.player.player_lname }}"><i class="fa-solid fa-plus"></i></a>
         {% if user.is_superuser %}
             {% if p.count == 0 %}
-                <a class=""
+                <a class="action-btn delete-btn"
                     href="#delete"
                     hx-post="{% url 'players:players-delete-async' p.player.id %}"
                     hx-target="#card-div"
                     hx-swap="innerHTML"
-                    hx-confirm="Are you sure you want to proceed? This action cannot be undone"><i class="fa-solid fa-trash"></i></a>
+                    hx-confirm="Are you sure you want to proceed? This action cannot be undone"
+                    title="Delete Player"><i class="fa-solid fa-trash-can"></i></a>
             {% else %}
-                <span class="text-muted" title="Unable to delete since there are child records"><i class="fa-solid fa-trash"></i></span>
+                <span class="action-btn opacity-25" title="Unable to delete (has card records)"><i class="fa-solid fa-trash-can"></i></span>
             {% endif %}
         {% endif %}
-        <a class="" href="#update" hx-get="{% url 'players:players-upd-async' p.player.id %}" hx-target="#form-div" hx-swap="innerHTML"><i class="fa-solid fa-edit"></i></a>
+        <a class="action-btn" href="#update" hx-get="{% url 'players:players-upd-async' p.player.id %}" hx-target="#form-div" hx-swap="innerHTML" title="Edit Player"><i class="fa-solid fa-pen-to-square"></i></a>
     {% endif %}
-    <span class="fade-out m-1">
+    <span class="fade-out ms-1">
         {% if t_message %}
-            <small class="text-muted">{{t_message|safe}}</small>
+            <small class="text-success fw-bold">{{t_message|safe}}</small>
         {% endif %}
         {% if new_id and new_id == p.player.id %}
-            <small class="text-muted">
+            <span class="star-badge" title="Recently updated">
                 <i class="fa-solid fa-star"></i>
-            </small>
+            </span>
         {% endif %}
     </span>
 </td>

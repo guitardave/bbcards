@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import django_heroku
 import dj_database_url
@@ -6,6 +7,20 @@ import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env if present
+env_file = BASE_DIR / '.env'
+if env_file.is_file():
+    with open(env_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            key, val = line.split('=', 1)
+            key = key.strip()
+            val = val.strip().strip("'").strip('"')
+            if key and key not in os.environ:
+                os.environ[key] = val
 
 
 # Quick-start development settings - unsuitable for production
@@ -128,11 +143,28 @@ LOGIN_URL = 'users:login'
 
 # Databases
 
-if os.getenv("DATABASE_URL", None) is None:
-    raise Exception("DATABASE_URL environment variable not defined")
-DATABASES = {
-    "default": dj_database_url.parse(os.getenv('DATABASE_URL')),
-}
+if 'test' in sys.argv or 'pytest' in sys.modules or os.getenv('DJANGO_TESTING') == '1':
+    if os.getenv("DATABASE_URL") and "sqlite" in os.getenv("DATABASE_URL"):
+        DATABASES = {
+            "default": dj_database_url.parse(os.getenv("DATABASE_URL")),
+        }
+    elif os.getenv("TEST_DATABASE_URL"):
+        DATABASES = {
+            "default": dj_database_url.parse(os.getenv("TEST_DATABASE_URL")),
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'test_db.sqlite3',
+            }
+        }
+else:
+    if os.getenv("DATABASE_URL", None) is None:
+        raise Exception("DATABASE_URL environment variable not defined")
+    DATABASES = {
+        "default": dj_database_url.parse(os.getenv("DATABASE_URL")),
+    }
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
@@ -172,10 +204,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 PASSWORD_HASHERS = (
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-    'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
@@ -204,18 +236,17 @@ AWS_QUERYSTRING_AUTH = False
 AWS_LOCATION = 'static'
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400',}
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_DEFAULT_ACL = None
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 PUBLIC_MEDIA_LOCATION = 'media'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+STATIC_ROOT = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
@@ -226,4 +257,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_LIMIT = 50
 
-django_heroku.settings(locals())
+django_heroku.settings(locals(), databases=False, test_runner=False, staticfiles=False)

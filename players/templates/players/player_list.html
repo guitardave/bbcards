@@ -8,15 +8,15 @@
 {% endblock breadcrumbs %}
 {% block content %}
     <div class="container">
-        <div><small class="text-muted">{% render_breadcrumbs %}</small></div>
-        <div class="row">
-            <div class="col-sm-{% if user.is_authenticated %}8{% else %}12{% endif %}">
+        <div class="mb-3"><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="row g-4">
+            <div class="col-lg-{% if user.is_authenticated %}8{% else %}12{% endif %}">
                 <div id="card-div" class="fade-in">
                     {% include 'players/player_list_card_partial.html' %}
                 </div>
             </div>
             {% if user.is_authenticated %}
-                <div class="col-sm-4">
+                <div class="col-lg-4">
                     <div id="form-div">
                         {% include 'players/player_form.html'%}
                     </div>

@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: test-bbcards-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - "25060:25060"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Optional: drop .sql files here to auto-run on first startup
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Optional: web UI to browse the DB at http://localhost:8081
+  adminer:
+    image: adminer:latest
+    container_name: test-bbcards-adminer
+    restart: unless-stopped
+    ports:
+      - "8881:8888"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

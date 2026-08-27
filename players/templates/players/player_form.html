@@ -1,54 +1,43 @@
 {% load crispy_forms_tags %}
 <div class="card">
     <div class="card-header bg-info-subtle">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-sm-10">
-                <h2>{{ card_title }}</h2>
+                <h2><i class="fa-solid fa-user-plus text-warning me-2"></i>{{ card_title }}</h2>
             </div>
-            <div class="col-sm-2 me-auto text-end">
-                <a href="#refresh" hx-get="{% url 'players:players-form-refresh' %}" hx-target="#form-div" hx-swap="innerHTML"><i class="fa-solid fa-refresh"></i></a>
+            <div class="col-sm-2 text-end">
+                <a class="action-btn" href="#refresh" hx-get="{% url 'players:players-form-refresh' %}" hx-target="#form-div" hx-swap="innerHTML" title="Refresh Form"><i class="fa-solid fa-rotate"></i></a>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div id="player-form" class="fade-in">
-            <div class="card card-body">
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-sm-12">
-{#                            {{ form|crispy }}#}
-{#                            <label for="player_fname"></label>#}
-{#                            <input type="text" name="player_fname" id="player_fname" class="form-control" placeholder="First Name">#}
-                            {{ form.player_fname|as_crispy_field }}
-                        </div>
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-sm-12">
+                        {{ form.player_fname|as_crispy_field }}
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-{#                            <label for="player_lname"></label>#}
-{#                            <input type="text" name="player_lname" id="player_lname" class="form-control" placeholder="Last Name">#}
-                            {{ form.player_lname|as_crispy_field }}
-                        </div>
+                    <div class="col-sm-12">
+                        {{ form.player_lname|as_crispy_field }}
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12">&nbsp;</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-sm-12 text-end">
+                        {% if obj %}
+                            <button class="btn btn-sport-save" hx-post="{% url 'players:players-upd-async' obj.id %}" hx-target="#tr-p{{ obj.id }}" hx-swap="innerHTML"><i class="fa-solid fa-floppy-disk me-1"></i> Save Player</button>
+                        {% else %}
+                            <button class="btn btn-sport-save" hx-post="{% url 'players:players-new' %}" hx-target="#card-div" hx-swap="outerHTML"><i class="fa-solid fa-plus me-1"></i> Add Player</button>
+                        {% endif %}
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12 me-auto text-end">
-                            {% if obj %}
-                                <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'players:players-upd-async' obj.id %}" hx-target="#tr-p{{ obj.id }}" hx-swap="innerHTML"><i class="fa-solid fa-save"></i></button>
-                            {% else %}
-                                <button class="btn btn-lg btn-outline-secondary" hx-post="{% url 'players:players-new' %}" hx-target="#card-div" hx-swap="outerHTML"><i class="fa-solid fa-save"></i></button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </form>
-              </div>
+                </div>
+            </form>
         </div>
     </div>
     <div class="card-footer bg-info-subtle">
-        <small class="text-muted">
-            <i class="fa-solid fa-refresh"></i> {{ loaded|date:'m/d/Y h:i:s A' }}
+        <small class="text-muted d-flex align-items-center justify-content-between">
+            <span><i class="fa-solid fa-clock-rotate-left me-1"></i> Last updated:</span>
+            <span>{{ loaded|date:'m/d/Y h:i:s A' }}</span>
         </small>
     </div>
 </div>
