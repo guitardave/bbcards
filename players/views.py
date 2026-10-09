@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, QuerySet
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
@@ -11,26 +12,23 @@ from .models import Player
 from .forms import PlayerForm
 
 
-def player_list_count(p_list: list) -> list[dict]:
-    players = []
-    for player in p_list:
-        p_count = Card.objects.filter(player_id_id=player.id).count()
-        if p_count > 0:
-            players.append(dict(player=player, count=p_count))
-    return players
+def players_with_counts(players: QuerySet, skip_empty: bool = False) -> list[dict]:
+    """Pair each player with a card count from one aggregate query (call before slicing)."""
+    rows = [dict(player=p, count=p.card_count) for p in players]
+    return [r for r in rows if r['count'] > 0] if skip_empty else rows
 
 
 # @cache_page(60*5)
 def player_list(request, n_list: int = 0):
     if n_list == 0:
-        players = Player.list_no_ignore.all()
+        players = Player.list_no_ignore.annotate(card_count=Count('card'))
     elif n_list == 99:
-        players = Player.list_ignore.all()
+        players = Player.list_ignore.annotate(card_count=Count('card'))
     else:
-        players = Player.objects.all().order_by('-id')[:n_list]
+        players = Player.objects.annotate(card_count=Count('card')).order_by('-id')[:n_list]
     context = {
         'title': 'Player List',
-        'rs': player_list_count(players),
+        'rs': players_with_counts(players, skip_empty=True),
         'form': PlayerForm,
         'loaded': timezone.now(),
         'card_title': 'Add Player'
@@ -55,11 +53,11 @@ def player_add_async(request):
                 message = f'<i class="fa-solid fa-check"></i> {f_name} {l_name} entered successfully'
         else:
             message = f'<i class="fa-solid fa-remove"></i> {f_name} {l_name} already exists'
-    players = Player.list_all.all()
+    players = Player.list_all.annotate(card_count=Count('card'))
     new_id = Player.objects.last().id
     context = {
         'title': 'Player List',
-        'rs': [{'player': p, 'count': Card.objects.filter(player_id_id=p.id).count()} for p in players],
+        'rs': players_with_counts(players),
         'new_id': new_id,
         'message': message
     }
@@ -111,10 +109,10 @@ def player_delete_async(request, player_id: int):
     if obj.exists():
         obj.delete()
         message = 'Player deleted successfully'
-    players = Player.list_all.all()
+    players = Player.list_all.annotate(card_count=Count('card'))
     context = {
         'title': 'Player List',
-        'rs': [{'player': p, 'count': Card.objects.filter(player_id_id=p.id).count()} for p in players],
+        'rs': players_with_counts(players),
         'message': message
     }
     return render(request, 'players/player_list_card_partial.html', context)

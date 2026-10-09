@@ -75,12 +75,12 @@ class CardSearchMgr(models.Manager):
 
 class CardLast50Mgr(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().all().order_by('-id')[:50]
+        return super().get_queryset().select_related('player_id', 'card_set_id').order_by('-id')[:50]
 
 
 class CardsAllMgr(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().all().order_by(
+        return super().get_queryset().select_related('player_id', 'card_set_id').order_by(
             'player_id__player_fname',
             'card_set_id__year',
             'card_set_id__card_set_name'
