@@ -290,7 +290,7 @@ django_heroku.settings(locals(), databases=False, test_runner=False, staticfiles
 # Set after django_heroku.settings(), which would otherwise replace ALLOWED_HOSTS with ['*'].
 # Comma-separated; override with DJANGO_ALLOWED_HOSTS. '.jojodave.com' matches the apex and all subdomains.
 ALLOWED_HOSTS = [
-    h.strip() for h in os.environ.get('ALLOWED_HOSTS', '.jojodave.com').split(',') if h.strip()
+    h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '.jojodave.com').split(',') if h.strip()
 ]
 # Full origins incl. scheme; override with DJANGO_CSRF_TRUSTED_ORIGINS. Wildcards don't match the apex, so list both.
 CSRF_TRUSTED_ORIGINS = [
