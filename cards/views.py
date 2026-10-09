@@ -188,7 +188,6 @@ class CardListData:
         return c_list
 
 
-@error_handling
 def card_list_pagination(request, cards: QuerySet | list[dict], n_count: int = None):
     p = Paginator(cards, n_count if n_count else 100)
     page_number = request.GET['page'] if 'page' in request.GET else 1
