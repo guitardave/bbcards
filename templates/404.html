@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="graded-slab text-center">
+                <div class="graded-slab-header">
+                    <div class="slab-auth"><i class="fa-solid fa-certificate text-warning me-1"></i> BBCards Authentic Vault Slab</div>
+                    <div class="slab-title">Error 404</div>
+                    <div class="slab-sub text-white-50">Card not found</div>
+                </div>
+                <div class="graded-slab-image-wrap py-5">
+                    <i class="fa-solid fa-baseball fa-4x text-warning mb-3"></i>
+                    <h2 class="font-athletic">Strike three &mdash; this page is out.</h2>
+                    <p class="text-muted mb-4">We couldn't find the page you were looking for. It may have been moved, or the link may be wrong.</p>
+                    <a class="btn btn-sport-save" href="{% url 'cards:card-list-50' %}"><i class="fa-solid fa-house me-1"></i> Back to the Collection</a>
+                    <a class="btn btn-outline-secondary ms-1" href="#back" onclick="history.back(); return false;"><i class="fa-solid fa-arrow-left me-1"></i> Go Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

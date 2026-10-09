@@ -1,0 +1,38 @@
+{# Standalone on purpose: no base.html, header, or context processors, so this page still renders when the database, Redis, or static files are the thing that broke. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BBCards: Server Error</title>
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+               background: #f3f6fa; color: #0f172a; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .slab { width: min(92vw, 520px); background: #fff; border: 1px solid #dbe4ee; border-radius: 12px;
+                box-shadow: 0 10px 25px -5px rgba(13, 27, 42, .08); overflow: hidden; text-align: center; }
+        .slab-header { background: linear-gradient(135deg, #0d1b2a 0%, #1e3a8a 100%); color: #fff; padding: 1rem; }
+        .slab-header small { color: #f59e0b; letter-spacing: .08em; text-transform: uppercase; }
+        .slab-header h1 { margin: .25rem 0 0; font-size: 1.6rem; }
+        .slab-body { padding: 2rem 1.5rem; }
+        .slab-body .icon { font-size: 3rem; }
+        .slab-body p { color: #64748b; }
+        a.btn { display: inline-block; margin-top: .5rem; padding: .55rem 1.1rem; border-radius: 8px;
+                background: #1d4ed8; color: #fff; text-decoration: none; font-weight: 600; }
+        a.btn:hover { background: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="slab">
+        <div class="slab-header">
+            <small>BBCards Authentic Vault Slab</small>
+            <h1>Error 500</h1>
+        </div>
+        <div class="slab-body">
+            <div class="icon">&#9918;</div>
+            <h2>We dropped the ball.</h2>
+            <p>Something went wrong on our end. The problem has been logged. Please try again in a moment.</p>
+            <a class="btn" href="/">Back to the Collection</a>
+        </div>
+    </div>
+</body>
+</html>
