@@ -244,14 +244,39 @@ STATIC_ROOT = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_URL = '/media/'
+# Uploaded media (card images) goes to S3 when a bucket is configured, otherwise to local disk.
+# Local disk is ephemeral on most deploy targets, so production should always set the AWS_* vars.
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')  # only for S3-compatible hosts (e.g. DO Spaces)
+
+if AWS_STORAGE_BUCKET_NAME and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {'location': PUBLIC_MEDIA_LOCATION},
+        },
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{PUBLIC_MEDIA_LOCATION}/'
+else:
+    STORAGES = {
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+    MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# AI image agent (DigitalOcean Serverless Inference + Brave Image Search)
+
+MODEL_ACCESS_KEY = os.environ.get('MODEL_ACCESS_KEY')
+DO_INFERENCE_URL = os.environ.get('DO_INFERENCE_URL', 'https://inference.do-ai.run/v1')
+DO_INFERENCE_MODEL = os.environ.get('DO_INFERENCE_MODEL', 'deepseek-v4.1-flash')
+BRAVE_API_KEY = os.environ.get('BRAVE_API_KEY')
 
 # General
 

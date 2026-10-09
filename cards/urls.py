@@ -15,6 +15,7 @@ urlpatterns = [
     path('cards/new/form/async/', views.card_create_form_async, name='card-new-form-async'),
     path('cards/new/form/async/<str:card_type>/<str:type_slug>/', views.card_create_form_async, name='card-new-form-async'),
     path('cards/<slug:slug>/images/', views.card_image, name='card-image'),
+    path('cards/<slug:slug>/images/find/', views.card_image_find, name='card-image-find'),
     path('cards/<slug:slug>/update/async/', views.card_update_async, name='card-upd-async'),
     path('cards/<slug:slug>/delete/async/', views.card_delete_async, name='card-delete-async'),
     path('cards/form/refresh/async/', views.card_form_refresh, name='card-form-refresh'),

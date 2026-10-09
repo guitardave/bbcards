@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -16,15 +17,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector, SearchQuery
 from django.db.models import Q, QuerySet, IntegerField
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.contrib import messages
 
 from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
+from .image_agent import find_image_for_card
 from .models import Card, CardSet, CardListExport
 from decorators.my_decorators import error_handling
+
+logger = logging.getLogger(__name__)
 
 
 def card_set_list_fn(request, n_count: int):
@@ -423,6 +428,23 @@ def card_image(request, slug: str):
     card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
     context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
     return render(request, 'cards/card-image.html', context)
+
+
+@login_required(login_url='/users/')
+@require_POST
+def card_image_find(request, slug: str):
+    card = get_object_or_404(Card.objects.select_related('player_id', 'card_set_id'), slug=slug)
+    try:
+        url = find_image_for_card(card, overwrite=True)
+    except Exception as e:
+        logger.exception('Image agent failed for card %s', card.pk)
+        messages.error(request, f'Image search failed: {e}')
+    else:
+        if url:
+            messages.success(request, 'Image found and saved.')
+        else:
+            messages.warning(request, 'No suitable image found.')
+    return redirect('cards:card-image', slug=card.slug)
 
 
 def card_search_pagination(request, search: str):
