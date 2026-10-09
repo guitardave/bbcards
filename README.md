@@ -28,7 +28,8 @@ Although the project is named for baseball cards, the data model supports baseba
 
 - **AI card image finder**
   - An LLM agent (DigitalOcean Serverless Inference) searches the web for a photo of each card using Brave Image Search, then downloads, validates, and attaches the best match.
-  - Use the **Find image** button on a card's image page, or fill in many cards at once with the `fetch_card_images` management command (see [AI image agent](#ai-image-agent)).
+  - Use the **Image Manager** page (nav bar) to list cards with or without images and run the agent on a single card from its row; results update in place without a page reload.
+  - Or use the **Find image** button on a card's image page, or fill in many cards at once with the `fetch_card_images` management command (see [AI image agent](#ai-image-agent)).
 
 - **Images and exports**
   - Upload card images through Django's file-storage abstraction.
@@ -174,7 +175,9 @@ The agent in `cards/image_agent.py` finds a photo for a card. It builds a descri
 
 Safeguards: the model can only choose URLs that appeared in search results, and downloads are restricted to public `http(s)` hosts (no private or loopback addresses, no redirects).
 
-**From the UI:** open a card's image page and click **Find image** (or **Find a different image**, which replaces the existing image). This blocks the request for roughly 10-30 seconds.
+**From the Image Manager:** choose **Image Manager** in the nav bar. It lists cards missing images (or all cards) with a **Find image** / **Re-search** button on each row. The search runs for that card only, shows a spinner, and swaps in the result.
+
+**From a card's image page:** open a card's image page and click **Find image** (or **Find a different image**, which replaces the existing image). This blocks the request for roughly 10-30 seconds.
 
 **In bulk:**
 
@@ -211,8 +214,10 @@ Card creation is also available through the API. Refer to `api/serializers.py` a
 Dependencies are managed with uv; install them in the build step with `uv sync --frozen`. Also run `uv run python manage.py collectstatic --noinput` in the build step; WhiteNoise serves the collected files from `staticfiles/`. Run the app with Gunicorn:
 
 ```bash
-uv run gunicorn bbcards.wsgi
+uv run gunicorn bbcards.wsgi --timeout 120
 ```
+
+The longer timeout matters: an image search can take 10-30 seconds or more, and Gunicorn's 30-second default would kill the worker mid-request.
 
 There is no `Procfile`, so configure this as the run command on your hosting platform.
 

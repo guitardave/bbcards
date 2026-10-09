@@ -412,6 +412,41 @@ def card_image(request, slug: str):
     return render(request, 'cards/card-image.html', context)
 
 
+IMAGE_MANAGER_SHOW = ('missing', 'all')
+
+
+@login_required(login_url='/users/')
+def image_manager(request):
+    show = request.GET.get('show', 'missing')
+    if show not in IMAGE_MANAGER_SHOW:
+        show = 'missing'
+    cards = Card.list_all.select_related('player_id', 'card_set_id')
+    if show == 'missing':
+        cards = cards.filter(Q(card_image='') | Q(card_image__isnull=True))
+    card_count, rs, n_pages = card_list_pagination(request, cards, settings.DEFAULT_LIMIT)
+    return render(request, 'cards/image-manager.html', {
+        'title': 'Image Manager',
+        'rs': rs,
+        'show': show,
+        'card_count': card_count,
+        'n_pages': n_pages,
+    })
+
+
+@login_required(login_url='/users/')
+@require_POST
+def image_manager_find(request, slug: str):
+    """Run the image agent for one card and return the refreshed table row (HTMX)."""
+    card = get_object_or_404(Card.objects.select_related('player_id', 'card_set_id'), slug=slug)
+    status, error = 'none', ''
+    try:
+        status = 'found' if find_image_for_card(card, overwrite=True) else 'none'
+    except Exception:
+        logger.exception('Image agent failed for card %s', card.pk)
+        status, error = 'error', 'Search failed. Please try again.'
+    return render(request, 'cards/image-manager-row.html', {'card': card, 'status': status, 'error': error})
+
+
 @login_required(login_url='/users/')
 @require_POST
 def card_image_find(request, slug: str):

@@ -1,0 +1,37 @@
+<tr id="im-{{ card.id }}">
+    <td class="text-center" style="width: 70px;">
+        {% if card.card_image %}
+            <a href="{% url 'cards:card-image' card.slug %}" title="View card image">
+                <img src="{{ card.card_image.url }}" alt="{{ card.card_num }}" class="rounded border" style="height: 56px; width: auto; max-width: 56px; object-fit: cover;">
+            </a>
+        {% else %}
+            <i class="fa-solid fa-image fa-lg text-muted opacity-50" title="No image"></i>
+        {% endif %}
+    </td>
+    <td class="fw-bold">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</td>
+    <td class="font-athletic">{{ card.card_set_id.year }}</td>
+    <td>{{ card.card_set_id.card_set_name }}{% if card.card_subset %} <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ card.card_subset }}</span>{% endif %}</td>
+    <td class="font-athletic text-primary">#{{ card.card_num }}</td>
+    <td class="text-nowrap">
+        <button type="button" class="btn btn-sport-save btn-sm"
+            hx-post="{% url 'cards:image-manager-find' card.slug %}"
+            hx-target="#im-{{ card.id }}"
+            hx-swap="outerHTML"
+            hx-disabled-elt="this"
+            hx-indicator="#im-spin-{{ card.id }}"
+            {% if card.card_image %}hx-confirm="This card already has an image. Search again and replace it?"{% endif %}
+            title="Search the web for an image of this card">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i>{% if card.card_image %}Re-search{% else %}Find image{% endif %}
+        </button>
+        <span id="im-spin-{{ card.id }}" class="htmx-indicator ms-2 text-muted small">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching&hellip;
+        </span>
+        {% if status == 'found' %}
+            <small class="text-success fw-bold ms-2"><i class="fa-solid fa-check"></i> Image saved</small>
+        {% elif status == 'none' %}
+            <small class="text-warning fw-bold ms-2"><i class="fa-solid fa-circle-question"></i> No suitable image found</small>
+        {% elif status == 'error' %}
+            <small class="text-danger fw-bold ms-2"><i class="fa-solid fa-triangle-exclamation"></i> {{ error }}</small>
+        {% endif %}
+    </td>
+</tr>

@@ -43,6 +43,11 @@
                     <li><a class="dropdown-item" href="{% url 'cards:card-list-all' 1 %}"><i class="fa-solid fa-list-ol"></i> List by Card Set (all)</a></li>
                 </ul>
             </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cards:image-manager' %}"><i class="fa-solid fa-images me-1"></i> Image Manager</a>
+                </li>
+            {% endif %}
         </ul>
         <!-- Navbar Right Side -->
         <ul class="navbar-nav ms-auto align-items-lg-center">

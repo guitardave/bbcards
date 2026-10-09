@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Image Manager" "cards:image-manager" %}
+{% endblock breadcrumbs %}
+{% block content %}
+    <div class="container">
+        <div class="mb-3"><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="card" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <div class="card-header bg-info-subtle">
+                <div class="row align-items-center">
+                    <div class="col-sm-7">
+                        <h1><i class="fa-solid fa-images me-2"></i>Image Manager</h1>
+                        <small class="text-muted">{{ card_count }} card{{ card_count|pluralize }} {% if show == 'missing' %}without an image{% else %}in the collection{% endif %}</small>
+                    </div>
+                    <div class="col-sm-5 text-sm-end mt-2 mt-sm-0">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filter">
+                            <a class="btn btn-outline-secondary {% if show == 'missing' %}active{% endif %}" href="?show=missing">Missing images</a>
+                            <a class="btn btn-outline-secondary {% if show == 'all' %}active{% endif %}" href="?show=all">All cards</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Player</th>
+                                <th>Year</th>
+                                <th>Set</th>
+                                <th>Card Num</th>
+                                <th>Image search</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for card in rs.object_list %}
+                                {% include 'cards/image-manager-row.html' %}
+                            {% empty %}
+                                <tr><td colspan="6" class="text-center text-muted py-4">
+                                    {% if show == 'missing' %}Every card has an image.{% else %}No cards yet.{% endif %}
+                                </td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if n_pages > 1 %}
+                <div class="card-footer text-center bg-info-subtle">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        {% if rs.has_previous %}
+                            <a class="action-btn" href="?show={{ show }}&page={{ rs.previous_page_number }}" title="Previous page"><i class="fa-solid fa-angle-left"></i></a>
+                        {% endif %}
+                        <span class="badge bg-secondary px-2 py-1">Page {{ rs.number }} of {{ n_pages }}</span>
+                        {% if rs.has_next %}
+                            <a class="action-btn" href="?show={{ show }}&page={{ rs.next_page_number }}" title="Next page"><i class="fa-solid fa-angle-right"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
