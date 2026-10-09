@@ -36,6 +36,7 @@ dependencies = [
     "requests",
     "Pillow",
     "bcrypt>=5.0.0",
+    "whitenoise>=6.12.0",
 ]
 
 [project.scripts]

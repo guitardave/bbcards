@@ -31,18 +31,18 @@ if env_file.is_file():
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# CSRF_COOKIE_SECURE = True
+# ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS are set at the bottom of this file, after
+# django_heroku.settings() runs, because it overwrites ALLOWED_HOSTS.
 
-
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS')
-
+# CORS is only needed for the REST API. Allowed origins: jojodave.com and any subdomain (hyphens included).
+CORS_URLS_REGEX = r'^/api/.*$'
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://\w+\.jojodave\.com$",
+    r"^https://([\w-]+\.)?jojodave\.com$",
 ]
-
-CORS_ALLOW_ALL_ORIGINS = True
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -102,6 +102,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -240,7 +241,7 @@ AWS_DEFAULT_ACL = None
 
 PUBLIC_MEDIA_LOCATION = 'media'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 
@@ -255,13 +256,13 @@ if AWS_STORAGE_BUCKET_NAME and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
             'BACKEND': 'storages.backends.s3.S3Storage',
             'OPTIONS': {'location': PUBLIC_MEDIA_LOCATION},
         },
-        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
     }
     MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{PUBLIC_MEDIA_LOCATION}/'
 else:
     STORAGES = {
         'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
     }
     MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
@@ -283,3 +284,26 @@ BRAVE_API_KEY = os.environ.get('BRAVE_API_KEY')
 DEFAULT_LIMIT = 50
 
 django_heroku.settings(locals(), databases=False, test_runner=False, staticfiles=False)
+
+
+# Hosts and HTTPS
+# Set after django_heroku.settings(), which would otherwise replace ALLOWED_HOSTS with ['*'].
+# Comma-separated; override with DJANGO_ALLOWED_HOSTS. '.jojodave.com' matches the apex and all subdomains.
+ALLOWED_HOSTS = [
+    h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '.jojodave.com').split(',') if h.strip()
+]
+# Full origins incl. scheme; override with DJANGO_CSRF_TRUSTED_ORIGINS. Wildcards don't match the apex, so list both.
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://jojodave.com,https://*.jojodave.com').split(',')
+    if o.strip()
+]
+
+if not DEBUG:
+    # Assumes TLS is terminated by a trusted proxy / load balancer that sets X-Forwarded-Proto.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SSL_REDIRECT', 'True').lower() == 'true'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Leave at 0 until HTTPS is confirmed working; HSTS is hard to undo once browsers cache it.
+    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_HSTS_SECONDS', '0'))

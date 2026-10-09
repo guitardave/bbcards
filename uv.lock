@@ -191,6 +191,7 @@ dependencies = [
     { name = "requests" },
     { name = "sqlparse" },
     { name = "typing-extensions" },
+    { name = "whitenoise" },
     { name = "xhtml2pdf" },
 ]
 
@@ -223,6 +224,7 @@ requires-dist = [
     { name = "requests" },
     { name = "sqlparse", specifier = "==0.4.4" },
     { name = "typing-extensions", specifier = "==3.10.0.0" },
+    { name = "whitenoise", specifier = ">=6.12.0" },
     { name = "xhtml2pdf" },
 ]
 

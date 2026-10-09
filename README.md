@@ -123,6 +123,7 @@ Create a `.env` file in the project root or export the variables in your shell. 
 ```dotenv
 DJANGO_SECRET_KEY=replace-with-a-development-secret
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+DEBUG=true   # local development only; defaults to false
 DATABASE_URL=postgres://testuser:testpass@localhost:5432/testdb
 ```
 
@@ -207,7 +208,7 @@ Card creation is also available through the API. Refer to `api/serializers.py` a
 
 ## Deployment
 
-Dependencies are managed with uv; install them in the build step with `uv sync --frozen`. Run the app with Gunicorn:
+Dependencies are managed with uv; install them in the build step with `uv sync --frozen`. Also run `uv run python manage.py collectstatic --noinput` in the build step; WhiteNoise serves the collected files from `staticfiles/`. Run the app with Gunicorn:
 
 ```bash
 uv run gunicorn bbcards.wsgi
@@ -218,7 +219,9 @@ There is no `Procfile`, so configure this as the run command on your hosting pla
 Before deploying, configure production values for at least:
 
 - `DJANGO_SECRET_KEY`
-- `DJANGO_ALLOWED_HOSTS`
+- `DJANGO_ALLOWED_HOSTS` (comma-separated; defaults to `.jojodave.com`, which matches the apex domain and all subdomains)
+- `DJANGO_CSRF_TRUSTED_ORIGINS` (defaults to `https://jojodave.com,https://*.jojodave.com`)
+- Optional: `DJANGO_SSL_REDIRECT` (default `True`) and `DJANGO_HSTS_SECONDS` (default `0`; raise it once HTTPS is confirmed)
 - `DATABASE_URL`
 - Redis connection variables
 - AWS credentials and bucket name. These are required in production: without them uploads fall back to local disk, which is ephemeral on most platforms and is wiped on each deploy
