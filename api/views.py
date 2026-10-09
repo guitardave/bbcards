@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.postgres.search import SearchVector, SearchQuery
+from django.shortcuts import get_object_or_404
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -37,7 +38,7 @@ def create_card_set(request):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def update_card_set(request, pk: int):
-    obj = CardSet.objects.get(pk=pk)
+    obj = get_object_or_404(CardSet, pk=pk)
     serializer = CardSetSerializer(obj, data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -69,7 +70,7 @@ def create_player(request):
 @authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def update_player(request, player_id: int):
-    obj = Player.objects.get(pk=player_id)
+    obj = get_object_or_404(Player, pk=player_id)
     serializer = PlayerSerializer(obj, data=request.data)
     if serializer.is_valid():
         serializer.save()

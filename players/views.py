@@ -1,13 +1,12 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 
 from cards.models import Card
-from decorators.my_decorators import error_handling
 from .models import Player
 from .forms import PlayerForm
 
@@ -22,7 +21,6 @@ def player_list_count(p_list: list) -> list[dict]:
 
 
 # @cache_page(60*5)
-@error_handling
 def player_list(request, n_list: int = 0):
     if n_list == 0:
         players = Player.list_no_ignore.all()
@@ -41,7 +39,6 @@ def player_list(request, n_list: int = 0):
 
 
 @login_required(login_url="/users/")
-@error_handling
 def player_add_async(request):
     message = ''
     if request.method == 'POST':
@@ -70,9 +67,8 @@ def player_add_async(request):
 
 
 @login_required(login_url="/users/")
-@error_handling
 def player_update_async(request, pk: int):
-    player = Player.objects.get(pk=pk)
+    player = get_object_or_404(Player, pk=pk)
     if request.method == 'POST':
         form = PlayerForm(request.POST, instance=player)
         if form.is_valid():
@@ -102,7 +98,6 @@ def player_update_async(request, pk: int):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def player_form_refresh(request):
     context = {'card_title': 'Add Player', 'loaded': datetime.datetime.now(), 'form': PlayerForm}
     return render(request, 'players/player_form.html', context)
@@ -110,7 +105,6 @@ def player_form_refresh(request):
 
 @login_required(login_url='/users/')
 @csrf_exempt
-@error_handling
 def player_delete_async(request, player_id: int):
     message = ''
     obj = Player.objects.filter(id=player_id)

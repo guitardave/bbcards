@@ -27,7 +27,6 @@ from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
 from .image_agent import find_image_for_card
 from .models import Card, CardSet, CardListExport
-from decorators.my_decorators import error_handling
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,6 @@ def card_set_list_fn(request, n_count: int):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_set_create_async(request):
     c_message = ''
     if request.method == 'POST':
@@ -88,7 +86,6 @@ def card_set_create_async(request):
     return render(request, 'cards/cardset-list-card-partial.html', context)
 
 
-@error_handling
 def card_set_list(request, n_count: int = 0, inc_zero: bool = False):
     if request.method == 'POST':
         form = CardSetForm(request.POST)
@@ -101,9 +98,8 @@ def card_set_list(request, n_count: int = 0, inc_zero: bool = False):
 
 
 @login_required(login_url="/users/")
-@error_handling
 def card_set_update_async(request, slug: str):
-    obj = CardSet.objects.get(slug=slug)
+    obj = get_object_or_404(CardSet, slug=slug)
     if request.method == 'POST':
         form = CardSetForm(request.POST, instance=obj)
         if form.is_valid():
@@ -132,7 +128,6 @@ def card_set_update_async(request, slug: str):
 
 @login_required(login_url='/users/')
 @csrf_exempt
-@error_handling
 def card_set_delete_async(request, slug: str):
     obj = CardSet.objects.filter(slug=slug)
     t_message = ''
@@ -148,7 +143,6 @@ def card_set_delete_async(request, slug: str):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_set_form_refresh(request):
     context = {'card_title': 'Add Card Set', 'form': CardSetForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/cardset-form.html', context)
@@ -201,7 +195,6 @@ def card_list_pagination(request, cards: QuerySet | list[dict], n_count: int = N
 
 
 # @login_required(login_url='/users/')
-@error_handling
 def card_list_last_n(request):
     cards = Card.last_50.all()
     card_count, rs, n_pages = card_list_pagination(request, cards)
@@ -220,9 +213,8 @@ def card_list_last_n(request):
 
 
 # @login_required(login_url='/users/')
-@error_handling
 def card_list_by_player(request, slug: str):
-    obj = Player.objects.get(slug=slug)
+    obj = get_object_or_404(Player, slug=slug)
     cards = Card.objects.filter(
         player_id__slug=slug
     ).order_by('card_set_id__year', 'card_set_id__slug')
@@ -243,9 +235,8 @@ def card_list_by_player(request, slug: str):
 
 
 # @login_required(login_url='/users/')
-@error_handling
 def card_list_by_set(request, slug: str):
-    obj = CardSet.objects.get(slug=slug)
+    obj = get_object_or_404(CardSet, slug=slug)
     cards = Card.objects.filter(
         card_set_id__slug=slug
     ).order_by(
@@ -268,7 +259,6 @@ def card_list_by_set(request, slug: str):
 
 
 # @login_required(login_url='/users/')
-@error_handling
 def card_list_all(request, sort_by: int = None):
     if not sort_by:
         sort_by = 0
@@ -299,7 +289,6 @@ def card_list_all(request, sort_by: int = None):
     )
 
 
-@error_handling
 def load_cards_async(request):
     card_count, rs, n_pages = card_list_pagination(request)
     context = {'rs': rs, 'loaded': timezone.now(), 'n_pages': n_pages, 'card_count': card_count}
@@ -307,9 +296,8 @@ def load_cards_async(request):
 
 
 @login_required(login_url="/users/")
-@error_handling
 def card_update_async(request, slug: str):
-    obj = Card.objects.get(slug=slug)
+    obj = get_object_or_404(Card, slug=slug)
     if request.method == 'POST':
         success = False
 
@@ -336,7 +324,6 @@ def card_update_async(request, slug: str):
 
 @login_required(login_url='/users/')
 @csrf_exempt
-@error_handling
 def card_delete_async(request, slug: str):
     c_message, cards, player = None, None, None
     obj = Card.objects.filter(slug=slug)
@@ -359,7 +346,6 @@ class TypeSlugs:
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_create_async(request, card_type: str = None, type_slug: str = None):
     player_id, new_id = None, {'id': None}
 
@@ -371,11 +357,11 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
 
     if card_type and type_slug:
         if card_type == TypeSlugs.PLAYER:
-            obj = Player.objects.get(slug=type_slug)
+            obj = get_object_or_404(Player, slug=type_slug)
             cards = Card.objects.filter(player_id__slug=type_slug).order_by('-id')
             title = f'{obj.player_fname} {obj.player_lname}'
         else:
-            obj = CardSet.objects.get(slug=type_slug)
+            obj = get_object_or_404(CardSet, slug=type_slug)
             cards = Card.objects.filter(card_set_id__slug=type_slug).order_by('-id')
             title = f'{str(obj.year)} {obj.card_set_name}'
     elif player_id:
@@ -397,7 +383,6 @@ def card_create_async(request, card_type: str = None, type_slug: str = None):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_create_form_async(request, card_type: str = None, type_slug: str = None):
     form = CardCreateForm
     context = {'card_title': 'Add Card'}
@@ -414,16 +399,14 @@ def card_create_form_async(request, card_type: str = None, type_slug: str = None
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_form_refresh(request):
     context = {'card_title': 'Add New Card', 'form': CardCreateForm, 'loaded': datetime.datetime.now()}
     return render(request, 'cards/card-form.html', context)
 
 
 @login_required(login_url='/users/')
-@error_handling
 def card_image(request, slug: str):
-    obj = Card.objects.get(slug=slug)
+    obj = get_object_or_404(Card, slug=slug)
     card_string = f'{obj.card_set_id.year} {obj.card_set_id.card_set_name} {obj.card_subset} {obj.card_num}'
     context = {'title': obj.card_image, 'object': obj, 'card_string': card_string}
     return render(request, 'cards/card-image.html', context)
@@ -578,7 +561,6 @@ def html_to_pdf():
 
 @login_required(login_url='/users/')
 @csrf_exempt
-@error_handling
 def card_list_export_vw_pdf(request, q: str = None):
     search = ''
     if request.method == 'POST':
@@ -598,7 +580,6 @@ def card_list_export_vw_pdf(request, q: str = None):
 
 @login_required(login_url='/users/')
 @csrf_exempt
-@error_handling
 def card_list_export_vw(request):
     rs = card_list_export(request.session['rs']) if 'rs' in request.session else ''
     if len(rs) > 0:

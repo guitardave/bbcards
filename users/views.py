@@ -6,17 +6,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetCompleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views.generic import UpdateView, DetailView
 
-from decorators.my_decorators import error_handling
 from .models import CardUser
 from .forms import UserForm, LoginForm
 
 
-@error_handling
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -35,7 +33,6 @@ def login_view(request):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def logout_view(request):
     logout(request)
     messages.info(request, 'logout successful')
@@ -57,7 +54,6 @@ def toggle_view_mode(request, mode: str = None):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def user_management_list(request):
     if not request.user.is_superuser:
         messages.warning(request, 'Unauthorized Access')
@@ -79,7 +75,6 @@ def user_management_list(request):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def user_management_create(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
@@ -96,9 +91,8 @@ def user_management_create(request):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def user_management_update(request, pk: int):
-    user = CardUser.objects.get(pk=pk)
+    user = get_object_or_404(CardUser, pk=pk)
     message, u_success = '', False
     context = {
         'c_title': 'Update User',
@@ -125,7 +119,7 @@ class UserDetail(LoginRequiredMixin, DetailView):
     template_name = 'users/user_update.html'
 
     def get_object(self, queryset=None):
-        return CardUser.objects.get(pk=self.kwargs['pk'])
+        return get_object_or_404(CardUser, pk=self.kwargs['pk'])
 
     def get_context_data(self, **kwargs):
         user = self.get_object()
@@ -139,9 +133,8 @@ class UserDetail(LoginRequiredMixin, DetailView):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def user_update_async(request, pk):
-    user = CardUser.objects.get(pk=pk)
+    user = get_object_or_404(CardUser, pk=pk)
     if request.method == 'POST':
         form = UserForm(instance=user, data=request.POST or None)
         if form.is_valid():
@@ -157,9 +150,8 @@ def user_update_async(request, pk):
 
 
 @login_required(login_url='/users/')
-@error_handling
 def password_update(request, pk: int):
-    user = CardUser.objects.get(pk=pk)
+    user = get_object_or_404(CardUser, pk=pk)
     if request.method == 'POST':
         form = SetPasswordForm(user, data=request.POST or None)
         if form.is_valid():
