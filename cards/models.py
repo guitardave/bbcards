@@ -15,6 +15,11 @@ from players.models import Player
 from users.models import CardUser
 
 
+def current_year() -> int:
+    # Callable default so the value is computed per save, not frozen at import time.
+    return datetime.now().year
+
+
 class CardSetAll(models.Manager):
     def get_queryset(self):
         return super().get_queryset().all().order_by('year', 'card_set_name')
@@ -28,7 +33,7 @@ class CardSet(models.Model):
         FOOTBALL = 'Football', _('Football')
         BASKETBALL = 'Basketball', _('Basketball')
 
-    year = models.IntegerField(default=datetime.now().year)
+    year = models.IntegerField(default=current_year)
     card_set_name = models.CharField(max_length=45, default=None)
     date_entered = models.DateTimeField(auto_now_add=True)
     sport = models.CharField(max_length=50, null=True, default=Sports.BASEBALL, choices=Sports.choices)
