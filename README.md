@@ -26,9 +26,13 @@ Although the project is named for baseball cards, the data model supports baseba
   - Search across card metadata, including year, set name, sport, subset, card number, and player name.
   - Uses PostgreSQL full-text search capabilities through Django's `SearchVector` and `SearchQuery` APIs.
 
+- **AI card image finder**
+  - An LLM agent (DigitalOcean Serverless Inference) searches the web for a photo of each card using Brave Image Search, then downloads, validates, and attaches the best match.
+  - Use the **Find image** button on a card's image page, or fill in many cards at once with the `fetch_card_images` management command (see [AI image agent](#ai-image-agent)).
+
 - **Images and exports**
   - Upload card images through Django's file-storage abstraction.
-  - Support AWS S3 configuration through `boto3` and `django-storages`.
+  - Card images are stored in AWS S3 (via `boto3` and `django-storages`) when AWS settings are present, and on local disk otherwise.
   - Export collection lists to Excel with `openpyxl`.
   - Export collection lists to PDF with `xhtml2pdf`.
 
@@ -56,7 +60,9 @@ Although the project is named for baseball cards, the data model supports baseba
 - Redis-backed caching
 - Bootstrap 5 and crispy forms
 - HTMX
-- AWS S3-compatible object storage support
+- AWS S3 object storage for uploaded card images
+- DigitalOcean Serverless Inference (LLM) and Brave Search API for the image agent
+- uv for dependency management
 - Gunicorn for deployment
 - Docker Compose for local PostgreSQL and Adminer services
 
@@ -66,20 +72,19 @@ Although the project is named for baseball cards, the data model supports baseba
 bbcards/
 ├── api/          REST API endpoints and serializers
 ├── bbcards/      Django project configuration and URL routing
-├── cards/        Card and card-set models, views, exports, and templates
+├── cards/        Card and card-set models, views, exports, templates, and the AI image agent
 ├── players/      Player models, views, and templates
 ├── users/        Authentication, profiles, and user management
 ├── static/       CSS, JavaScript, and other static assets
 ├── templates/    Shared Django templates
-├── cards/        Collection data and uploaded card-related assets
 ├── manage.py     Django administration command-line utility
-├── Procfile      Gunicorn process definition
-└── requirements.txt
+├── pyproject.toml  Project metadata and dependencies
+└── uv.lock       Locked dependency versions
 ```
 
 ## Requirements
 
-- Python 3.10 or later is recommended.
+- Python 3.14 (see `.python-version`) and [uv](https://docs.astral.sh/uv/).
 - PostgreSQL is required for normal development and production use because the application uses PostgreSQL full-text search features.
 - Redis is required by the configured cache backend.
 - Docker and Docker Compose are optional but provide a convenient local PostgreSQL and Adminer setup.
@@ -93,27 +98,15 @@ git clone https://github.com/guitardave/bbcards.git
 cd bbcards
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Install dependencies
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+uv sync
 ```
 
-On Windows PowerShell:
+This creates `.venv` and installs the locked dependencies from `uv.lock`. Run commands with `uv run` (for example `uv run python manage.py runserver`) or activate the environment with `source .venv/bin/activate`.
 
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-### 3. Install dependencies
-
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 4. Start PostgreSQL locally
+### 3. Start PostgreSQL locally
 
 The repository includes a Docker Compose configuration for PostgreSQL and Adminer:
 
@@ -123,7 +116,7 @@ docker compose up -d postgres adminer
 
 The included Compose file exposes an Adminer database browser at `http://localhost:8881`. Confirm the PostgreSQL connection details in your local environment before starting Django; the application's `DATABASE_URL` must point to a reachable PostgreSQL database.
 
-### 5. Configure environment variables
+### 4. Configure environment variables
 
 Create a `.env` file in the project root or export the variables in your shell. At minimum, configure a Django secret key and database URL:
 
@@ -144,24 +137,53 @@ REDIS_PW=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_STORAGE_BUCKET_NAME=
+AWS_S3_REGION_NAME=          # optional
+AWS_S3_ENDPOINT_URL=         # optional, for S3-compatible hosts such as DO Spaces
+
+# AI image agent
+MODEL_ACCESS_KEY=            # DigitalOcean Serverless Inference model access key
+BRAVE_API_KEY=               # Brave Search API key
+DO_INFERENCE_MODEL=          # optional, default: deepseek-v4.1-flash
+DO_INFERENCE_URL=            # optional, default: https://inference.do-ai.run/v1
 ```
 
 > **Note:** The exact PostgreSQL host, port, username, password, and database name must match the database service you use. Update `DATABASE_URL` if your local PostgreSQL installation uses different values.
 
-### 6. Apply migrations and create an administrator
+### 5. Apply migrations and create an administrator
 
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 7. Run the development server
+### 6. Run the development server
 
 ```bash
 python manage.py runserver
 ```
 
 Open `http://127.0.0.1:8000/` in a browser and sign in with a user account.
+
+## AI image agent
+
+The agent in `cards/image_agent.py` finds a photo for a card. It builds a description from the card's year, set, sport, subset, number, and player, then lets the model call two tools in a loop:
+
+- `search_images` queries Brave Image Search.
+- `choose_image` picks one of the returned URLs. The image is downloaded, verified as a real JPEG/PNG/WebP/GIF (max 8 MB), and saved to `Card.card_image`.
+
+Safeguards: the model can only choose URLs that appeared in search results, and downloads are restricted to public `http(s)` hosts (no private or loopback addresses, no redirects).
+
+**From the UI:** open a card's image page and click **Find image** (or **Find a different image**, which replaces the existing image). This blocks the request for roughly 10-30 seconds.
+
+**In bulk:**
+
+```bash
+uv run python manage.py fetch_card_images [--limit 25] [--overwrite]
+```
+
+By default only cards without an image are processed; `--overwrite` also replaces existing images. Errors on individual cards are reported and skipped.
+
+Requires `MODEL_ACCESS_KEY` and `BRAVE_API_KEY`. Not every model on a DigitalOcean account is authorized for inference; if requests return `403 Forbidden`, list available models with `GET {DO_INFERENCE_URL}/models` and set `DO_INFERENCE_MODEL` to one that works. Images come from the open web, so review them before relying on them.
 
 ## API overview
 
@@ -185,11 +207,13 @@ Card creation is also available through the API. Refer to `api/serializers.py` a
 
 ## Deployment
 
-The project includes a `Procfile` for Gunicorn-based hosting:
+Dependencies are managed with uv; install them in the build step with `uv sync --frozen`. Run the app with Gunicorn:
 
-```text
-web: gunicorn bbcards.wsgi
+```bash
+uv run gunicorn bbcards.wsgi
 ```
+
+There is no `Procfile`, so configure this as the run command on your hosting platform.
 
 Before deploying, configure production values for at least:
 
@@ -197,7 +221,8 @@ Before deploying, configure production values for at least:
 - `DJANGO_ALLOWED_HOSTS`
 - `DATABASE_URL`
 - Redis connection variables
-- AWS credentials and bucket name if S3 storage is used
+- AWS credentials and bucket name. These are required in production: without them uploads fall back to local disk, which is ephemeral on most platforms and is wiped on each deploy
+- `MODEL_ACCESS_KEY` and `BRAVE_API_KEY` if the image agent is used
 
 Review Django's deployment checklist before running the application in production. In particular, do not use development `DEBUG` settings or permissive CORS configuration for a public production deployment without reviewing the security implications.
 
@@ -219,7 +244,7 @@ A `Card` belongs to one `Player` and one `CardSet`. A `CardSet` records the year
 
 - Database-backed full-text search relies on PostgreSQL features and should be tested against PostgreSQL rather than SQLite.
 - HTMX endpoints are used for asynchronous create, update, delete, and form-refresh interactions.
-- Uploaded files are configured through Django's storage settings; local development uses filesystem storage by default, while AWS S3 settings are available for deployments that need object storage.
+- Uploaded files use Django's `STORAGES` setting. When `AWS_STORAGE_BUCKET_NAME` and AWS credentials are set, media is stored in S3 under the `media/` prefix and served from the bucket's URL (the prefix must be publicly readable). Otherwise, media is stored in the local `media/` directory.
 - Keep credentials, secret keys, and production connection strings out of source control.
 
 ## License
