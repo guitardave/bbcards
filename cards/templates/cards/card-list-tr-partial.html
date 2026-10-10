@@ -16,8 +16,8 @@
         <span class="sport-badge sport-badge-baseball ms-1">{{ card.card_set_id.sport }}</span>
     {% endif %}
 </td>
-<td class="d-none d-md-table-cell col-sm-3 text-muted">{% if card.card_subset %}<span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ card.card_subset }}</span>{% else %}&mdash;{% endif %}</td>
-<td class="col-sm-1 text-end font-athletic fs-6 text-primary">#{{ card.card_num }}</td>
+<td class="d-none d-md-table-cell col-sm-3 text-muted">{% if card.card_subset %}<span class="badge bg-info text-dark">{{ card.card_subset }}</span>{% else %}&mdash;{% endif %}</td>
+<td class="col-sm-1 text-end"><span class="card-num-badge">#{{ card.card_num }}</span></td>
 {% if user.is_authenticated %}
     <td class="col-sm-2 text-nowrap">
         {% if card.card_image %}

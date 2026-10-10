@@ -578,25 +578,57 @@ a:hover {
 }
 
 .sport-badge-baseball {
-    background: rgba(220, 38, 38, 0.1);
-    color: var(--sport-crimson);
-    border: 1px solid rgba(220, 38, 38, 0.25);
+    background: #ef4444;
+    color: #fff;
+    border: 1px solid #f87171;
 }
 
 .sport-badge-football {
-    background: rgba(245, 158, 11, 0.1);
-    color: #b45309;
-    border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-[data-bs-theme="dark"] .sport-badge-football {
-    color: var(--sport-gold);
+    background: #fbbf24;
+    color: #1f1300;
+    border: 1px solid #fcd34d;
 }
 
 .sport-badge-basketball {
-    background: rgba(234, 88, 12, 0.1);
-    color: var(--sport-court-orange);
-    border: 1px solid rgba(234, 88, 12, 0.25);
+    background: #f97316;
+    color: #fff;
+    border: 1px solid #fb923c;
+}
+
+/* Card number badge */
+.card-num-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    background: #0ea5e9;
+    color: #fff;
+    border: 1px solid #38bdf8;
+    font-family: 'OldSport02Athletic', 'Barlow Condensed', 'Oswald', sans-serif;
+    font-size: 13.5px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+/* Card list: fit the pane without horizontal scroll */
+#cards-table {
+    overflow-x: hidden;
+}
+
+#cards-table .table thead th {
+    white-space: normal;
+    padding: 0.75rem 0.5rem;
+    font-size: 14px;
+}
+
+#cards-table .table td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    overflow-wrap: anywhere;
+    font-size: 0.9rem;
+}
+
+#cards-table .sport-badge {
+    font-size: 10.5px;
 }
 
 /* Action Icons & Buttons */
