@@ -106,6 +106,12 @@ class Card(models.Model):
     condition = models.CharField(max_length=100, default=None, null=True, blank=True, choices=Condition.choices)
     graded = models.BooleanField(default=False, null=True)
     search_vector = SearchVectorField(null=True)
+    price_low = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_high = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_estimate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_source = models.URLField(max_length=500, null=True, blank=True)
+    price_notes = models.CharField(max_length=300, null=True, blank=True)
+    price_checked_at = models.DateTimeField(null=True, blank=True)
 
     objects = CardSearchMgr()
     # objects = models.Manager()

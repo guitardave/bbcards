@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Price Manager" "cards:price-manager" %}
+{% endblock breadcrumbs %}
+{% block content %}
+    <div class="container">
+        <div class="mb-3"><small class="text-muted">{% render_breadcrumbs %}</small></div>
+        <div class="card" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <div class="card-header bg-info-subtle">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <h1><i class="fa-solid fa-tags me-2"></i>Price Manager</h1>
+                        <small class="text-muted">{{ card_count }} card{{ card_count|pluralize }} {% if show == 'unpriced' %}never priced{% else %}in the collection{% endif %}. Prices are AI estimates from web search; verify before buying or selling.</small>
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                        <button type="button" id="price-all" class="btn btn-sport-save btn-sm me-2">
+                            <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Get prices for this page
+                        </button>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filter">
+                            <a class="btn btn-outline-secondary {% if show == 'all' %}active{% endif %}" href="?show=all">All cards</a>
+                            <a class="btn btn-outline-secondary {% if show == 'unpriced' %}active{% endif %}" href="?show=unpriced">Never priced</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Year</th>
+                                <th>Set</th>
+                                <th>Card Num</th>
+                                <th>Price (low &ndash; high)</th>
+                                <th>Checked</th>
+                                <th>Lookup</th>
+                            </tr>
+                        </thead>
+                        <tbody id="price-rows">
+                            {% for card in rs.object_list %}
+                                {% include 'cards/price-manager-row.html' %}
+                            {% empty %}
+                                <tr><td colspan="7" class="text-center text-muted py-4">No cards to show.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if n_pages > 1 %}
+                <div class="card-footer text-center bg-info-subtle">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        {% if rs.has_previous %}
+                            <a class="action-btn" href="?show={{ show }}&page={{ rs.previous_page_number }}" title="Previous page"><i class="fa-solid fa-angle-left"></i></a>
+                        {% endif %}
+                        <span class="badge bg-secondary px-2 py-1">Page {{ rs.number }} of {{ n_pages }}</span>
+                        {% if rs.has_next %}
+                            <a class="action-btn" href="?show={{ show }}&page={{ rs.next_page_number }}" title="Next page"><i class="fa-solid fa-angle-right"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        // Run the per-row lookups one at a time so we don't hammer the search/LLM APIs.
+        document.getElementById('price-all').addEventListener('click', async function () {
+            this.disabled = true;
+            const ids = [...document.querySelectorAll('#price-rows tr[id^="pm-"]')].map(tr => tr.id);
+            for (const id of ids) {
+                const btn = document.querySelector('#' + id + ' .price-check-btn');
+                if (!btn) continue;
+                const done = new Promise(res => btn.addEventListener('htmx:afterRequest', res, {once: true}));
+                htmx.trigger(btn, 'click');
+                await done;
+            }
+            this.disabled = false;
+        });
+    </script>
+{% endblock %}

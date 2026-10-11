@@ -26,6 +26,7 @@ from django.contrib import messages
 from players.models import Player
 from .forms import CardSetForm, CardUpdateForm, CardCreateForm, SearchForm
 from .image_agent import find_image_for_card
+from .price_agent import find_price_for_card
 from .models import Card, CardSet, CardListExport
 
 logger = logging.getLogger(__name__)
@@ -440,6 +441,38 @@ def image_manager_find(request, slug: str):
         logger.exception('Image agent failed for card %s', card.pk)
         status, error = 'error', 'Search failed. Please try again.'
     return render(request, 'cards/image-manager-row.html', {'card': card, 'status': status, 'error': error})
+
+
+@login_required(login_url='/users/')
+def price_manager(request):
+    show = request.GET.get('show', 'all')
+    cards = Card.list_all.select_related('player_id', 'card_set_id')
+    if show == 'unpriced':
+        cards = cards.filter(price_checked_at__isnull=True)
+    else:
+        show = 'all'
+    card_count, rs, n_pages = card_list_pagination(request, cards, settings.DEFAULT_LIMIT)
+    return render(request, 'cards/price-manager.html', {
+        'title': 'Price Manager',
+        'rs': rs,
+        'show': show,
+        'card_count': card_count,
+        'n_pages': n_pages,
+    })
+
+
+@login_required(login_url='/users/')
+@require_POST
+def price_manager_check(request, slug: str):
+    """Run the price agent for one card and return the refreshed table row (HTMX)."""
+    card = get_object_or_404(Card.objects.select_related('player_id', 'card_set_id'), slug=slug)
+    status, error = 'none', ''
+    try:
+        status = 'found' if find_price_for_card(card) else 'none'
+    except Exception:
+        logger.exception('Price agent failed for card %s', card.pk)
+        status, error = 'error', 'Price lookup failed. Please try again.'
+    return render(request, 'cards/price-manager-row.html', {'card': card, 'status': status, 'error': error})
 
 
 @login_required(login_url='/users/')

@@ -130,14 +130,14 @@ def download_image(url: str) -> tuple[bytes, str]:
     return data.getvalue(), 'jpg' if fmt == 'jpeg' else fmt
 
 
-def _chat(messages: list[dict]) -> dict:
+def _chat(messages: list[dict], tools: list[dict] | None = None) -> dict:
     key = getattr(settings, 'MODEL_ACCESS_KEY', None)
     if not key:
         raise ImageAgentError('MODEL_ACCESS_KEY is not set')
     resp = requests.post(
         f'{settings.DO_INFERENCE_URL}/chat/completions',
         headers={'Authorization': f'Bearer {key}'},
-        json={'model': settings.DO_INFERENCE_MODEL, 'messages': messages, 'tools': TOOLS, 'temperature': 0},
+        json={'model': settings.DO_INFERENCE_MODEL, 'messages': messages, 'tools': tools or TOOLS, 'temperature': 0},
         timeout=60,
     )
     resp.raise_for_status()

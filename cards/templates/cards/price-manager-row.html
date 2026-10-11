@@ -1,0 +1,41 @@
+<tr id="pm-{{ card.id }}">
+    <td class="fw-bold">{{ card.player_id.player_fname }} {{ card.player_id.player_lname }}</td>
+    <td class="font-athletic">{{ card.card_set_id.year }}</td>
+    <td>{{ card.card_set_id.card_set_name }}{% if card.card_subset %} <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ card.card_subset }}</span>{% endif %}</td>
+    <td class="font-athletic text-primary">#{{ card.card_num }}</td>
+    <td class="text-nowrap">
+        {% if card.price_estimate %}
+            <span class="fw-bold text-success">${{ card.price_estimate }}</span>
+            <small class="text-muted">(${{ card.price_low }} &ndash; ${{ card.price_high }})</small>
+        {% else %}
+            <span class="text-muted">&mdash;</span>
+        {% endif %}
+    </td>
+    <td class="small">
+        {% if card.price_checked_at %}
+            {{ card.price_checked_at|date:"M j, Y" }}
+            {% if card.price_source %}<a href="{{ card.price_source }}" target="_blank" rel="noopener noreferrer nofollow" title="{{ card.price_notes }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>{% endif %}
+        {% endif %}
+    </td>
+    <td class="text-nowrap">
+        <button type="button" class="btn btn-sport-save btn-sm price-check-btn"
+            hx-post="{% url 'cards:price-manager-check' card.slug %}"
+            hx-target="#pm-{{ card.id }}"
+            hx-swap="outerHTML"
+            hx-disabled-elt="this"
+            hx-indicator="#pm-spin-{{ card.id }}"
+            title="Look up the current market price of this card">
+            <i class="fa-solid fa-magnifying-glass-dollar me-1"></i>{% if card.price_checked_at %}Refresh{% else %}Get price{% endif %}
+        </button>
+        <span id="pm-spin-{{ card.id }}" class="htmx-indicator ms-2 text-muted small">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching&hellip;
+        </span>
+        {% if status == 'found' %}
+            <small class="text-success fw-bold ms-2"><i class="fa-solid fa-check"></i> Price saved</small>
+        {% elif status == 'none' %}
+            <small class="text-warning fw-bold ms-2"><i class="fa-solid fa-circle-question"></i> No credible price found</small>
+        {% elif status == 'error' %}
+            <small class="text-danger fw-bold ms-2"><i class="fa-solid fa-triangle-exclamation"></i> {{ error }}</small>
+        {% endif %}
+    </td>
+</tr>
