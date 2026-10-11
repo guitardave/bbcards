@@ -19,11 +19,23 @@
                             <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Get prices for this page
                         </button>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Filter">
-                            <a class="btn btn-outline-secondary {% if show == 'all' %}active{% endif %}" href="?show=all">All cards</a>
-                            <a class="btn btn-outline-secondary {% if show == 'unpriced' %}active{% endif %}" href="?show=unpriced">Never priced</a>
+                            <a class="btn btn-outline-secondary {% if show == 'all' %}active{% endif %}" href="?show=all&q={{ q|urlencode }}">All cards</a>
+                            <a class="btn btn-outline-secondary {% if show == 'unpriced' %}active{% endif %}" href="?show=unpriced&q={{ q|urlencode }}">Never priced</a>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="card-body border-bottom py-2">
+                <form method="get" class="row g-2 align-items-center">
+                    <input type="hidden" name="show" value="{{ show }}">
+                    <div class="col">
+                        <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Filter by player, set, year, subset or card # (e.g. 1989 donruss griffey)" aria-label="Filter cards">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-sport-save btn-sm"><i class="fa-solid fa-filter me-1"></i>Filter</button>
+                        {% if q %}<a class="btn btn-outline-secondary btn-sm" href="?show={{ show }}">Clear</a>{% endif %}
+                    </div>
+                </form>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -43,7 +55,7 @@
                             {% for card in rs.object_list %}
                                 {% include 'cards/price-manager-row.html' %}
                             {% empty %}
-                                <tr><td colspan="7" class="text-center text-muted py-4">No cards to show.</td></tr>
+                                <tr><td colspan="7" class="text-center text-muted py-4">{% if q %}No cards match "{{ q }}".{% else %}No cards to show.{% endif %}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -53,11 +65,11 @@
                 <div class="card-footer text-center bg-info-subtle">
                     <div class="d-flex align-items-center justify-content-center gap-2">
                         {% if rs.has_previous %}
-                            <a class="action-btn" href="?show={{ show }}&page={{ rs.previous_page_number }}" title="Previous page"><i class="fa-solid fa-angle-left"></i></a>
+                            <a class="action-btn" href="?show={{ show }}&q={{ q|urlencode }}&page={{ rs.previous_page_number }}" title="Previous page"><i class="fa-solid fa-angle-left"></i></a>
                         {% endif %}
                         <span class="badge bg-secondary px-2 py-1">Page {{ rs.number }} of {{ n_pages }}</span>
                         {% if rs.has_next %}
-                            <a class="action-btn" href="?show={{ show }}&page={{ rs.next_page_number }}" title="Next page"><i class="fa-solid fa-angle-right"></i></a>
+                            <a class="action-btn" href="?show={{ show }}&q={{ q|urlencode }}&page={{ rs.next_page_number }}" title="Next page"><i class="fa-solid fa-angle-right"></i></a>
                         {% endif %}
                     </div>
                 </div>

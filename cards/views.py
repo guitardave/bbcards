@@ -411,6 +411,20 @@ def card_image(request, slug: str):
 IMAGE_MANAGER_SHOW = ('missing', 'all')
 
 
+def filter_cards_by_text(cards: QuerySet, q: str) -> QuerySet:
+    """Every whitespace-separated term must match player, set, year, subset or card number."""
+    for term in q.split():
+        cond = (
+            Q(player_id__player_fname__icontains=term) | Q(player_id__player_lname__icontains=term)
+            | Q(card_set_id__card_set_name__icontains=term) | Q(card_subset__icontains=term)
+            | Q(card_num__iexact=term.lstrip('#'))
+        )
+        if term.isdigit():
+            cond |= Q(card_set_id__year=int(term))
+        cards = cards.filter(cond)
+    return cards
+
+
 @login_required(login_url='/users/')
 def image_manager(request):
     show = request.GET.get('show', 'missing')
@@ -419,11 +433,14 @@ def image_manager(request):
     cards = Card.list_all.select_related('player_id', 'card_set_id')
     if show == 'missing':
         cards = cards.filter(Q(card_image='') | Q(card_image__isnull=True))
+    q = request.GET.get('q', '').strip()[:100]
+    cards = filter_cards_by_text(cards, q)
     card_count, rs, n_pages = card_list_pagination(request, cards, settings.DEFAULT_LIMIT)
     return render(request, 'cards/image-manager.html', {
         'title': 'Image Manager',
         'rs': rs,
         'show': show,
+        'q': q,
         'card_count': card_count,
         'n_pages': n_pages,
     })
@@ -451,11 +468,14 @@ def price_manager(request):
         cards = cards.filter(price_checked_at__isnull=True)
     else:
         show = 'all'
+    q = request.GET.get('q', '').strip()[:100]
+    cards = filter_cards_by_text(cards, q)
     card_count, rs, n_pages = card_list_pagination(request, cards, settings.DEFAULT_LIMIT)
     return render(request, 'cards/price-manager.html', {
         'title': 'Price Manager',
         'rs': rs,
         'show': show,
+        'q': q,
         'card_count': card_count,
         'n_pages': n_pages,
     })
